@@ -29,7 +29,7 @@ python -m pytest -q
 
 ## 静态数据
 
-所有文件位于网站的 `data/` 下，时间使用 UTC。页面仅提供数据链接，预报交互界面尚未实现。
+所有文件位于网站的 `data/` 下，时间使用 UTC。基础前端提供 WGS84 校区优选点示意图、事件表、详情、时区切换、筛选及 CSV / JSON 下载。完整可见范围尚未导出，不画推测覆盖区。地图不使用第三方瓦片或坐标偏移，不需要地图 API 密钥。
 
 | 文件 | 内容 |
 | --- | --- |
@@ -75,3 +75,17 @@ SGP4 传播轨道，DE421 计算日月位置。搜索采用 60 秒有限轨迹�
 - [社区备用镜像](https://github.com/satvisorcom/satvisor-data)
 - [Open-Meteo](https://open-meteo.com/)：免费接口用于非商业用途，天气数据按 CC BY 4.0 署名
 - [JPL 星历](https://ssd.jpl.nasa.gov/planets/eph_export.html)
+
+## 基础前端
+
+`deploy/` 为无框架、无外部运行依赖的 HTML/CSS/ES modules。界面读取并核对 manifest 中的事件和校区文件 SHA256；发布切换导致不一致时重试一次，仍失败则明确报错。数据缺失、历史数据、天气不可用及未知尺寸均单独标注。
+
+本地预览（先生成或下载 `dist/data`）：
+
+```bash
+cp deploy/*.html deploy/*.css deploy/*.mjs dist/
+python -m http.server 8765 --directory dist --bind 127.0.0.1
+node --test tests/frontend.test.mjs
+```
+
+访问 `http://localhost:8765`。无需 npm 安装；前端数据处理测试使用 Node.js 自带测试工具，Actions runner 已提供 Node。视觉规则和科学字段定义见网站 `reading.html`。不提供后台提醒、轨道误差带、全覆盖可见区域或用户位置处的重算。

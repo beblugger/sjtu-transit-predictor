@@ -60,6 +60,8 @@ jobs:
           echo "a20a7139da04cbc462454634918e9a9ca69127044e2cc9d4f9c16e238d2deedc  $TRANSIT_EPHEMERIS_PATH" | sha256sum --check
       - name: Test backend
         run: python -m pytest -q
+      - name: Test frontend data handling
+        run: node --test tests/frontend.test.mjs
       - name: Compute next 96 hours
         run: python -m app.export --database .state/transit.db --output dist/data --hours 96
       - name: Save durable inputs (including failed request attempts)
@@ -87,7 +89,7 @@ jobs:
         run: python scripts/validate_export.py --data dist/data
       - name: Prepare static data site
         run: |
-          cp deploy/index.html dist/index.html
+          cp deploy/*.html deploy/*.css deploy/*.mjs dist/
           touch dist/.nojekyll
       - name: Save calculation cache
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4

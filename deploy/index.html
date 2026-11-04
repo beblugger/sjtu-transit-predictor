@@ -1,26 +1,106 @@
 <!doctype html>
 <html lang="zh-CN">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>交大日月凌星预报数据</title>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>交大日月凌星预报</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.mjs"></script>
+</head>
 <body>
-<h1>交大日月凌星预报后端</h1>
-<p>上海交通大学闵行校区，未来 96 小时的太阳、月球凌星几何预报。每两小时尝试更新。</p>
-<ul>
-<li><a href="data/manifest.json">数据版本、更新时间与校验值</a></li>
-<li><a href="data/events.json">凌星事件</a></li>
-<li><a href="data/orbits.json">完整轨道目录（OMM）</a></li>
-<li><a href="data/orbits.tle">传统 TLE 子集</a></li>
-<li><a href="data/weather.json">天气缓存</a></li>
-<li><a href="data/campus.geojson">校区范围</a></li>
-</ul>
-<p>事件未按天气或卫星地影排除。轨道历元与外推时长随事件提供；数值精度不代表真实轨道预报精度。</p>
-<p>数据来源：<a href="https://celestrak.org/">CelesTrak</a>、
-<a href="https://github.com/satvisorcom/satvisor-data">社区备用镜像</a>、
-<a href="https://open-meteo.com/">Open-Meteo</a>（天气数据
-<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>）、
-<a href="https://ssd.jpl.nasa.gov/planets/eph_export.html">JPL DE421</a>。</p>
-<p><a href="https://github.com/beblugger/sjtu-transit-predictor/actions">构建状态</a> ·
-<a href="https://github.com/beblugger/sjtu-transit-predictor">源代码</a></p>
+<header>
+  <h1>交大日月凌星预报</h1>
+  <p>上海交通大学闵行校区 · 未来 96 小时 · 太阳 / 月球</p>
+  <p id="load-status" role="status" aria-live="polite">正在读取并校验数据……</p>
+  <button id="reload" type="button">重新读取数据</button>
+</header>
+<main id="application" hidden>
+  <section aria-labelledby="metadata-title">
+    <h2 id="metadata-title">数据与时效</h2>
+    <dl id="metadata" class="metadata"></dl>
+    <p id="freshness" role="status"></p>
+    <ul id="warnings"></ul>
+    <p>预报时间对应导出的<strong>优选观测点</strong>，不是整个校区的统一发生时间。轨道历元超过六小时仍保留；数值计算精度不代表真实预报误差。</p>
+  </section>
+  <form id="filters" aria-labelledby="filter-title">
+    <h2 id="filter-title">筛选</h2>
+    <fieldset id="filter-controls" disabled>
+      <legend>事件条件</legend>
+      <label>时间显示 <select id="timezone"><option value="Asia/Shanghai">北京时间 UTC+08:00</option><option value="UTC">UTC</option></select></label>
+      <label>目标 <select id="target"><option value="all">太阳和月球</option><option value="sun">太阳</option><option value="moon">月球</option></select></label>
+      <label>搜索卫星名 / NORAD 编号 <input id="search" type="search" autocomplete="off"></label>
+      <label>起始时间 <input id="from" type="datetime-local" step="1" required></label>
+      <label>结束时间 <input id="to" type="datetime-local" step="1" required></label>
+      <label>最低高度角 (°) <input id="min-altitude" type="number" min="0" max="90" step="1" value="15"></label>
+      <label>最小卫星角直径 (″) <input id="min-diameter" type="number" min="0" step="0.1" value="0"></label>
+      <label><input id="keep-unknown" type="checkbox" checked> 保留尺寸未知的事件</label>
+      <label>天气条件 <select id="weather"><option value="all">全部，包括天气不可用</option><option value="announced">仅模型评分达标</option><option value="unavailable">仅天气不可用</option></select></label>
+      <label>排序 <select id="sort"><option value="time">时间从近到远</option><option value="altitude">高度角从高到低</option><option value="diameter">角直径从大到小</option><option value="distance">距参考点从近到远</option></select></label>
+      <div class="actions">
+        <button type="button" data-hours="6">未来 6 小时</button><button type="button" data-hours="24">未来 24 小时</button><button type="button" data-hours="96">未来 96 小时</button>
+        <button id="all-coverage" type="button">全部数据覆盖时段</button><button id="reset" type="button">恢复默认筛选</button>
+      </div>
+    </fieldset>
+    <p id="filter-error" role="alert"></p>
+    <p>默认隐藏高度角低于 15° 的事件，可改为 0°。高度角相对几何地平线，不代表无遮挡。尺寸未知不会按 0″ 处理。天气评分是模型指标，不是观测成功概率。</p>
+  </form>
+  <section aria-labelledby="location-title">
+    <h2 id="location-title">参考位置（可选）</h2>
+    <form id="location-form">
+      <label>纬度 (°N, WGS84) <input id="latitude" type="number" min="-90" max="90" step="any" value="31.02807" required></label>
+      <label>经度 (°E, WGS84) <input id="longitude" type="number" min="-180" max="180" step="any" value="121.42839" required></label>
+      <button type="submit">设置参考位置</button><button id="locate" type="button">使用设备定位</button><button id="clear-location" type="button">清除参考位置</button>
+    </form>
+    <p id="location-status" role="status">未设置参考位置。位置只用于本机计算距优选点的距离，不会上传。</p>
+  </section>
+  <section aria-labelledby="map-title">
+    <h2 id="map-title">校区范围与优选观测点</h2>
+    <p><strong>这里显示的是优选点，不是完整可见区域、凌星中心线或卫星地面轨迹。</strong> 后端尚未输出完整覆盖范围。本版使用 WGS84 校区范围示意图，无高德或交大瓦片底图。</p>
+    <p>与当前列表页同步；小屏可横向滚动。只标注选中事件，避免遮挡。填充越浅表示事件越远；边线始终保留。时间深浅不表示预报可靠性。</p>
+    <div class="legend" aria-label="地图图例">
+      <span><svg width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="#9c4100" stroke="#9c4100"/></svg>太阳：圆形</span>
+      <span><svg width="20" height="20" aria-hidden="true"><path d="M10 2L18 10L10 18L2 10Z" fill="#0072b2" stroke="#0072b2"/></svg>月球：菱形</span>
+      <span>填充深浅：</span>
+      <span><svg width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="#0072b2" stroke="#0072b2"/></svg>≤6 h</span>
+      <span><svg width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="#0072b2" fill-opacity=".65" stroke="#0072b2"/></svg>≤24 h</span>
+      <span><svg width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="#0072b2" fill-opacity=".4" stroke="#0072b2"/></svg>≤48 h</span>
+      <span><svg width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="#0072b2" fill-opacity=".2" stroke="#0072b2"/></svg>&gt;48 h</span><span>十字：参考位置</span>
+    </div>
+    <div class="map-scroll" tabindex="0" aria-label="可横向滚动的校区范围图"><svg id="map" viewBox="0 0 960 560" role="group" aria-labelledby="map-description"><title id="map-description">WGS84 校区范围和当前列表页的优选观测点</title></svg></div>
+    <p id="map-status"></p>
+    <p>坐标计算和距离使用 WGS84。GCJ-02 高德坐标不能直接填入。校区边界来自交大电子地图，未做独立测绘精度核验；示意图比例尺用于读图。</p>
+  </section>
+  <section aria-labelledby="events-title">
+    <h2 id="events-title">事件列表</h2>
+    <p id="result-count" role="status" aria-live="polite"></p>
+    <div class="actions"><button id="previous" type="button">上一页</button><span id="page-status"></span><button id="next" type="button">下一页</button><button id="download-csv" type="button">下载筛选结果 CSV（UTC）</button></div>
+    <div class="table-scroll" tabindex="0" aria-label="可横向滚动的凌星事件表">
+      <table>
+        <caption>每行时间、高度和距离均对应该事件的优选点。点击“详情”与地图联动。每页 50 条。</caption>
+        <thead><tr><th scope="col">卫星 / NORAD</th><th scope="col">目标</th><th scope="col" id="time-heading">最小角距时刻</th><th scope="col" class="number">高度 (°)</th><th scope="col" class="number">持续 (s)</th><th scope="col" class="number">角直径 (″)</th><th scope="col" class="number">斜距 (km)</th><th scope="col">天气</th><th scope="col" class="number">距参考点 (m)</th><th scope="col">选择</th></tr></thead>
+        <tbody id="events"></tbody>
+      </table>
+    </div>
+  </section>
+  <section id="detail" aria-labelledby="detail-title" tabindex="-1">
+    <h2 id="detail-title">事件详情</h2><p id="detail-empty">从表格或地图选择事件。</p>
+    <div id="detail-content" hidden>
+      <p id="detail-name"></p><dl id="detail-fields" class="metadata"></dl>
+      <h3>天气证据</h3><dl id="weather-fields" class="metadata"></dl>
+      <h3>数据提示</h3><ul id="detail-reasons"></ul>
+      <div class="actions"><button id="share" type="button">复制事件链接</button><button id="download-event" type="button">下载该事件 JSON</button></div>
+      <p id="share-status" role="status"></p><details><summary>原始事件 JSON（原始时间为 UTC）</summary><pre id="raw-event"></pre></details>
+    </div>
+  </section>
+</main>
+<footer>
+  <h2>读图与原始数据</h2>
+  <p><a href="reading.html">字段定义、视觉编码与标准依据</a> · <a href="data/manifest.json">版本清单</a> · <a href="data/events.json">事件 JSON</a> · <a href="data/orbits.json">完整 OMM 轨道</a> · <a href="data/orbits.tle">传统 TLE 子集</a> · <a href="data/weather.json">天气缓存</a> · <a href="data/campus.geojson">校区 GeoJSON</a></p>
+  <p>来源：<a href="https://celestrak.org/">CelesTrak</a>、<a href="https://github.com/satvisorcom/satvisor-data">社区备用镜像</a>、<a href="https://open-meteo.com/">Open-Meteo</a>（<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>）、<a href="https://ssd.jpl.nasa.gov/planets/eph_export.html">JPL DE421</a>。</p>
+  <p><a href="https://github.com/beblugger/sjtu-transit-predictor/actions">构建状态</a> · <a href="https://github.com/beblugger/sjtu-transit-predictor">源代码</a> · <a href="https://map.sjtu.edu.cn/">交大电子地图</a></p>
+</footer>
+<noscript><p>交互界面需要 JavaScript；仍可通过页尾链接下载全部科学数据。</p></noscript>
 </body>
 </html>
