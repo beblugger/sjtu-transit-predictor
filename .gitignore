@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.env
+*.db
+*.db-shm
+*.db-wal
+.playwright-mcp/
+htmlcov/
+.coverage
+dist/
+.state/

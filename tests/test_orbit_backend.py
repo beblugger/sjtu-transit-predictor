@@ -1,0 +1,243 @@
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+import asyncio
+import json
+
+import httpx
+import numpy as np
+import pytest
+from skyfield.api import EarthSatellite, wgs84
+
+from app.astronomy import CelestialCalculator
+from app.config import Settings
+from app.geo import Geodetic, angular_separation_arcsec
+from app.providers.celestrak import CelestrakProvider, CatalogUnchanged, TLEEntry, parse_omm_elements
+from app.services import build_services
+from app.store import DatabaseStore
+from app.export import export_snapshot
+from app.main import create_app
+from app.models import TransitEvent, Target
+from app.satellites import SatelliteService
+from fastapi.testclient import TestClient
+
+
+LINE1 = "1 25544U 98067A   20344.91667824  .00001264  00000-0  29621-4 0  9993"
+LINE2 = "2 25544  51.6431 211.2001 0001731  65.5605  39.9047 15.49399730256344"
+EPOCH = datetime(2020, 12, 9, 22, 0, 1, tzinfo=timezone.utc)
+
+
+def entry():
+    return TLEEntry("ISS", 25544, LINE1, LINE2, EPOCH)
+
+
+def test_position_matches_independent_skyfield_topocentric(tmp_path):
+    calculator = CelestialCalculator(tmp_path / "missing.bsp")
+    satrec = entry().to_satrec()
+    observer = Geodetic(31.02807, 121.42839)
+    satellite = EarthSatellite.from_satrec(satrec, calculator.ts)
+    site = wgs84.latlon(observer.latitude_deg, observer.longitude_deg)
+    times = [EPOCH + timedelta(minutes=offset) for offset in (0, 10, 30, 60)]
+    vectors, ranges = calculator.satellite_vectors(satrec, observer, times)
+    for index, value in enumerate(times):
+        expected_alt, expected_az, expected_range = (satellite - site).at(calculator.time(value)).altaz()
+        actual = calculator.satellite_position(satrec, observer, value)
+        assert actual.altitude_deg == pytest.approx(expected_alt.degrees, abs=0.001)
+        assert actual.azimuth_deg == pytest.approx(expected_az.degrees, abs=0.001)
+        assert actual.range_m == pytest.approx(expected_range.m, abs=10)
+        assert ranges[index] == pytest.approx(actual.range_m, abs=1e-5)
+        assert vectors[index] == pytest.approx(actual.vector_enu, abs=1e-10)
+
+
+def test_omm_six_digit_id_and_database_roundtrip(tmp_path):
+    fields = entry().as_omm()
+    fields["NORAD_CAT_ID"] = 100001
+    fields["EPOCH"] = "2026-11-04T01:02:03Z"
+    records = parse_omm_elements([fields])
+    assert records[0].to_satrec().satnum == 100001
+    store = DatabaseStore(tmp_path / "cache.db")
+    store.save_tles(records, datetime(2026, 11, 4, tzinfo=timezone.utc))
+    restored = store.load_tles(0, datetime(2027, 1, 1, tzinfo=timezone.utc))
+    assert restored[0].as_omm() == records[0].as_omm()
+    assert restored[0].to_satrec().satnum == 100001
+    store.close()
+
+
+@pytest.mark.parametrize("payload", [[], {}, [{"NORAD_CAT_ID": 1}], "<html>error</html>"])
+def test_bad_catalog_does_not_silently_replace_good_data(payload):
+    with pytest.raises((ValueError, KeyError)):
+        parse_omm_elements(payload)
+
+
+def test_primary_mirror_cache_and_unchanged_provenance(tmp_path):
+    settings = Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp")
+    runtime = build_services(settings)
+    calls = []
+    def handler(request):
+        calls.append(request.url.host)
+        if request.url.host == "primary.test":
+            return httpx.Response(503, text="down")
+        return httpx.Response(200, json=[entry().as_omm()])
+    transport = httpx.MockTransport(handler)
+    runtime.satellites.provider = CelestrakProvider("https://primary.test", transport=transport)
+    runtime.satellites.fallback_provider = CelestrakProvider("https://mirror.test", transport=transport)
+    asyncio.run(runtime.satellites.refresh_catalog())
+    assert calls == ["primary.test", "mirror.test"]
+    assert runtime.satellites.catalog_source == "community-mirror"
+    first_download = runtime.satellites.updated_at
+    asyncio.run(runtime.satellites.refresh_catalog())
+    assert len(calls) == 2  # persisted refresh interval, no repeated requests
+    runtime.store.close()
+    runtime = build_services(settings)
+    assert runtime.satellites.updated_at == first_download
+    runtime.store.set_cache("orbit_primary_attempt", True, datetime(2000, 1, 1, tzinfo=timezone.utc))
+    runtime.satellites.provider = CelestrakProvider("https://primary.test", transport=httpx.MockTransport(
+        lambda request: httpx.Response(403, text="GP data has not updated since your last successful download")))
+    asyncio.run(runtime.satellites.refresh_catalog())
+    assert runtime.satellites.updated_at == first_download
+    assert runtime.satellites.checked_at >= first_download
+    assert runtime.satellites.records
+    # A later outage of both sources must retain the last valid catalog.
+    runtime.store.set_cache("orbit_primary_attempt", True, datetime(2000, 1, 1, tzinfo=timezone.utc))
+    failing = httpx.MockTransport(lambda request: httpx.Response(503, text="down"))
+    runtime.satellites.provider = CelestrakProvider("https://primary.test", transport=failing)
+    runtime.satellites.fallback_provider = CelestrakProvider("https://mirror.test", transport=failing)
+    asyncio.run(runtime.satellites.refresh_catalog())
+    assert runtime.satellites.records[0].entry.norad_id == 25544
+    assert runtime.satellites.updated_at == first_download
+    assert runtime.satellites.last_error
+    runtime.store.close()
+
+
+def test_redirect_and_empty_catalog_are_errors():
+    for response in (httpx.Response(301, headers={"Location": "https://other.test"}),
+                     httpx.Response(200, text="[]")):
+        provider = CelestrakProvider("https://primary.test", transport=httpx.MockTransport(lambda request: response))
+        with pytest.raises((httpx.HTTPStatusError, ValueError)):
+            asyncio.run(provider.fetch_active())
+
+
+def test_stale_mirror_never_rolls_back_newer_cached_orbit(tmp_path):
+    runtime = build_services(Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp"))
+    fresh = entry().as_omm()
+    fresh["EPOCH"] = "2026-11-04T00:00:00.000000"
+    runtime.store.save_tles(parse_omm_elements([fresh]), EPOCH)
+    runtime.satellites._restore_cached_catalog()
+    runtime.satellites.provider = CelestrakProvider("https://primary.test", transport=httpx.MockTransport(
+        lambda request: httpx.Response(503)))
+    runtime.satellites.fallback_provider = CelestrakProvider("https://mirror.test", transport=httpx.MockTransport(
+        lambda request: httpx.Response(200, json=[entry().as_omm()])))
+    asyncio.run(runtime.satellites.refresh_catalog())
+    assert runtime.satellites.records[0].entry.epoch.year == 2026
+    assert runtime.satellites.updated_at == EPOCH
+    runtime.store.close()
+
+
+def test_old_epoch_is_not_excluded_from_geometry(tmp_path, monkeypatch):
+    runtime = build_services(Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp"))
+    runtime.store.save_tles([entry()], EPOCH)
+    runtime.satellites._restore_cached_catalog()
+    now = EPOCH + timedelta(days=3)
+    visited = []
+    def candidates(record, target, observer, times, *args):
+        visited.append(record.entry.norad_id)
+        return []
+    monkeypatch.setattr(runtime.satellites, "_candidate_windows", candidates)
+    runtime.satellites._compute_events(now, now + timedelta(minutes=1), now, runtime.satellites.records)
+    assert visited == [25544, 25544]
+    runtime.store.close()
+
+
+def test_export_96_hours_keeps_weather_unavailable_events_and_reuses_geometry(tmp_path, monkeypatch):
+    import hashlib
+    now = EPOCH.replace(hour=0, minute=0, second=0)
+    settings = Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp")
+    store = DatabaseStore(settings.database_path)
+    store.save_tles([entry()], EPOCH - timedelta(days=10))
+    store.close()
+    calls = []
+    async def fake_events(self, start, end, now=None):
+        calls.append(start)
+        value = start + timedelta(hours=1)
+        return [TransitEvent(
+            event_type="satellite", target="moon", name="ISS", identifier="25544",
+            start_time=value, minimum_time=value, end_time=value + timedelta(seconds=1),
+            duration_ms=1000, min_separation_arcsec=1, target_angular_radius_arcsec=900,
+            range_km=400, observer={"latitude":31.028, "longitude":121.428},
+            azimuth_deg=180, altitude_deg=45, target_azimuth_deg=180, target_altitude_deg=45,
+            orbit_epoch=EPOCH, confidence=0,
+            weather=self.weather.evaluate("moon", value, now).evidence)]
+    monkeypatch.setattr(SatelliteService, "events", fake_events)
+    output = tmp_path / "output"
+    first = asyncio.run(export_snapshot(settings, output, offline=True, now=now))
+    assert len(calls) == 16
+    payload = json.loads((output / "events.json").read_text())
+    assert payload["hours"] == 96
+    assert payload["announced_only"] is False
+    assert len(payload["events"]) == 16
+    assert all(event["weather"]["decision"] == "unavailable" for event in payload["events"])
+    manifest = json.loads((output / "manifest.json").read_text())
+    assert manifest["catalog_fetched_at"] == (EPOCH - timedelta(days=10)).isoformat()
+    for name, digest in manifest["files"].items():
+        assert hashlib.sha256((output / name).read_bytes()).hexdigest() == digest
+    second = asyncio.run(export_snapshot(settings, output, offline=True, now=now + timedelta(hours=1)))
+    assert second["cache_hits"] == 16
+    assert len(calls) == 17  # only the new six-hour tail needs computation
+    assert second["catalog_fetched_at"] == first["catalog_fetched_at"]
+
+
+def test_missing_catalog_preserves_previous_export(tmp_path):
+    output = tmp_path / "output"
+    output.mkdir()
+    (output / "manifest.json").write_text("previous generation")
+    settings = Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp")
+    with pytest.raises(RuntimeError, match="No usable orbit catalog"):
+        asyncio.run(export_snapshot(settings, output, offline=True))
+    assert (output / "manifest.json").read_text() == "previous generation"
+
+
+def test_orbit_api_and_96_hour_endpoint(tmp_path, monkeypatch):
+    runtime = build_services(Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp"))
+    fields = entry().as_omm()
+    fields["NORAD_CAT_ID"] = 100001
+    runtime.store.save_tles([entry(), *parse_omm_elements([fields])])
+    runtime.satellites._restore_cached_catalog()
+    async def fake_events(*args, **kwargs):
+        return []
+    monkeypatch.setattr(runtime.satellites, "events", fake_events)
+    with TestClient(create_app(runtime, start_services=False)) as client:
+        result = client.get("/api/v1/orbits")
+        assert result.status_code == 200
+        assert [row["NORAD_CAT_ID"] for row in result.json()] == [25544, 100001]
+        tle = client.get("/api/v1/orbits?format=tle")
+        assert tle.headers["X-TLE-Omitted-Count"] == "1"
+        assert len(tle.text.splitlines()) == 3
+        assert client.get("/api/v1/weather/snapshot").json()["ensemble"] is None
+        result = client.get("/api/v1/events?type=satellite&hours=96")
+        assert result.status_code == 200
+        assert result.json()["announced_only"] is False
+        assert client.get("/api/v1/events?hours=97").status_code == 422
+    runtime.store.close()
+
+
+@pytest.mark.parametrize("target", [Target.SUN, Target.MOON])
+@pytest.mark.parametrize("use_kernel", [False, True])
+def test_window_interpolation_matches_exact_topocentric_places(tmp_path, target, use_kernel):
+    path = Path("~/.cache/sjtu-transit/de421.bsp").expanduser() if use_kernel else tmp_path / "missing.bsp"
+    if use_kernel and not path.exists():
+        pytest.skip("Optional DE421 kernel is not installed")
+    runtime = build_services(Settings(database_path=tmp_path / "cache.db", ephemeris_path=path))
+    center_time = datetime(2026, 11, 5, 2, tzinfo=timezone.utc)
+    interpolate = runtime.satellites._target_interpolator(target, center_time)
+    for point in runtime.campus.grid(400)[::5]:
+        observer = Geodetic(point.latitude, point.longitude)
+        for offset in (-59.3, -21.7, 0.1, 34.9, 59.1):
+            value = center_time + timedelta(seconds=offset)
+            exact = runtime.astronomy.target_at(target.value, observer, value)
+            approximate = interpolate(observer, value)
+            separation = angular_separation_arcsec(exact.azimuth_deg, exact.altitude_deg,
+                                                  approximate.azimuth_deg, approximate.altitude_deg)
+            assert separation < 0.02
+            assert approximate.angular_radius_arcsec == pytest.approx(exact.angular_radius_arcsec, abs=0.001)
+    runtime.store.close()
+    if runtime.astronomy.eph:
+        runtime.astronomy.eph.close()

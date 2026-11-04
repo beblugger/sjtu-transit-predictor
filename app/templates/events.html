@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>闵行校区凌日月预测</title>
+  <style>
+    :root { color-scheme: light dark; --accent:#b4232c; --muted:#667085; --line:#d9dde5; --panel:#fff; --bg:#f4f6f8; }
+    @media (prefers-color-scheme: dark) { :root { --panel:#17191d; --bg:#0f1115; --line:#30343d; --muted:#98a2b3; } }
+    * { box-sizing:border-box; }
+    body { margin:0; font:15px/1.55 system-ui,-apple-system,"Segoe UI","Noto Sans SC",sans-serif; background:var(--bg); color:inherit; }
+    main { max-width:1180px; margin:0 auto; padding:32px 18px 64px; }
+    h1 { margin:0 0 4px; font-size:30px; }
+    .sub { color:var(--muted); margin-bottom:24px; }
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:18px 0; }
+    .card,.panel { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; }
+    .card strong { display:block; font-size:20px; }
+    .notice { border-left:4px solid #d99a00; padding:12px 14px; margin:10px 0; background:var(--panel); }
+    table { width:100%; border-collapse:collapse; background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+    th,td { text-align:left; padding:11px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
+    td.mono { font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .empty { padding:28px; text-align:center; color:var(--muted); background:var(--panel); border:1px dashed var(--line); border-radius:12px; }
+    .bad { color:var(--accent); font-weight:650; }
+    .good { color:#14804a; font-weight:650; }
+    .links a { color:var(--accent); }
+    .map-wrap { margin:18px 0 24px; }
+    .campus-map { width:100%; height:auto; display:block; background:#eef3f6; border-radius:12px; }
+    .campus-shape { fill:rgba(180,35,44,.12); stroke:var(--accent); stroke-width:2; }
+    .event-dot { fill:#14804a; stroke:#fff; stroke-width:2; }
+    footer { margin-top:28px; color:var(--muted); font-size:13px; }
+    @media (max-width:820px) { table { display:block; overflow-x:auto; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>飞行器凌日月预测</h1>
+  <div class="sub">
+    上海交通大学闵行校区 · 生成于 {{ generated_at_local.strftime("%Y-%m-%d %H:%M:%S") }} UTC+8
+  </div>
+
+  <section class="cards">
+    <div class="card"><span>播报事件</span><strong>{{ result.events|length }}</strong></div>
+    <div class="card"><span>天气抑制</span><strong>{{ result.suppressed_count }}</strong></div>
+    <div class="card"><span>天气</span><strong class="{{ 'good' if weather.current_condition == 'clear' else 'bad' }}">
+      {% if weather.current_condition == "clear" %}晴好
+      {% elif weather.current_condition == "rain" %}有雨
+      {% elif weather.current_condition == "overcast" %}阴
+      {% else %}未知{% endif %}
+    </strong></div>
+    <div class="card"><span>云量 / 降水</span><strong>
+      {% if weather.current_cloud_cover is not none %}
+        {{ "%.0f"|format(weather.current_cloud_cover) }}% / {{ "%.1f"|format(weather.current_precipitation or 0) }} mm
+      {% else %}未知{% endif %}
+    </strong></div>
+  </section>
+
+  {% for warning in result.warnings %}
+  <div class="notice">{{ warning }}</div>
+  {% endfor %}
+  {% if not aircraft_enabled %}
+  <div class="notice">飞机模块未启用：尚未配置获授权的 ADS-B provider。可先人工查看
+    <a href="https://flightadsb.variflight.com/#/home">FlightADSB</a>，后端不会抓取该页面。</div>
+  {% endif %}
+
+  <section class="panel map-wrap" aria-label="闵行校区观测范围">
+    <strong>闵行校区观测框</strong>
+    <span class="sub">官方校区多边形与本次事件的最佳观测点</span>
+    <svg class="campus-map" viewBox="0 0 {{ map_data.width }} {{ map_data.height }}" role="img">
+      {% for polygon in map_data.polygons %}
+      <polygon class="campus-shape" points="{{ polygon }}"></polygon>
+      {% endfor %}
+      {% for marker in map_data.markers %}
+      <circle class="event-dot" cx="{{ marker.x }}" cy="{{ marker.y }}" r="6">
+        <title>{{ marker.label }}</title>
+      </circle>
+      {% endfor %}
+    </svg>
+  </section>
+
+  {% if result.events %}
+  <table aria-label="预测事件列表">
+    <thead>
+      <tr>
+        <th>时间</th><th>类型 / 目标</th><th>高度角</th><th>角距</th>
+        <th>物体角径</th><th>持续时间</th><th>观测点</th><th>天气</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for event in result.events %}
+      <tr>
+        <td class="mono">{{ event.minimum_time.astimezone(generated_at_local.tzinfo).strftime("%m-%d %H:%M:%S.%f")[:-3] }}</td>
+        <td><strong>{{ event.name }}</strong><br>{{ event.event_type.value }} / {{ event.target.value }}</td>
+        <td class="mono">{{ "%.2f"|format(event.altitude_deg) }}°</td>
+        <td class="mono">{{ "%.1f"|format(event.min_separation_arcsec) }}″</td>
+        <td class="mono">
+          {% if event.object_angular_diameter_arcsec is not none %}
+            {{ "%.2f"|format(event.object_angular_diameter_arcsec) }}″
+            {% if event.object_angular_diameter_min_arcsec is not none %}
+              <br><span class="sub">{{ "%.2f"|format(event.object_angular_diameter_min_arcsec) }}–{{ "%.2f"|format(event.object_angular_diameter_max_arcsec) }}″</span>
+            {% endif %}
+          {% else %}尺寸未知{% endif %}
+        </td>
+        <td class="mono">{{ event.duration_ms }} ms</td>
+        <td class="mono">{{ "%.5f"|format(event.observer.latitude) }}, {{ "%.5f"|format(event.observer.longitude) }}</td>
+        <td>
+          {% if event.weather.decision.value == "announced" %}
+            <span class="good">通过</span>
+          {% else %}
+            <span class="bad">{{ event.weather.decision.value }}</span>
+          {% endif %}
+          <br>{{ "%.2f"|format(event.weather.score) }} / 门槛 {{ "%.2f"|format(event.weather.threshold) }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">当前时窗内没有通过复合判据的事件。</div>
+  {% endif %}
+
+  <footer>
+    <div class="links">
+      坐标：WGS84/CGCS2000；校区边界来源：
+      <a href="https://map.sjtu.edu.cn/">上海交通大学校园电子地图</a>。
+      天气数据：<a href="https://open-meteo.com/">Open-Meteo</a>（CC BY 4.0）。
+      ADS-B 商业接入：<a href="https://dataworks.variflight.com/products/real-time-aircraft-tracking-adsb/">VariFlight DataWorks</a>。
+    </div>
+    <div>本页面为观测规划参考，不用于飞行运行、空管或安全关键决策。</div>
+  </footer>
+</main>
+</body>
+</html>

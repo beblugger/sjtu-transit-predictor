@@ -1,0 +1,19 @@
+# Physical dimensions are used only when a documented characteristic span
+# exists. TLE and radar cross-section are deliberately not treated as size.
+satellites:
+  "25544":
+    name: International Space Station
+    characteristic_length_m: 109.0
+    width_m: 73.0
+    height_m: 20.0
+    source_url: https://www.nasa.gov/international-space-station/
+    retrieved_at: "2026-10-24"
+    confidence: high
+  "20580":
+    name: Hubble Space Telescope
+    characteristic_length_m: 13.2
+    width_m: 4.2
+    height_m: 4.2
+    source_url: https://science.nasa.gov/mission/hubble/overview/
+    retrieved_at: "2026-10-24"
+    confidence: high

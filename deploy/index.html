@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>交大日月凌星预报数据</title>
+<body>
+<h1>交大日月凌星预报后端</h1>
+<p>上海交通大学闵行校区，未来 96 小时的太阳、月球凌星几何预报。每两小时尝试更新。</p>
+<ul>
+<li><a href="data/manifest.json">数据版本、更新时间与校验值</a></li>
+<li><a href="data/events.json">凌星事件</a></li>
+<li><a href="data/orbits.json">完整轨道目录（OMM）</a></li>
+<li><a href="data/orbits.tle">传统 TLE 子集</a></li>
+<li><a href="data/weather.json">天气缓存</a></li>
+<li><a href="data/campus.geojson">校区范围</a></li>
+</ul>
+<p>事件未按天气或卫星地影排除。轨道历元与外推时长随事件提供；数值精度不代表真实轨道预报精度。</p>
+<p>数据来源：<a href="https://celestrak.org/">CelesTrak</a>、
+<a href="https://github.com/satvisorcom/satvisor-data">社区备用镜像</a>、
+<a href="https://open-meteo.com/">Open-Meteo</a>（天气数据
+<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>）、
+<a href="https://ssd.jpl.nasa.gov/planets/eph_export.html">JPL DE421</a>。</p>
+<p><a href="https://github.com/beblugger/sjtu-transit-predictor/actions">构建状态</a> ·
+<a href="https://github.com/beblugger/sjtu-transit-predictor">源代码</a></p>
+</body>
+</html>
