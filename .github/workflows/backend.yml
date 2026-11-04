@@ -65,6 +65,27 @@ jobs:
         run: python -m pytest -q
       - name: Compute next 96 hours
         run: python -m app.export --database .state/transit.db --output dist/data --hours 96
+      - name: Save durable inputs (including failed request attempts)
+        if: ${{ !cancelled() && hashFiles('.state/transit.db') != '' }}
+        shell: bash
+        run: |
+          snapshot_dir="$RUNNER_TEMP/backend-state"
+          mkdir -p "$snapshot_dir"
+          python scripts/deployment_state.py pack --snapshot "$snapshot_dir/inputs.db.gz"
+          if [[ -f dist/data/manifest.json ]]; then
+            cp dist/data/manifest.json "$snapshot_dir/manifest.json"
+          fi
+          # A dedicated root commit keeps only the latest snapshot reachable.
+          # It never rewrites main or accumulates a history of binary databases.
+          previous_sha="$(git ls-remote --heads origin state | cut -f1)"
+          git -C "$snapshot_dir" init --initial-branch=state
+          git -C "$snapshot_dir" config user.name 'github-actions[bot]'
+          git -C "$snapshot_dir" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$snapshot_dir" add .
+          git -C "$snapshot_dir" commit -m 'Update orbit and weather snapshot'
+          state_sha="$(git -C "$snapshot_dir" rev-parse HEAD)"
+          git fetch "$snapshot_dir" state
+          git push --force-with-lease="refs/heads/state:$previous_sha" origin "$state_sha:refs/heads/state"
       - name: Independently validate published geometry
         run: python scripts/validate_export.py --data dist/data
       - name: Prepare static data site
@@ -78,24 +99,6 @@ jobs:
             .state/transit.db
             /home/runner/.cache/sjtu-transit/de421.bsp
           key: backend-v1-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
-      - name: Save durable inputs
-        shell: bash
-        run: |
-          snapshot_dir="$RUNNER_TEMP/backend-state"
-          mkdir -p "$snapshot_dir"
-          python scripts/deployment_state.py pack --snapshot "$snapshot_dir/inputs.db.gz"
-          cp dist/data/manifest.json "$snapshot_dir/manifest.json"
-          # A dedicated root commit keeps only the latest snapshot reachable.
-          # It never rewrites main or accumulates a history of binary databases.
-          previous_sha="$(git ls-remote --heads origin state | cut -f1)"
-          git -C "$snapshot_dir" init --initial-branch=state
-          git -C "$snapshot_dir" config user.name 'github-actions[bot]'
-          git -C "$snapshot_dir" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git -C "$snapshot_dir" add inputs.db.gz manifest.json
-          git -C "$snapshot_dir" commit -m 'Update orbit and weather snapshot'
-          state_sha="$(git -C "$snapshot_dir" rev-parse HEAD)"
-          git fetch "$snapshot_dir" state
-          git push --force-with-lease="refs/heads/state:$previous_sha" origin "$state_sha:refs/heads/state"
       - name: Upload complete static snapshot
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:

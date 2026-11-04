@@ -29,9 +29,10 @@ class Settings(BaseSettings):
         "https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=json"
     )
     community_orbit_url: str = "https://raw.githubusercontent.com/satvisorcom/satvisor-data/master/celestrak/json/active.json"
+    celestrak_update_url: str = "https://celestrak.org/NORAD/elements/"
     celestrak_timeout_seconds: float = 20.0
     satnogs_tle_url: str = "https://db.satnogs.org/api/tle/?format=json"
-    tle_refresh_seconds: int = 7200
+    tle_refresh_seconds: int = Field(default=7200, ge=7200)
     tle_stale_seconds: int = 6 * 3600
     satellite_hours: int = Field(default=96, ge=1, le=96)
     satellite_coarse_step_seconds: float = 60.0

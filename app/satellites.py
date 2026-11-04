@@ -86,6 +86,7 @@ class SatelliteService:
         self.provider = provider or CelestrakProvider(
             settings.celestrak_active_url,
             timeout_seconds=settings.celestrak_timeout_seconds,
+            update_url=settings.celestrak_update_url,
         )
         self.fallback_provider = fallback_provider or CelestrakProvider(settings.community_orbit_url)
         self.store = store
@@ -169,6 +170,8 @@ class SatelliteService:
             if self.store is not None:
                 self.store.save_tles(entries, fetched_at=self.updated_at)
                 self.store.set_cache("orbit_source", source, self.updated_at)
+                if source == "celestrak-active" and self.provider.known_update_at is not None:
+                    self.store.set_cache("orbit_primary_update", self.provider.known_update_at.isoformat(), self.updated_at)
         except Exception as exc:
             self.last_error = str(exc)
 
@@ -215,6 +218,9 @@ class SatelliteService:
             source = self.store.get_cache("orbit_source")
             if source is not None:
                 self.catalog_source = str(source[0])
+            upstream_update = self.store.get_cache("orbit_primary_update")
+            if upstream_update is not None:
+                self.provider.known_update_at = datetime.fromisoformat(str(upstream_update[0]))
             attempt = self.store.get_cache("orbit_primary_attempt")
             self.checked_at = attempt[1] if attempt else None
             cached = self.store.get_cache("tle_fetched_at")

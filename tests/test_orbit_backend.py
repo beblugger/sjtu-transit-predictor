@@ -116,6 +116,54 @@ def test_redirect_and_empty_catalog_are_errors():
             asyncio.run(provider.fetch_active())
 
 
+def test_publication_timestamp_skips_download_until_updated(tmp_path):
+    calls = []
+    published = ["2026 Nov 04 12:23:24"]
+    def handler(request):
+        calls.append(request.url.path)
+        if request.url.path == "/index":
+            return httpx.Response(200, text=f"<h3>Current as of {published[0]} UTC (Day 308)</h3>")
+        return httpx.Response(200, json=[entry().as_omm()])
+    settings = Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp")
+    runtime = build_services(settings)
+    provider = CelestrakProvider("https://primary.test/gp", update_url="https://primary.test/index",
+                                 transport=httpx.MockTransport(handler))
+    runtime.satellites.provider = provider
+    asyncio.run(runtime.satellites.refresh_catalog())
+    original_download = runtime.satellites.updated_at
+    assert calls == ["/index", "/gp"]
+    runtime.store.close()
+    # A fresh process restores the publication marker along with the catalog.
+    runtime = build_services(settings)
+    assert runtime.satellites.provider.known_update_at == datetime(2026, 11, 4, 12, 23, 24, tzinfo=timezone.utc)
+    provider.known_update_at = runtime.satellites.provider.known_update_at
+    runtime.satellites.provider = provider
+    runtime.store.set_cache("orbit_primary_attempt", True, EPOCH)
+    asyncio.run(runtime.satellites.refresh_catalog())
+    assert calls == ["/index", "/gp", "/index"]
+    assert runtime.satellites.updated_at == original_download
+    published[0] = "2026 Nov 04 14:23:38"
+    runtime.store.set_cache("orbit_primary_attempt", True, EPOCH)
+    asyncio.run(runtime.satellites.refresh_catalog())
+    assert calls[-2:] == ["/index", "/gp"]
+    assert runtime.store.get_cache("orbit_primary_update")[0] == "2026-11-04T14:23:38+00:00"
+    runtime.store.close()
+
+
+@pytest.mark.parametrize("response", [httpx.Response(503), httpx.Response(200, text="changed layout")])
+def test_failed_publication_probe_never_downloads_catalog(response):
+    calls = []
+    def handler(request):
+        calls.append(request.url.path)
+        return response
+    provider = CelestrakProvider("https://primary.test/gp", update_url="https://primary.test/index",
+                                 transport=httpx.MockTransport(handler))
+    with pytest.raises((httpx.HTTPStatusError, ValueError)):
+        asyncio.run(provider.fetch_active())
+    assert calls == ["/index"]
+    assert provider.known_update_at is None
+
+
 def test_stale_mirror_never_rolls_back_newer_cached_orbit(tmp_path):
     runtime = build_services(Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp"))
     fresh = entry().as_omm()

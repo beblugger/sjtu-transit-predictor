@@ -121,6 +121,7 @@ async def export_snapshot(settings: Settings, output: Path, *, offline: bool = F
             "catalog_source": runtime.satellites.catalog_source,
             "catalog_fetched_at": runtime.satellites.updated_at.isoformat() if runtime.satellites.updated_at else None,
             "catalog_checked_at": runtime.satellites.checked_at.isoformat() if runtime.satellites.checked_at else None,
+            "primary_upstream_updated_at": runtime.satellites.provider.known_update_at.isoformat() if runtime.satellites.provider.known_update_at else None,
             "catalog_sha256": catalog_hash,
             "catalog_count": len(omm_rows), "event_count": len(events),
             "tle_count": len(tles) // 3, "tle_omitted_count": len(omm_rows) - len(tles) // 3,

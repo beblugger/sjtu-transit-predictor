@@ -46,6 +46,10 @@ service automatically uses its built-in analytical Sun/Moon model. The first
 orbit refresh loads the active satellite catalog and can take a little time.
 CelesTrak's "not updated" response is handled as an unchanged catalog, with
 the public `satvisorcom/satvisor-data` OMM mirror as an outage fallback.
+Before downloading the catalog, the primary checks the GP index's `Current as of`
+publication timestamp. An unchanged timestamp skips the full download. The
+publication marker is persisted only after a valid primary catalog is saved.
+A failed timestamp probe stops primary requests and falls back to the mirror.
 An unchanged response does not reset the original download timestamp. A six-hour
 warning threshold never excludes a satellite solely because its epoch is old.
 If a mirror lags behind the last-valid snapshot, newer cached elements are kept;
@@ -176,7 +180,8 @@ Actions cache accelerates geometry and ephemeris reuse. A separate `state`
 branch stores a compact SQLite snapshot of orbit/weather inputs and original
 fetch/check times. It deliberately omits geometry and aircraft samples. On a
 cache miss the workflow restores these durable inputs before fetching providers.
-Each successful build replaces **only the dedicated state branch** with a new
+After calculation, including a failed calculation, the workflow persists request
+attempts so retries retain the two-hour cooldown. It replaces **only the dedicated state branch** with a new
 root commit, leaving only the latest binary snapshot reachable. Main history
 is never rewritten. The state is public scientific data, with no credentials.
 This avoids retaining a growing Git history of large databases; GitHub controls

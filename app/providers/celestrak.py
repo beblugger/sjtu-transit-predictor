@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 import json
 import math
+import re
 
 import httpx
 from sgp4.api import Satrec
@@ -81,14 +82,17 @@ class CelestrakProvider:
         *,
         timeout_seconds: float = 60.0,
         transport: httpx.AsyncBaseTransport | None = None,
+        update_url: str | None = None,
     ):
         self.url = url
         self.timeout_seconds = timeout_seconds
         self.transport = transport
+        self.update_url = update_url
+        self.known_update_at: datetime | None = None
 
     async def fetch_active(self, *, max_targets: int = 0) -> list[TLEEntry]:
         headers = {
-            "User-Agent": "sjtu-transit-predictor/0.1 (+https://www.sjtu.edu.cn/)",
+            "User-Agent": "sjtu-transit-predictor/0.1 (+https://github.com/beblugger/sjtu-transit-predictor)",
             "Accept": "application/json, text/plain",
         }
         async with httpx.AsyncClient(
@@ -96,6 +100,18 @@ class CelestrakProvider:
             follow_redirects=False,
             transport=self.transport,
         ) as client:
+            update_at = None
+            if self.update_url:
+                index = await client.get(self.update_url, headers=headers)
+                index.raise_for_status()
+                text = re.sub(r"<[^>]+>", " ", index.text)
+                match = re.search(r"Current as of\s+(\d{4} [A-Za-z]{3} \d{2} \d{2}:\d{2}:\d{2}) UTC", text)
+                if not match:
+                    # Do not download blindly if the freshness check is broken.
+                    raise ValueError("GP index has no recognizable Current as of timestamp")
+                update_at = datetime.strptime(match[1], "%Y %b %d %H:%M:%S").replace(tzinfo=timezone.utc)
+                if self.known_update_at is not None and update_at <= self.known_update_at:
+                    raise CatalogUnchanged(f"GP publication timestamp unchanged: {update_at.isoformat()}")
             response = await client.get(self.url, headers=headers)
             if response.status_code == 403 and "has not updated" in response.text.lower():
                 raise CatalogUnchanged(response.text.strip())
@@ -106,6 +122,8 @@ class CelestrakProvider:
             entries = parse_three_line_elements(response.text)
         if not entries:
             raise ValueError("Orbit provider returned no usable records")
+        if update_at is not None:
+            self.known_update_at = update_at
         if max_targets > 0:
             entries = entries[:max_targets]
         return entries
