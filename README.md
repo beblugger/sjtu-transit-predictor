@@ -154,8 +154,8 @@ DE421, including 60 events with six-digit satellite IDs. Cold export took
 17 chunks in 4.5 seconds. The independent audit checked every event with no
 violations; maximum minimum-separation difference was 0.67 arcsecond and maximum
 contact-boundary residual was 0.77 arcsecond. These are numerical consistency
-checks, not estimates of orbital prediction uncertainty. GitHub runner timing
-has not yet been measured.
+checks, not estimates of orbital prediction uncertainty. The first GitHub Actions build completed in 5 minutes 57 seconds, plus
+15 seconds for Pages deployment.
 
 ## Hosted backend
 
@@ -178,8 +178,9 @@ Pages and OIDC write permissions are limited to deployment.
 
 Actions cache accelerates geometry and ephemeris reuse. A separate `state`
 branch stores a compact SQLite snapshot of orbit/weather inputs and original
-fetch/check times. It deliberately omits geometry and aircraft samples. On a
-cache miss the workflow restores these durable inputs before fetching providers.
+fetch/check times. It deliberately omits geometry and aircraft samples. Every run merges newer durable inputs into its restored calculation cache before
+fetching providers, including cooldowns written by failed runs. A cache miss
+restores the durable snapshot as a new database.
 After calculation, including a failed calculation, the workflow persists request
 attempts so retries retain the two-hour cooldown. It replaces **only the dedicated state branch** with a new
 root commit, leaving only the latest binary snapshot reachable. Main history

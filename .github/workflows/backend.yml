@@ -41,15 +41,13 @@ jobs:
             /home/runner/.cache/sjtu-transit/de421.bsp
           key: backend-v1-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: backend-v1-${{ runner.os }}-
-      - name: Recover durable orbit and weather inputs if cache is absent
+      - name: Recover latest durable inputs and request cooldowns
         shell: bash
         run: |
-          if [[ ! -f .state/transit.db ]]; then
-            if git ls-remote --exit-code --heads origin state; then
-              git fetch --depth=1 origin state
-              git show FETCH_HEAD:inputs.db.gz > "$RUNNER_TEMP/inputs.db.gz"
-              python scripts/deployment_state.py restore --snapshot "$RUNNER_TEMP/inputs.db.gz"
-            fi
+          if git ls-remote --exit-code --heads origin state; then
+            git fetch --depth=1 origin state
+            git show FETCH_HEAD:inputs.db.gz > "$RUNNER_TEMP/inputs.db.gz"
+            python scripts/deployment_state.py merge --snapshot "$RUNNER_TEMP/inputs.db.gz"
           fi
       - name: Install and verify JPL ephemeris
         shell: bash
