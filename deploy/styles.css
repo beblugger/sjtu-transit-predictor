@@ -1,6 +1,6 @@
 /* Functional layout only. Data legibility takes priority over decoration. */
 :root { color: #161616; background: #fff; font: 16px/1.6 system-ui, sans-serif; }
-body { margin: 1rem auto; padding: 0 1rem; max-width: 94rem; }
+body { margin: 1rem auto; padding: 0 1rem; overflow-x: clip; max-width: 94rem; }
 h1 { font-size: 1.6rem; } h2 { font-size: 1.25rem; } h3 { font-size: 1.05rem; }
 section, form#filters, footer { margin-block: 1.6rem; }
 a { color: #005a9c; } a:visited { color: #653c83; }

@@ -55,3 +55,19 @@ test('mixed publications and malformed events cannot be silently presented', () 
   assert.throws(() => validateSnapshot(m, {...p, events: [{...e, range_km: 0}]}, campus));
   assert.throws(() => validateSnapshot(m, {...p, events: [{...e, minimum_time: '2026-11-05T00:00:00Z'}]}, campus));
 });
+
+test('inverse region membership, distance and local time use geometry instead of a radius around the preferred point', async () => {
+  const {visibilityAt, regionContains} = await import('../deploy/core.mjs');
+  const geometry = {type:'MultiPolygon',coordinates:[[[[0,0],[.01,0],[.01,.002],[0,.002],[0,0]]]]};
+  assert.equal(regionContains(geometry,[.009,.001]),true);
+  assert.equal(regionContains(geometry,[.005,.003]),false);
+  const e={...event(1,'2026-11-04T00:00:00Z'),visibility:{geometry,chart:{longitude:0,latitude:0,east_m_per_degree:100000,north_m_per_degree:100000},
+    reference_time:'2026-11-04T00:00:00Z',sampled_boundary_tolerance_m:5,models:[{bounds_m:[0,0,1000,200],origin_m:[0,0],time_offset_s:0,time_gradient_s_per_m:[.01,0]}]}};
+  const inside=visibilityAt(e,{longitude:.009,latitude:.001});
+  assert.equal(inside.inside,true);assert.equal(inside.distance_m,0);
+  assert.equal(inside.minimum_time,'2026-11-04T00:00:09.000Z');
+  const outside=visibilityAt(e,{longitude:.005,latitude:.003});
+  assert.equal(outside.inside,false);assert.ok(Math.abs(outside.distance_m-100)<.001);
+  assert.equal(outside.minimum_time,null);
+  assert.equal(filterEvents([e],{...filters,insideOnly:true},{longitude:.005,latitude:.003}).length,0);
+});

@@ -37,7 +37,8 @@
       <label>最小卫星角直径 (″) <input id="min-diameter" type="number" min="0" step="0.1" value="0"></label>
       <label><input id="keep-unknown" type="checkbox" checked> 保留尺寸未知的事件</label>
       <label>天气条件 <select id="weather"><option value="all">全部，包括天气不可用</option><option value="announced">仅模型评分达标</option><option value="unavailable">仅天气不可用</option></select></label>
-      <label>排序 <select id="sort"><option value="time">时间从近到远</option><option value="altitude">高度角从高到低</option><option value="diameter">角直径从大到小</option><option value="distance">距参考点从近到远</option></select></label>
+      <label>排序 <select id="sort"><option value="time">时间从近到远</option><option value="altitude">高度角从高到低</option><option value="diameter">角直径从大到小</option><option value="distance">距校内可见区从近到远</option></select></label>
+      <label><input id="inside-only" type="checkbox" disabled> 参考点位于校内可见区</label>
       <div class="actions">
         <button type="button" data-hours="6">未来 6 小时</button><button type="button" data-hours="24">未来 24 小时</button><button type="button" data-hours="96">未来 96 小时</button>
         <button id="all-coverage" type="button">全部数据覆盖时段</button><button id="reset" type="button">恢复默认筛选</button>
@@ -53,22 +54,22 @@
       <label>经度 (°E, WGS84) <input id="longitude" type="number" min="-180" max="180" step="any" value="121.42839" required></label>
       <button type="submit">设置参考位置</button><button id="locate" type="button">使用设备定位</button><button id="clear-location" type="button">清除参考位置</button>
     </form>
-    <p id="location-status" role="status">未设置参考位置。位置只用于本机计算距优选点的距离，不会上传。</p>
+    <p id="location-status" role="status">未设置参考位置。位置只用于本机计算距校内可见区的距离，不会上传。</p>
   </section>
   <section aria-labelledby="map-title">
-    <h2 id="map-title">校区范围与优选观测点</h2>
-    <p><strong>这里显示的是优选点，不是完整可见区域、凌星中心线或卫星地面轨迹。</strong> 后端尚未输出完整覆盖范围。本版使用 WGS84 校区范围示意图，无高德或交大瓦片底图。</p>
-    <p>与当前列表页同步；小屏可横向滚动。只标注选中事件，避免遮挡。填充越浅表示事件越远；边线始终保留。时间深浅不表示预报可靠性。</p>
+    <h2 id="map-title">校区内凌星可见区域</h2>
+    <p><strong>区域由凌星角几何反解，并裁剪到校区内；不是卫星地面轨迹。</strong> 使用自适应分片一阶近似，接触边界采样回算目标为 5 m；这不是轨道实际误差保证。本版使用 WGS84 校区范围示意图，无高德或交大瓦片底图。</p>
+    <p>一次显示选中事件的可见区，避免不同事件重叠。点击列表“区域/详情”切换；小屏可横向滚动。填充越浅表示事件越远；边线始终保留。时间深浅不表示预报可靠性。</p>
     <div class="legend" aria-label="地图图例">
-      <span><svg width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="#9c4100" stroke="#9c4100"/></svg>太阳：圆形</span>
-      <span><svg width="20" height="20" aria-hidden="true"><path d="M10 2L18 10L10 18L2 10Z" fill="#0072b2" stroke="#0072b2"/></svg>月球：菱形</span>
+      <span><svg width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="#9c4100" stroke="#9c4100"/></svg>太阳区域</span>
+      <span><svg width="20" height="20" aria-hidden="true"><path d="M10 2L18 10L10 18L2 10Z" fill="#0072b2" stroke="#0072b2"/></svg>月球区域</span>
       <span>填充深浅：</span>
       <span><svg width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="#0072b2" stroke="#0072b2"/></svg>≤6 h</span>
       <span><svg width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="#0072b2" fill-opacity=".65" stroke="#0072b2"/></svg>≤24 h</span>
       <span><svg width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="#0072b2" fill-opacity=".4" stroke="#0072b2"/></svg>≤48 h</span>
-      <span><svg width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="#0072b2" fill-opacity=".2" stroke="#0072b2"/></svg>&gt;48 h</span><span>十字：参考位置</span>
+      <span><svg width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="#0072b2" fill-opacity=".2" stroke="#0072b2"/></svg>&gt;48 h</span><span>虚线：凌星中心线（可能在校外）</span><span>十字：参考位置；圆点：时间参考点</span>
     </div>
-    <div class="map-scroll" tabindex="0" aria-label="可横向滚动的校区范围图"><svg id="map" viewBox="0 0 960 560" role="group" aria-labelledby="map-description"><title id="map-description">WGS84 校区范围和当前列表页的优选观测点</title></svg></div>
+    <div class="map-scroll" tabindex="0" aria-label="可横向滚动的校区范围图"><svg id="map" viewBox="0 0 960 560" role="group" aria-labelledby="map-description"><title id="map-description">WGS84 校区范围和选中事件的反解可见区域</title></svg></div>
     <p id="map-status"></p>
     <p>坐标计算和距离使用 WGS84。GCJ-02 高德坐标不能直接填入。校区边界来自交大电子地图，未做独立测绘精度核验；示意图比例尺用于读图。</p>
   </section>
@@ -78,8 +79,8 @@
     <div class="actions"><button id="previous" type="button">上一页</button><span id="page-status"></span><button id="next" type="button">下一页</button><button id="download-csv" type="button">下载筛选结果 CSV（UTC）</button></div>
     <div class="table-scroll" tabindex="0" aria-label="可横向滚动的凌星事件表">
       <table>
-        <caption>每行时间、高度和距离均对应该事件的优选点。点击“详情”与地图联动。每页 50 条。</caption>
-        <thead><tr><th scope="col">卫星 / NORAD</th><th scope="col">目标</th><th scope="col" id="time-heading">最小角距时刻</th><th scope="col" class="number">高度 (°)</th><th scope="col" class="number">持续 (s)</th><th scope="col" class="number">角直径 (″)</th><th scope="col" class="number">斜距 (km)</th><th scope="col">天气</th><th scope="col" class="number">距参考点 (m)</th><th scope="col">选择</th></tr></thead>
+        <caption>每行时间、高度和卫星斜距对应原优选点；“距校内可见区”使用所设参考位置。点击“区域/详情”查看该事件的反解可见区。每页 50 条。</caption>
+        <thead><tr><th scope="col">卫星 / NORAD</th><th scope="col">目标</th><th scope="col" id="time-heading">最小角距时刻</th><th scope="col" class="number">高度 (°)</th><th scope="col" class="number">持续 (s)</th><th scope="col" class="number">角直径 (″)</th><th scope="col" class="number">斜距 (km)</th><th scope="col">天气</th><th scope="col" class="number">距校内可见区 (m)</th><th scope="col">选择</th></tr></thead>
         <tbody id="events"></tbody>
       </table>
     </div>

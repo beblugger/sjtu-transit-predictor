@@ -26,14 +26,14 @@ def _json(value) -> str:
 def prediction_fingerprint(runtime) -> str:
     """Invalidate cached geometry when data, numerical code, or settings change."""
     digest = hashlib.sha256()
-    for dependency in ("sgp4", "skyfield", "numpy", "scipy"):
+    for dependency in ("sgp4", "skyfield", "numpy", "scipy", "shapely"):
         digest.update(f"{dependency}={version(dependency)}".encode())
     for record in runtime.satellites.records:
         digest.update(_json(record.entry.as_omm()).encode())
     for path in (runtime.settings.campus_geojson_path, runtime.settings.satellite_sizes_path,
                  Path(__file__).with_name("satellites.py"), Path(__file__).with_name("astronomy.py"),
                  Path(__file__).with_name("geo.py"), Path(__file__).with_name("campus.py"),
-                 Path(__file__).with_name("satellite_sizes.py")):
+                 Path(__file__).with_name("satellite_sizes.py"), Path(__file__).with_name("footprints.py")):
         digest.update(path.read_bytes())
     digest.update(_json({
         "step": runtime.settings.satellite_coarse_step_seconds,
@@ -124,6 +124,7 @@ async def export_snapshot(settings: Settings, output: Path, *, offline: bool = F
             "primary_upstream_updated_at": runtime.satellites.provider.known_update_at.isoformat() if runtime.satellites.provider.known_update_at else None,
             "catalog_sha256": catalog_hash,
             "catalog_count": len(omm_rows), "event_count": len(events),
+            "visibility_event_count": sum(event.visibility is not None for event in events),
             "tle_count": len(tles) // 3, "tle_omitted_count": len(omm_rows) - len(tles) // 3,
             "ephemeris": runtime.astronomy.ephemeris_backend,
             "weather_status": runtime.weather.status(now).model_dump(mode="json"),

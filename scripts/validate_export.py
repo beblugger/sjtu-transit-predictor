@@ -11,7 +11,9 @@ import json
 from pathlib import Path
 
 import numpy as np
+from scipy.optimize import minimize_scalar
 from skyfield.api import EarthSatellite, load, load_file, wgs84
+from shapely.geometry import shape
 
 from app.campus import load_campus
 from app.geo import angular_separation_arcsec
@@ -34,10 +36,47 @@ def validate(root: Path, ephemeris: Path) -> dict:
     minimum_errors = []
     contact_errors = []
     violations = []
+    region_count, boundary_count, boundary_errors = 0, 0, []
+    campus_geometry = shape(json.loads((root / "campus.geojson").read_text())["features"][0]["geometry"])
     start = datetime.fromisoformat(manifest["from_time"])
     end = datetime.fromisoformat(manifest["to_time"])
     try:
         for event in events:
+            visibility = event.get("visibility")
+            if visibility is not None:
+                region_count += 1
+                region = shape(visibility["geometry"])
+                if not region.is_valid or region.is_empty or not campus_geometry.buffer(1e-10).covers(region):
+                    violations.append({"id": event["identifier"], "reason": "invalid_ground_region"})
+                for sample in visibility["boundary_samples"]:
+                    boundary_count += 1
+                    point = wgs84.latlon(sample["latitude"], sample["longitude"],
+                                         elevation_m=visibility["chart"]["observer_elevation_m"])
+                    sat = satellites[int(event["identifier"])]
+                    body = eph[event["target"]]
+                    estimate = datetime.fromisoformat(sample["predicted_minimum_time"])
+                    def residual(offset):
+                        from datetime import timedelta
+                        instant = ts.from_datetime(estimate + timedelta(seconds=float(offset)))
+                        satellite_position = (sat - point).at(instant)
+                        target_position = (eph["earth"] + point).at(instant).observe(body).apparent()
+                        angle = satellite_position.separation_from(target_position).arcseconds()
+                        radius = 695_700_000 if event["target"] == "sun" else 1_737_400
+                        threshold = np.degrees(2 * np.arctan(radius / (2 * target_position.distance().m))) * 3600
+                        if event["physical_size_m"] is not None:
+                            threshold += np.degrees(np.arctan(event["physical_size_m"] / (2 * satellite_position.distance().m))) * 3600
+                        return float(angle), float(threshold)
+                    width = max(3., min(600., event["duration_ms"] / 1000 * 1.5 + 3))
+                    result = minimize_scalar(lambda offset: residual(offset)[0] ** 2,
+                                             bounds=(-width, width), method="bounded", options={"xatol": 1e-5})
+                    angle, threshold = residual(result.x)
+                    error = abs(angle - threshold)
+                    boundary_errors.append(error)
+                    # Add the independent implementations' existing 1 arcsec
+                    # agreement allowance to the inverse model's spatial tolerance.
+                    allowance = 1 + np.degrees(sample["normal_gradient_rad_per_m"] * visibility["sampled_boundary_tolerance_m"]) * 3600
+                    if abs(result.x) > width * .98 or error > allowance:
+                        violations.append({"id": event["identifier"], "reason": "inverse_boundary_mismatch", "error_arcsec": error})
             observer = event["observer"]
             if not campus.contains(observer["latitude"], observer["longitude"]):
                 violations.append({"id": event["identifier"], "reason": "observer_outside_campus"})
@@ -72,11 +111,16 @@ def validate(root: Path, ephemeris: Path) -> dict:
                     violations.append({"id": event["identifier"], "field": key, "error_arcsec": float(error)})
     finally:
         eph.close()
+    if region_count != manifest.get("visibility_event_count", region_count):
+        violations.append({"reason": "visibility_count_mismatch"})
     return {
         "events_checked": len(events),
         "maximum_minimum_separation_difference_arcsec": max(minimum_errors, default=0),
         "maximum_contact_error_arcsec": max(contact_errors, default=0),
         "six_digit_event_count": sum(int(event["identifier"]) >= 100000 for event in events),
+        "inverse_regions_checked": region_count,
+        "inverse_boundary_samples_checked": boundary_count,
+        "maximum_inverse_boundary_residual_arcsec": max(boundary_errors, default=0),
         "violations": violations,
     }
 

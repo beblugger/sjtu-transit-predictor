@@ -1,5 +1,5 @@
 import {PAGE_SIZE, TARGETS, WEATHER, REASONS, present, number, formatTime, zoneName,
-  inputTime, inputInstant, eventKey, distanceMeters, filterEvents, timeOpacity, validateSnapshot, eventsCSV} from './core.mjs';
+  inputTime, inputInstant, eventKey, filterEvents, timeOpacity, validateSnapshot, eventsCSV, visibilityAt} from './core.mjs';
 
 const $ = id => document.getElementById(id);
 const state = {manifest: null, events: [], campus: null, filtered: [], page: 0, selected: null,
@@ -99,14 +99,14 @@ function setWindow(hours, all = false) {
 }
 function resetFilters(all = false) {
   $('target').value = 'all'; $('search').value = ''; $('min-altitude').value = all ? '0' : '15';
-  $('min-diameter').value = '0'; $('keep-unknown').checked = true; $('weather').value = 'all'; $('sort').value = 'time';
+  $('inside-only').checked = false; $('min-diameter').value = '0'; $('keep-unknown').checked = true; $('weather').value = 'all'; $('sort').value = 'time';
   setWindow(24, all); state.page = 0;
 }
 function readFilters() {
   return {from: inputInstant($('from').value, state.zone), to: inputInstant($('to').value, state.zone),
     target: $('target').value, search: $('search').value, minAltitude: $('min-altitude').valueAsNumber,
     minDiameter: $('min-diameter').valueAsNumber, keepUnknown: $('keep-unknown').checked,
-    weather: $('weather').value, sort: $('sort').value};
+    weather: $('weather').value, sort: $('sort').value, insideOnly: $('inside-only').checked};
 }
 function render() {
   if (!state.manifest) return;
@@ -120,6 +120,7 @@ function render() {
   state.page = Math.min(state.page, pages - 1);
   if (state.selected && !state.filtered.some(e => eventKey(e) === eventKey(state.selected))) state.selected = null;
   const events = state.filtered.slice(state.page * PAGE_SIZE, (state.page + 1) * PAGE_SIZE);
+  if (!events.includes(state.selected)) state.selected = events[0] || null;
   $('time-heading').textContent = `最小角距时刻 (${zoneName(state.zone)})`;
   $('result-count').textContent = `${state.filtered.length} / ${state.events.length} 条符合条件。时间区间包含起点、不包含终点。${f.sort === 'distance' && !state.location ? '尚未设置参考位置，暂按时间排序。' : ''}`;
   $('page-status').textContent = `第 ${state.page + 1} / ${pages} 页`;
@@ -129,9 +130,9 @@ function render() {
     const row = node('tr'); row.setAttribute('aria-selected', String(!!state.selected && eventKey(state.selected) === eventKey(event)));
     const values = [`${event.name} / ${event.identifier}`, TARGETS[event.target], formatTime(event.minimum_time, state.zone),
       number(event.altitude_deg, 1), number(event.duration_ms / 1000, 3), number(event.object_angular_diameter_arcsec, 2),
-      number(event.range_km, 1), WEATHER[event.weather.decision], state.location ? number(distanceMeters(state.location, event.observer), 0) : '未设置'];
+      number(event.range_km, 1), WEATHER[event.weather.decision], state.location ? number(visibilityAt(event, state.location)?.distance_m, 0) : '未设置'];
     values.forEach((value, index) => row.append(node('td', value, [3, 4, 5, 6, 8].includes(index) ? {class: 'number'} : {})));
-    const button = node('button', '详情', {type: 'button', 'aria-label': `查看 ${event.name} ${TARGETS[event.target]} ${formatTime(event.minimum_time, state.zone)} 的详情`});
+    const button = node('button', '区域/详情', {type: 'button', 'aria-label': `查看 ${event.name} ${TARGETS[event.target]} ${formatTime(event.minimum_time, state.zone)} 的详情`});
     button.addEventListener('click', () => selectEvent(event, true));
     const cell = node('td'); cell.append(button); row.append(cell); return row;
   }));
@@ -146,6 +147,14 @@ function selectEvent(event, focus) {
   history.replaceState(null, '', url);
   render();
   if (focus) $('detail').focus();
+}
+function selectSharedEvent() {
+  if (!state.manifest || state.loading) return;
+  const key = new URLSearchParams(location.hash.slice(1)).get('event');
+  if (!key) return;
+  const event = state.events.find(e => eventKey(e) === key);
+  if (event) { resetFilters(true); render(); selectEvent(event, false); }
+  else $('share-status').textContent = '链接所指事件已不在本次数据中，可能已过期或因轨道更新而改变。';
 }
 function renderDetail() {
   const e = state.selected;
@@ -166,7 +175,15 @@ function renderDetail() {
     ['卫星物理尺寸范围', `${quantity(e.physical_size_min_m, 'm')} — ${quantity(e.physical_size_max_m, 'm')}`],
     ['尺寸可信度', e.physical_size_confidence || '未知'], ['轨道历元', stamp(e.orbit_epoch, true)],
     ['距轨道历元的外推时长', quantity(e.orbit_age_at_event_hours, 'h', 2)],
-    ['距参考点', state.location ? `${quantity(distanceMeters(state.location, e.observer), 'm', 0)}（到优选点的直线距离，不是到可见区的距离或步行距离）` : '未设置参考位置'],
+    ['距校内可见区', state.location ? quantity(visibilityAt(e, state.location)?.distance_m, 'm', 0) : '未设置参考位置'],
+    ['参考位置的区域判断', state.location ? (visibilityAt(e, state.location)?.inside ? '在反解区域内' : '不在校内反解区域内；校外未计算') : '未设置参考位置'],
+    ['参考位置的边界提示', visibilityAt(e, state.location)?.outside_chart ? '参考点距校区中心超过 5 km，不作局部距离计算' : visibilityAt(e, state.location)?.near_boundary ? '距边界不足 5 m，区域判断对展开误差敏感，应完整复算' : '轨道真实误差尚未量化'],
+    ['参考位置的最小角距时刻（一阶近似）', stamp(visibilityAt(e, state.location)?.minimum_time, true)],
+    ['校内可见区域面积', quantity(e.visibility?.area_m2 / 1e6, 'km²', 3)],
+    ['空间反解模型', e.visibility?.method || '缺少区域数据'],
+    ['接触边界最大采样回算偏差', e.visibility?.contact_validation_count ? quantity(e.visibility.maximum_sampled_boundary_error_m, 'm', 3) : '本区域未采到日月接触边界'],
+    ['局部时刻最大采样回算偏差', quantity(e.visibility?.maximum_sampled_time_error_s, 's', 3)],
+    ['反解分片 / 接触验证点', `${e.visibility?.models.length ?? 0} / ${e.visibility?.contact_validation_count ?? 0}`],
   ]);
   if (e.physical_size_source) {
     const url = new URL(e.physical_size_source, location.href);
@@ -185,7 +202,7 @@ function renderDetail() {
     ['判定阈值', score(w.threshold)], ['确定性天气获取时间', stamp(w.observation_time)], ['集合预报获取时间', stamp(w.model_updated_at)],
   ]);
   const reasons = [...new Set([...e.reason_codes, ...w.reasons])];
-  $('detail-reasons').replaceChildren(...reasons.map(r => node('li', reason(r))), node('li', '尚无经过量化的轨道位置 / 凌星时刻误差范围；不据此给出百米可见保证。'));
+  $('detail-reasons').replaceChildren(...reasons.map(r => node('li', reason(r))), node('li', '反解区域在导出的观测高度上计算。采样回算偏差衡量局部展开的数值误差；不是轨道真实误差或任何位置的严格误差上界。'));
   $('raw-event').textContent = JSON.stringify(e, null, 2);
 }
 const SVG = 'http://www.w3.org/2000/svg';
@@ -206,7 +223,7 @@ function drawMap(events) {
   const minY = Math.min(...xy.map(p => p[1])), maxY = Math.max(...xy.map(p => p[1]));
   const scale = Math.min(820 / (maxX - minX), 420 / (maxY - minY));
   const project = p => { const [x, y] = meters(p); return [480 + x * scale, 280 - y * scale]; };
-  map.replaceChildren(svg('title', {id: 'map-description'}, 'WGS84 校区范围和当前列表页的优选观测点'));
+  map.replaceChildren(svg('title', {id: 'map-description'}, 'WGS84 校区范围和选中事件的反解可见区域'));
   for (const polygon of polygons) {
     const path = polygon.map(ring => ring.map((p, i) => `${i ? 'L' : 'M'}${project(p).join(',')}`).join(' ') + 'Z').join(' ');
     map.append(svg('path', {d: path, fill: '#f2f2f2', stroke: '#555', 'stroke-width': 1.5, 'fill-rule': 'evenodd'}));
@@ -214,24 +231,30 @@ function drawMap(events) {
   map.append(svg('path', {d: 'M36 78V24M30 34L36 24L42 34', stroke: '#161616', fill: 'none', 'stroke-width': 2}), svg('text', {x: 29, y: 100}, '北'));
   const bar = 500 * scale;
   map.append(svg('path', {d: `M60 510v8h${bar}v-8`, fill: 'none', stroke: '#161616', 'stroke-width': 2}), svg('text', {x: 60, y: 542}, '500 m（近似）'));
-  for (const event of events) {
+  const event = state.selected;
+  if (event?.visibility) {
+    const v = event.visibility, color = event.target === 'sun' ? '#9c4100' : '#0072b2';
+    const areas = v.geometry.type === 'MultiPolygon' ? v.geometry.coordinates : [v.geometry.coordinates];
+    for (const polygon of areas) {
+      const path = polygon.map(ring => ring.map((p, i) => `${i ? 'L' : 'M'}${project(p).join(',')}`).join(' ') + 'Z').join(' ');
+      map.append(svg('path', {d: path, fill: color, 'fill-opacity': .3 * timeOpacity(event.minimum_time),
+        stroke: color, 'stroke-width': 2.5, 'fill-rule': 'evenodd', class: 'visibility-region'}));
+    }
+    for (const line of v.centerline.coordinates) {
+      map.append(svg('path', {d: line.map((p, i) => `${i ? 'L' : 'M'}${project(p).join(',')}`).join(' '),
+        fill: 'none', stroke: '#161616', 'stroke-width': 2, 'stroke-dasharray': '7 4', class: 'visibility-centerline'}));
+      for (const p of [line[0], line.at(-1)]) {
+        const reading = visibilityAt(event, {longitude: p[0], latitude: p[1]});
+        if (reading?.minimum_time) {
+          const [x, y] = project(p);
+          map.append(svg('text', {x: Math.max(70, Math.min(800, x + 8)), y: Math.max(20, y - 8),
+            'paint-order': 'stroke', stroke: '#fff', 'stroke-width': 4}, formatTime(reading.minimum_time, state.zone).slice(11)));
+        }
+      }
+    }
     const [x, y] = project([event.observer.longitude, event.observer.latitude]);
-    const color = event.target === 'sun' ? '#9c4100' : '#0072b2';
-    const selected = state.selected && eventKey(state.selected) === eventKey(event);
-    const marker = event.target === 'sun' ? svg('circle', {cx: x, cy: y, r: selected ? 8 : 5}) :
-      svg('path', {d: `M${x} ${y - (selected ? 10 : 7)}l${selected ? 10 : 7} ${selected ? 10 : 7}l-${selected ? 10 : 7} ${selected ? 10 : 7}l-${selected ? 10 : 7} -${selected ? 10 : 7}Z`});
-    for (const [key, value] of Object.entries({fill: color, 'fill-opacity': timeOpacity(event.minimum_time), stroke: selected ? '#161616' : color,
-      'stroke-width': selected ? 3 : 1.5, class: 'marker', role: 'button', tabindex: 0,
-      'aria-label': `${event.name}，${TARGETS[event.target]}，${formatTime(event.minimum_time, state.zone)} ${zoneName(state.zone)}`})) marker.setAttribute(key, value);
-    marker.append(svg('title', {}, `${event.name} / ${event.identifier} / ${stamp(event.minimum_time)}`));
-    marker.addEventListener('click', () => selectEvent(event, true));
-    marker.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectEvent(event, true); } });
-    map.append(marker);
-  }
-  if (state.selected && events.includes(state.selected)) {
-    const event = state.selected, [x, y] = project([event.observer.longitude, event.observer.latitude]);
-    const text = svg('text', {x: Math.max(80, Math.min(x + 12, 700)), y: Math.max(25, y - 15), 'paint-order': 'stroke', stroke: '#fff', 'stroke-width': 4}, `${event.name} ${formatTime(event.minimum_time, state.zone).slice(11)} ${zoneName(state.zone)}`);
-    map.append(text);
+    map.append(svg('circle', {cx: x, cy: y, r: 4, fill: '#161616'}));
+    map.append(svg('text', {x: 70, y: 26}, `${event.name} / ${TARGETS[event.target]} / 区域 ${number(v.area_m2 / 1e6, 3)} km²`));
   }
   let locationText = '';
   if (state.location) {
@@ -240,9 +263,10 @@ function drawMap(events) {
       map.append(svg('path', {d: `M${x - 10} ${y}h20M${x} ${y - 10}v20`, stroke: '#161616', 'stroke-width': 3}));
     } else locationText = '参考位置在图外。';
   }
-  $('map-status').textContent = `本页 ${events.length} 个优选点，点可能重叠；可从列表逐一选择。${locationText}`;
+  $('map-status').textContent = `${event ? event.name + '：' : ''}${event?.visibility ? '已绘制反解区域。中心线未必经过校区；区域可能覆盖整个校区。' : '当前无区域数据。'}${locationText}`;
 }
 $('reload').addEventListener('click', loadSnapshot);
+window.addEventListener('hashchange', selectSharedEvent);
 $('filters').addEventListener('submit', event => event.preventDefault());
 $('filters').addEventListener('input', event => { if (event.target.id !== 'timezone') { state.page = 0; render(); } });
 $('timezone').addEventListener('change', () => {
@@ -259,14 +283,16 @@ $('previous').addEventListener('click', () => { state.page--; render(); });
 $('next').addEventListener('click', () => { state.page++; render(); });
 $('location-form').addEventListener('submit', event => {
   event.preventDefault(); state.location = {latitude: $('latitude').valueAsNumber, longitude: $('longitude').valueAsNumber};
-  $('location-status').textContent = '已设置 WGS84 参考位置；列表距离为到优选点的地表高度零近似直线距离，不代表可见范围。'; render();
+  $('inside-only').disabled = false;
+  $('location-status').textContent = '已设置 WGS84 参考位置；距离和区域判断针对校区内反解区域。轨道实际位置误差未量化。'; render();
 });
-$('clear-location').addEventListener('click', () => { state.location = null; $('location-status').textContent = '已清除参考位置。'; render(); });
+$('clear-location').addEventListener('click', () => { state.location = null; $('inside-only').checked = false; $('inside-only').disabled = true; $('location-status').textContent = '已清除参考位置。'; render(); });
 $('locate').addEventListener('click', () => {
   if (!navigator.geolocation) { $('location-status').textContent = '此浏览器不支持定位，请手动输入 WGS84 坐标。'; return; }
   $('location-status').textContent = '正在请求设备位置……';
   navigator.geolocation.getCurrentPosition(position => {
     state.location = {latitude: position.coords.latitude, longitude: position.coords.longitude};
+    $('inside-only').disabled = false;
     $('latitude').value = state.location.latitude; $('longitude').value = state.location.longitude;
     $('location-status').textContent = `设备定位精度报告：约 ${number(position.coords.accuracy, 0)} m；此精度不是凌星预测误差。位置仅在本机使用。`; render();
   }, error => { $('location-status').textContent = `定位失败：${error.message}。可手动输入 WGS84 坐标。`; }, {enableHighAccuracy: true, timeout: 15000, maximumAge: 30000});

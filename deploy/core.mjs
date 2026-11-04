@@ -56,13 +56,14 @@ export function filterEvents(events, filters, location = null) {
       (!needle || `${event.name} ${event.identifier}`.toLowerCase().includes(needle)) &&
       event.altitude_deg >= filters.minAltitude &&
       (present(diameter) ? diameter >= filters.minDiameter : filters.keepUnknown) &&
-      (filters.weather === 'all' || filters.weather === event.weather.decision);
+      (filters.weather === 'all' || filters.weather === event.weather.decision) &&
+      (!filters.insideOnly || !location || visibilityAt(event, location)?.inside === true);
   });
   result.sort((a, b) => {
     let difference = 0;
     if (filters.sort === 'altitude') difference = b.altitude_deg - a.altitude_deg;
     if (filters.sort === 'diameter') difference = (b.object_angular_diameter_arcsec ?? -1) - (a.object_angular_diameter_arcsec ?? -1);
-    if (filters.sort === 'distance' && location) difference = distanceMeters(location, a.observer) - distanceMeters(location, b.observer);
+    if (filters.sort === 'distance' && location) difference = (visibilityAt(a, location)?.distance_m ?? Infinity) - (visibilityAt(b, location)?.distance_m ?? Infinity);
     return difference || Date.parse(a.minimum_time) - Date.parse(b.minimum_time);
   });
   return result;
@@ -99,10 +100,57 @@ export function eventsCSV(events) {
   const fields = ['norad_id', 'name', 'target', 'start_time_utc', 'minimum_time_utc', 'end_time_utc',
     'duration_s', 'altitude_deg', 'azimuth_deg', 'range_km', 'angular_diameter_arcsec', 'maximum_size_m',
     'observer_latitude_deg_wgs84', 'observer_longitude_deg_wgs84', 'observer_elevation_m',
-    'orbit_epoch_utc', 'orbit_age_at_event_hours', 'weather_decision', 'weather_score', 'reason_codes'];
+    'orbit_epoch_utc', 'orbit_age_at_event_hours', 'weather_decision', 'weather_score', 'reason_codes', 'campus_visibility_area_m2', 'sampled_boundary_error_m'];
   const rows = events.map(e => [e.identifier, e.name, e.target, e.start_time, e.minimum_time, e.end_time,
     e.duration_ms / 1000, e.altitude_deg, e.azimuth_deg, e.range_km, e.object_angular_diameter_arcsec, e.physical_size_m,
     e.observer.latitude, e.observer.longitude, e.observer.elevation_m, e.orbit_epoch,
-    e.orbit_age_at_event_hours, e.weather.decision, e.weather.score, e.reason_codes.join(';')]);
+    e.orbit_age_at_event_hours, e.weather.decision, e.weather.score, e.reason_codes.join(';'), e.visibility?.area_m2, e.visibility?.maximum_sampled_boundary_error_m]);
   return '\ufeff' + [fields, ...rows].map(row => row.map(csvCell).join(',')).join('\r\n') + '\r\n';
+}
+
+function ringPosition(point, ring) {
+  const [x, y] = point;
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [ax, ay] = ring[j], [bx, by] = ring[i];
+    const dx = bx - ax, dy = by - ay;
+    const u = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy || 1)));
+    if (Math.hypot(x - ax - u * dx, y - ay - u * dy) < 1e-10) return {inside: true, boundary: true};
+    if ((ay > y) !== (by > y) && x < (bx - ax) * (y - ay) / (by - ay) + ax) inside = !inside;
+  }
+  return {inside, boundary: false};
+}
+export function regionContains(geometry, point) {
+  const polygons = geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates;
+  return polygons.some(polygon => {
+    const outer = ringPosition(point, polygon[0]);
+    if (!outer.inside) return false;
+    return !polygon.slice(1).some(hole => { const p = ringPosition(point, hole); return p.inside && !p.boundary; });
+  });
+}
+export function visibilityAt(event, location) {
+  const v = event.visibility;
+  if (!v || !location) return null;
+  const {longitude, latitude, east_m_per_degree: sx, north_m_per_degree: sy} = v.chart;
+  const project = point => [(point[0] - longitude) * sx, (point[1] - latitude) * sy];
+  const p = project([location.longitude, location.latitude]);
+  if (Math.hypot(...p) > 5000) return {inside:false,distance_m:null,boundary_distance_m:null,minimum_time:null,near_boundary:false,outside_chart:true};
+  const inside = regionContains(v.geometry, [location.longitude, location.latitude]);
+  let boundaryDistance = Infinity;
+  const polygons = v.geometry.type === 'Polygon' ? [v.geometry.coordinates] : v.geometry.coordinates;
+  for (const polygon of polygons) for (const ring of polygon) for (let i = 1; i < ring.length; i++) {
+    const a = project(ring[i - 1]), b = project(ring[i]), dx = b[0] - a[0], dy = b[1] - a[1];
+    const fraction = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / (dx * dx + dy * dy || 1)));
+    boundaryDistance = Math.min(boundaryDistance, Math.hypot(p[0] - a[0] - fraction * dx, p[1] - a[1] - fraction * dy));
+  }
+  const model = v.models.find(m => p[0] >= m.bounds_m[0] - 1e-5 && p[0] <= m.bounds_m[2] + 1e-5 &&
+    p[1] >= m.bounds_m[1] - 1e-5 && p[1] <= m.bounds_m[3] + 1e-5);
+  let minimumTime = null;
+  if (inside && model) {
+    const dt = model.time_offset_s + model.time_gradient_s_per_m[0] * (p[0] - model.origin_m[0]) +
+      model.time_gradient_s_per_m[1] * (p[1] - model.origin_m[1]);
+    minimumTime = new Date(Date.parse(v.reference_time) + dt * 1000).toISOString();
+  }
+  return {inside, distance_m: inside ? 0 : boundaryDistance, boundary_distance_m: boundaryDistance,
+    minimum_time: minimumTime, near_boundary: boundaryDistance <= v.sampled_boundary_tolerance_m};
 }

@@ -275,6 +275,12 @@ class SatelliteService:
         result.sort(key=lambda item: item.minimum_time)
         result = [event for event in result if start <= event.minimum_time < end]
         result = _deduplicate_events(result)
+        from app.footprints import FootprintSolver
+        records_by_id = {record.entry.norad_id: record for record in records}
+        for event in result:
+            event.visibility = FootprintSolver(
+                self.astronomy, self.campus, records_by_id[int(event.identifier)], event,
+            ).solve()
         with self._lock:
             self._event_cache = [event.model_copy(deep=True) for event in result]
             self._event_cache_key = (start, end)
