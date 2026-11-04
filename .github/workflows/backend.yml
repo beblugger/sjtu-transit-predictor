@@ -21,8 +21,7 @@ jobs:
     permissions:
       contents: write
     env:
-      AIRCRAFT_EPHEMERIS_PATH: /home/runner/.cache/sjtu-transit/de421.bsp
-      AIRCRAFT_ADS_PROVIDER: none
+      TRANSIT_EPHEMERIS_PATH: /home/runner/.cache/sjtu-transit/de421.bsp
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -52,13 +51,13 @@ jobs:
       - name: Install and verify JPL ephemeris
         shell: bash
         run: |
-          mkdir -p "$(dirname "$AIRCRAFT_EPHEMERIS_PATH")"
-          if [[ ! -f "$AIRCRAFT_EPHEMERIS_PATH" ]]; then
+          mkdir -p "$(dirname "$TRANSIT_EPHEMERIS_PATH")"
+          if [[ ! -f "$TRANSIT_EPHEMERIS_PATH" ]]; then
             curl --fail --location --retry 3 --max-time 180 \
               https://ssd.jpl.nasa.gov/ftp/eph/planets/bsp/de421.bsp \
-              --output "$AIRCRAFT_EPHEMERIS_PATH"
+              --output "$TRANSIT_EPHEMERIS_PATH"
           fi
-          echo "a20a7139da04cbc462454634918e9a9ca69127044e2cc9d4f9c16e238d2deedc  $AIRCRAFT_EPHEMERIS_PATH" | sha256sum --check
+          echo "a20a7139da04cbc462454634918e9a9ca69127044e2cc9d4f9c16e238d2deedc  $TRANSIT_EPHEMERIS_PATH" | sha256sum --check
       - name: Test backend
         run: python -m pytest -q
       - name: Compute next 96 hours

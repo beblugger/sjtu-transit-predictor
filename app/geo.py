@@ -34,22 +34,6 @@ def geodetic_to_ecef(latitude_deg: float, longitude_deg: float, altitude_m: floa
     )
 
 
-def ecef_to_geodetic(ecef: np.ndarray) -> Geodetic:
-    x, y, z = (float(v) for v in ecef)
-    lon = math.atan2(y, x)
-    p = math.hypot(x, y)
-    lat = math.atan2(z, p * (1.0 - WGS84_E2))
-    for _ in range(8):
-        sin_lat = math.sin(lat)
-        n = WGS84_A / math.sqrt(1.0 - WGS84_E2 * sin_lat * sin_lat)
-        alt = p / math.cos(lat) - n
-        lat = math.atan2(z, p * (1.0 - WGS84_E2 * n / (n + alt)))
-    sin_lat = math.sin(lat)
-    n = WGS84_A / math.sqrt(1.0 - WGS84_E2 * sin_lat * sin_lat)
-    alt = p / math.cos(lat) - n
-    return Geodetic(math.degrees(lat), math.degrees(lon), alt)
-
-
 def enu_rotation(latitude_deg: float, longitude_deg: float) -> np.ndarray:
     lat = math.radians(latitude_deg)
     lon = math.radians(longitude_deg)
@@ -72,16 +56,6 @@ def ecef_to_enu(
 ) -> np.ndarray:
     origin = geodetic_to_ecef(observer_latitude, observer_longitude, observer_altitude)
     return enu_rotation(observer_latitude, observer_longitude) @ (ecef - origin)
-
-
-def enu_to_ecef(
-    enu: np.ndarray,
-    observer_latitude: float,
-    observer_longitude: float,
-    observer_altitude: float = 0.0,
-) -> np.ndarray:
-    origin = geodetic_to_ecef(observer_latitude, observer_longitude, observer_altitude)
-    return origin + enu_rotation(observer_latitude, observer_longitude).T @ enu
 
 
 def enu_az_alt_range(east_north_up: np.ndarray) -> tuple[float, float, float]:
@@ -112,14 +86,3 @@ def angular_diameter_arcsec(diameter_m: float, range_m: float) -> float:
     if diameter_m <= 0.0 or range_m <= 0.0:
         raise ValueError("diameter and range must be positive")
     return 2.0 * math.atan(diameter_m / (2.0 * range_m)) * ARCSEC_PER_RADIAN
-
-
-def local_offsets_to_wgs84(
-    latitude_deg: float,
-    longitude_deg: float,
-    east_m: float,
-    north_m: float,
-    altitude_m: float = 0.0,
-) -> Geodetic:
-    ecef = enu_to_ecef(np.array([east_m, north_m, 0.0]), latitude_deg, longitude_deg, altitude_m)
-    return ecef_to_geodetic(ecef)

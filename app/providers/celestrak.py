@@ -129,52 +129,6 @@ class CelestrakProvider:
         return entries
 
 
-class SatNogsProvider:
-    """Fallback using SatNOGS's public TLE mirror of Space-Track data."""
-
-    def __init__(
-        self,
-        url: str,
-        *,
-        timeout_seconds: float = 45.0,
-        transport: httpx.AsyncBaseTransport | None = None,
-    ):
-        self.url = url
-        self.timeout_seconds = timeout_seconds
-        self.transport = transport
-
-    async def fetch_active(self, *, max_targets: int = 0) -> list[TLEEntry]:
-        async with httpx.AsyncClient(
-            timeout=self.timeout_seconds,
-            follow_redirects=True,
-            transport=self.transport,
-        ) as client:
-            response = await client.get(
-                self.url,
-                headers={"User-Agent": "sjtu-transit-predictor/0.1"},
-            )
-            response.raise_for_status()
-            rows = response.json()
-        entries: list[TLEEntry] = []
-        for row in rows:
-            try:
-                name = str(row["tle0"]).strip()
-                if name.startswith("0 "):
-                    name = name[2:]
-                entries.append(
-                    TLEEntry(
-                        name=name,
-                        norad_id=int(row["norad_cat_id"]),
-                        line1=str(row["tle1"]).strip(),
-                        line2=str(row["tle2"]).strip(),
-                        epoch=_parse_tle_epoch(str(row["tle1"])[18:32]),
-                    )
-                )
-            except (KeyError, TypeError, ValueError, IndexError):
-                continue
-        return entries[:max_targets] if max_targets > 0 else entries
-
-
 def parse_three_line_elements(text: str) -> list[TLEEntry]:
     lines = [line.rstrip() for line in text.splitlines() if line.strip()]
     entries: list[TLEEntry] = []

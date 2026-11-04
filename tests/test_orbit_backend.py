@@ -12,13 +12,11 @@ from app.astronomy import CelestialCalculator
 from app.config import Settings
 from app.geo import Geodetic, angular_separation_arcsec
 from app.providers.celestrak import CelestrakProvider, CatalogUnchanged, TLEEntry, parse_omm_elements
-from app.services import build_services
+from app.runtime import build_runtime
 from app.store import DatabaseStore
 from app.export import export_snapshot
-from app.main import create_app
 from app.models import TransitEvent, Target
 from app.satellites import SatelliteService
-from fastapi.testclient import TestClient
 
 
 LINE1 = "1 25544U 98067A   20344.91667824  .00001264  00000-0  29621-4 0  9993"
@@ -70,7 +68,7 @@ def test_bad_catalog_does_not_silently_replace_good_data(payload):
 
 def test_primary_mirror_cache_and_unchanged_provenance(tmp_path):
     settings = Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp")
-    runtime = build_services(settings)
+    runtime = build_runtime(settings)
     calls = []
     def handler(request):
         calls.append(request.url.host)
@@ -87,7 +85,7 @@ def test_primary_mirror_cache_and_unchanged_provenance(tmp_path):
     asyncio.run(runtime.satellites.refresh_catalog())
     assert len(calls) == 2  # persisted refresh interval, no repeated requests
     runtime.store.close()
-    runtime = build_services(settings)
+    runtime = build_runtime(settings)
     assert runtime.satellites.updated_at == first_download
     runtime.store.set_cache("orbit_primary_attempt", True, datetime(2000, 1, 1, tzinfo=timezone.utc))
     runtime.satellites.provider = CelestrakProvider("https://primary.test", transport=httpx.MockTransport(
@@ -125,7 +123,7 @@ def test_publication_timestamp_skips_download_until_updated(tmp_path):
             return httpx.Response(200, text=f"<h3>Current as of {published[0]} UTC (Day 308)</h3>")
         return httpx.Response(200, json=[entry().as_omm()])
     settings = Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp")
-    runtime = build_services(settings)
+    runtime = build_runtime(settings)
     provider = CelestrakProvider("https://primary.test/gp", update_url="https://primary.test/index",
                                  transport=httpx.MockTransport(handler))
     runtime.satellites.provider = provider
@@ -134,7 +132,7 @@ def test_publication_timestamp_skips_download_until_updated(tmp_path):
     assert calls == ["/index", "/gp"]
     runtime.store.close()
     # A fresh process restores the publication marker along with the catalog.
-    runtime = build_services(settings)
+    runtime = build_runtime(settings)
     assert runtime.satellites.provider.known_update_at == datetime(2026, 11, 4, 12, 23, 24, tzinfo=timezone.utc)
     provider.known_update_at = runtime.satellites.provider.known_update_at
     runtime.satellites.provider = provider
@@ -165,7 +163,7 @@ def test_failed_publication_probe_never_downloads_catalog(response):
 
 
 def test_stale_mirror_never_rolls_back_newer_cached_orbit(tmp_path):
-    runtime = build_services(Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp"))
+    runtime = build_runtime(Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp"))
     fresh = entry().as_omm()
     fresh["EPOCH"] = "2026-11-04T00:00:00.000000"
     runtime.store.save_tles(parse_omm_elements([fresh]), EPOCH)
@@ -181,7 +179,7 @@ def test_stale_mirror_never_rolls_back_newer_cached_orbit(tmp_path):
 
 
 def test_old_epoch_is_not_excluded_from_geometry(tmp_path, monkeypatch):
-    runtime = build_services(Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp"))
+    runtime = build_runtime(Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp"))
     runtime.store.save_tles([entry()], EPOCH)
     runtime.satellites._restore_cached_catalog()
     now = EPOCH + timedelta(days=3)
@@ -200,7 +198,9 @@ def test_export_96_hours_keeps_weather_unavailable_events_and_reuses_geometry(tm
     now = EPOCH.replace(hour=0, minute=0, second=0)
     settings = Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp")
     store = DatabaseStore(settings.database_path)
-    store.save_tles([entry()], EPOCH - timedelta(days=10))
+    six_digit = entry().as_omm()
+    six_digit["NORAD_CAT_ID"] = 100001
+    store.save_tles([entry(), *parse_omm_elements([six_digit])], EPOCH - timedelta(days=10))
     store.close()
     calls = []
     async def fake_events(self, start, end, now=None):
@@ -225,6 +225,11 @@ def test_export_96_hours_keeps_weather_unavailable_events_and_reuses_geometry(tm
     assert all(event["weather"]["decision"] == "unavailable" for event in payload["events"])
     manifest = json.loads((output / "manifest.json").read_text())
     assert manifest["catalog_fetched_at"] == (EPOCH - timedelta(days=10)).isoformat()
+    assert manifest["catalog_count"] == 2
+    assert manifest["tle_count"] == 1
+    assert manifest["tle_omitted_count"] == 1
+    assert [row["NORAD_CAT_ID"] for row in json.loads((output / "orbits.json").read_text())] == [25544, 100001]
+    assert len((output / "orbits.tle").read_text().splitlines()) == 3
     for name, digest in manifest["files"].items():
         assert hashlib.sha256((output / name).read_bytes()).hexdigest() == digest
     second = asyncio.run(export_snapshot(settings, output, offline=True, now=now + timedelta(hours=1)))
@@ -243,37 +248,13 @@ def test_missing_catalog_preserves_previous_export(tmp_path):
     assert (output / "manifest.json").read_text() == "previous generation"
 
 
-def test_orbit_api_and_96_hour_endpoint(tmp_path, monkeypatch):
-    runtime = build_services(Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp"))
-    fields = entry().as_omm()
-    fields["NORAD_CAT_ID"] = 100001
-    runtime.store.save_tles([entry(), *parse_omm_elements([fields])])
-    runtime.satellites._restore_cached_catalog()
-    async def fake_events(*args, **kwargs):
-        return []
-    monkeypatch.setattr(runtime.satellites, "events", fake_events)
-    with TestClient(create_app(runtime, start_services=False)) as client:
-        result = client.get("/api/v1/orbits")
-        assert result.status_code == 200
-        assert [row["NORAD_CAT_ID"] for row in result.json()] == [25544, 100001]
-        tle = client.get("/api/v1/orbits?format=tle")
-        assert tle.headers["X-TLE-Omitted-Count"] == "1"
-        assert len(tle.text.splitlines()) == 3
-        assert client.get("/api/v1/weather/snapshot").json()["ensemble"] is None
-        result = client.get("/api/v1/events?type=satellite&hours=96")
-        assert result.status_code == 200
-        assert result.json()["announced_only"] is False
-        assert client.get("/api/v1/events?hours=97").status_code == 422
-    runtime.store.close()
-
-
 @pytest.mark.parametrize("target", [Target.SUN, Target.MOON])
 @pytest.mark.parametrize("use_kernel", [False, True])
 def test_window_interpolation_matches_exact_topocentric_places(tmp_path, target, use_kernel):
     path = Path("~/.cache/sjtu-transit/de421.bsp").expanduser() if use_kernel else tmp_path / "missing.bsp"
     if use_kernel and not path.exists():
         pytest.skip("Optional DE421 kernel is not installed")
-    runtime = build_services(Settings(database_path=tmp_path / "cache.db", ephemeris_path=path))
+    runtime = build_runtime(Settings(database_path=tmp_path / "cache.db", ephemeris_path=path))
     center_time = datetime(2026, 11, 5, 2, tzinfo=timezone.utc)
     interpolate = runtime.satellites._target_interpolator(target, center_time)
     for point in runtime.campus.grid(400)[::5]:

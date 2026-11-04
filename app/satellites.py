@@ -30,7 +30,6 @@ from app.models import (
 from app.providers.celestrak import (
     CatalogUnchanged,
     CelestrakProvider,
-    SatNogsProvider,
     TLEEntry,
     tle_age_seconds,
 )
@@ -75,7 +74,7 @@ class SatelliteService:
         sizes: SatelliteSizeCatalog,
         weather: WeatherService,
         provider: CelestrakProvider | None = None,
-        fallback_provider: SatNogsProvider | None = None,
+        fallback_provider: CelestrakProvider | None = None,
         store: DatabaseStore | None = None,
     ):
         self.settings = settings
@@ -174,28 +173,6 @@ class SatelliteService:
                     self.store.set_cache("orbit_primary_update", self.provider.known_update_at.isoformat(), self.updated_at)
         except Exception as exc:
             self.last_error = str(exc)
-
-    def invalidate_cache(self) -> None:
-        with self._lock:
-            self._event_cache_key = None
-            self._event_cache = []
-
-    def reapply_weather(self, now: datetime | None = None) -> None:
-        now = _utc(now or datetime.now(timezone.utc))
-        with self._lock:
-            for index, event in enumerate(self._event_cache):
-                evaluation = self.weather.evaluate(event.target.value, event.minimum_time, now)
-                updated = event.model_copy(deep=True)
-                updated.weather = evaluation.evidence
-                updated.confidence = max(
-                    0.0,
-                    min(
-                        1.0,
-                        evaluation.evidence.score
-                        * (1.05 if updated.physical_size_m is not None else 1.0),
-                    ),
-                )
-                self._event_cache[index] = updated
 
     def _restore_cached_catalog(self) -> None:
         assert self.store is not None

@@ -1,243 +1,77 @@
-# SJTU Transit Predictor
+# 交大日月凌星预报
 
-Backend-only predictor for aircraft and satellite transits across the Sun or
-Moon as seen anywhere inside Shanghai Jiao Tong University's Minhang campus.
-It returns a JSON event list and a server-rendered HTML page.
+为上海交通大学闵行校区静态网站生成未来 96 小时的太阳、月球凌星事件、轨道目录和天气缓存。GitHub Actions 定时计算，GitHub Pages 发布数据。
 
-## Capabilities
+- [数据入口](https://beblugger.github.io/sjtu-transit-predictor/)
+- [数据版本与更新时间](https://beblugger.github.io/sjtu-transit-predictor/data/manifest.json)
+- [构建记录与手动运行](https://github.com/beblugger/sjtu-transit-predictor/actions/workflows/backend.yml)
 
-- WGS84/CGCS2000 geodetic coordinates transformed through ECEF into a local
-  campus ENU frame. No GCJ-02 shift is applied.
-- The official SJTU Minhang campus polygon, a 100 m observation grid, and 25 m
-  local refinement around candidate events.
-- CelesTrak active OMM/TLE ingestion and SGP4 propagation for a rolling 96-hour
-  window. The primary is checked at most once every two hours, with a community
-  OMM mirror and a persistent last-valid catalog as fallbacks. Six-digit catalog
-  numbers are supported through OMM.
-- Sun/Moon astrometry from Skyfield DE421 when that optional kernel is
-  available, with an offline Meeus analytical fallback. Events are refined
-  below one second rather than sampled only once per hour.
-- Physical angular diameter for satellites with audited dimensions:
-  `theta = 2 atan(D / (2 range))`. Unknown sizes are reported as unknown and
-  only central-line crossings are accepted.
-- Aircraft trajectory prediction using robust local cubic, constant-velocity,
-  and coordinated-turn models over a ten-minute horizon.
-- Open-Meteo deterministic and ECMWF/GFS ensemble forecasts with a composite
-  `P0/P3/P12` score, model agreement, run stability, and lead-time thresholds.
-- An official VariFlight DataWorks area-provider adapter. It remains explicitly
-  disabled until trial credentials are configured.
+## 本地构建
 
-## Setup
-
-Python 3.10 or newer is required.
+需要 Python 3.10 或更新版本；线上使用 Python 3.14。
 
 ```bash
-python3 -m pip install -e .
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[dev]'
 cp .env.example .env
-python3 -m uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
-
-For an isolated environment use standard Python `venv` and install `.[dev]`.
-No uv or Node.js is required for the backend. Python 3.14 is supported.
-
-DE421 is optional. Put `de421.bsp` at
-`~/.cache/sjtu-transit/de421.bsp` to use Skyfield's JPL ephemeris; otherwise the
-service automatically uses its built-in analytical Sun/Moon model. The first
-orbit refresh loads the active satellite catalog and can take a little time.
-CelesTrak's "not updated" response is handled as an unchanged catalog, with
-the public `satvisorcom/satvisor-data` OMM mirror as an outage fallback.
-Before downloading the catalog, the primary checks the GP index's `Current as of`
-publication timestamp. An unchanged timestamp skips the full download. The
-publication marker is persisted only after a valid primary catalog is saved.
-A failed timestamp probe stops primary requests and falls back to the mirror.
-An unchanged response does not reset the original download timestamp. A six-hour
-warning threshold never excludes a satellite solely because its epoch is old.
-If a mirror lags behind the last-valid snapshot, newer cached elements are kept;
-fallback merging is reported as `community-mirror+cache`. A successful primary
-snapshot replaces catalog membership normally.
-
-Open:
-
-- API: `http://127.0.0.1:8000/api/v1/events?type=satellite&hours=96`
-- OMM catalog: `http://127.0.0.1:8000/api/v1/orbits`
-- Legacy TLE: `http://127.0.0.1:8000/api/v1/orbits?format=tle`
-- Weather snapshot: `http://127.0.0.1:8000/api/v1/weather/snapshot`
-- Weather: `http://127.0.0.1:8000/api/v1/weather/status`
-- Health: `http://127.0.0.1:8000/api/v1/health`
-- HTML: `http://127.0.0.1:8000/events.html`
-- OpenAPI: `http://127.0.0.1:8000/docs`
-
-Each satellite event includes the physical span, nominal angular diameter,
-minimum/maximum orientation-dependent angular diameter, size-source URL, and
-size confidence. The nominal value uses the maximum documented span for
-conservative transit ingress/egress detection. The HTML page renders the
-official campus polygon and marks the best observation points returned by the
-campus-wide scan.
-
-## Batch/static backend
-
-```bash
-python3 -m app.export --database .state/transit.db --output dist/data --hours 96
-```
-
-This is a finite batch job: it does not start FastAPI, background polling, or
-the aircraft module. It exports every geometric Sun/Moon transit, including
-events with poor, missing, or stale weather. The browser can filter the event
-window and weather separately. The API likewise defaults to all events; pass
-`announced_only=true` to request weather-approved events only.
-
-Outputs:
-
-- `events.json`: all events and the fixed UTC prediction coverage.
-- `orbits.json`: complete OMM catalog for consumers, including six-digit IDs.
-- `orbits.tle`: compatibility subset with IDs up to 99999; the manifest records
-  how many objects were omitted. OMM must be used for complete coverage.
-- `weather.json`: cached deterministic/ensemble series with original fetch times.
-- `campus.geojson`: the observation area.
-- `manifest.json`: source, original fetch time, last check, hashes, warnings,
-  and event/catalog counts. It is committed last; consumers should verify hashes
-  and retry if files changed while loading.
-
-Retain `.state/transit.db` between jobs. It stores orbit snapshots, primary
-request attempts (including failures), weather, and six-hour geometry chunks.
-Unchanged geometry chunks are reused; changed orbital data, numerical code,
-dependencies, campus, sizes, or calculation settings invalidate them. New tail
-chunks are computed as the 96-hour window advances. Prediction cache entries
-older than seven days are removed. Use `--offline` to reproduce an export from
-stored data without fetching orbit/weather providers. With no usable catalog,
-the job fails before replacing an existing export.
-
-Weather requests cover six forecast days plus one past day for the ±12-hour
-score. A missing full window yields `weather_window_not_covered`, rather than
-using the last available hour for a later date. The snapshot includes location,
-member forecasts, and fetch timestamps so a future frontend can optionally
-refresh and re-score it. Free Open-Meteo service is for non-commercial use and
-requires attribution.
-
-Use DE421 for production transit calculations. Download the JPL kernel once:
-
-```bash
 mkdir -p ~/.cache/sjtu-transit
 curl --fail --location https://ssd.jpl.nasa.gov/ftp/eph/planets/bsp/de421.bsp \
   --output ~/.cache/sjtu-transit/de421.bsp
+python -m app.export --database .state/transit.db --output dist/data --hours 96
+python scripts/validate_export.py --data dist/data
+python -m pytest -q
 ```
 
-Without it the analytical fallback remains available, but the export explicitly
-warns `analytical_ephemeris_lower_accuracy`. Numerical subsecond refinement does
-not imply subsecond physical prediction accuracy: event uncertainty grows with
-distance from the orbit epoch, and maneuvers may invalidate an extrapolation.
-Events include `orbit_epoch` and `orbit_age_at_event_hours`. Satellite sunlight
-and Earth-shadow status are not filters for Sun/Moon transits.
+配置使用 `TRANSIT_` 环境变量前缀，见 `.env.example`。轨道、天气无需 API 密钥。
+保留 `.state/transit.db` 可复用数据和计算缓存；加 `--offline` 可完全使用已保存的数据。
+生产构建校验 DE421 的 SHA256；本地缺少星历时使用精度较低的解析模型，并在导出中警告。
 
-The coarse search uses 60-second finite trajectory arcs, then an array-based
-100 m campus screen and 25 m local refinement. A short-window cubic interpolation
-of Sun/Moon apparent positions accelerates observation-point screening; final
-event and contact times use the full ephemeris calculation. Minima at search
-boundaries are rejected, and contact roots can extend up to one hour on either
-side so slow transits are not truncated to the coarse search window.
+## 静态数据
 
-To independently audit exported positions and contact boundaries using
-Skyfield's satellite/topocentric implementation:
+所有文件位于网站的 `data/` 下，时间使用 UTC。页面仅提供数据链接，预报交互界面尚未实现。
 
-```bash
-python3 scripts/validate_export.py --data dist/data
-```
+| 文件 | 内容 |
+| --- | --- |
+| `manifest.json` | 生成时间、96 小时覆盖范围、上游时间、来源、数量、警告和文件 SHA256 |
+| `events.json` | 凌星事件、观测位置、入凌/出凌时间、角距、卫星尺寸、轨道历元和天气评分 |
+| `orbits.json` | 完整 OMM 轨道目录，支持六位及以上卫星编号 |
+| `orbits.tle` | 编号不超过 99999 的兼容子集；遗漏数量记录在 manifest 中 |
+| `weather.json` | 含原始获取时间和位置的确定性、ECMWF/GFS 集合天气缓存 |
+| `campus.geojson` | 闵行校区观测范围 |
 
-The audit verifies snapshot hashes, campus membership, coverage, and geometric
-agreement to one arcsecond. It does not establish real-world orbit accuracy or
-prove that the coarse candidate search is exhaustive.
+客户端可选择时间范围、天气条件，并使用轨道和天气数据进一步计算。导出保留所有几何事件，不按天气、地影或轨道历元超过六小时排除。超过时效会给出警告；天气缺失、过期或窗口不足时标为不可用。
 
-Local validation on 2026-11-04 (Python 3.14): 33 tests passed. A live CelesTrak
-catalog of 16,875 objects produced 1,166 geometric events over 96 hours using
-DE421, including 60 events with six-digit satellite IDs. Cold export took
-343 seconds on the development machine; a second offline export reused all
-17 chunks in 4.5 seconds. The independent audit checked every event with no
-violations; maximum minimum-separation difference was 0.67 arcsecond and maximum
-contact-boundary residual was 0.77 arcsecond. These are numerical consistency
-checks, not estimates of orbital prediction uncertainty. The first GitHub Actions build completed in 5 minutes 57 seconds, plus
-15 seconds for Pages deployment.
+## 更新与缓存
 
-## Hosted backend
+优先使用 CelesTrak active 目录，失败时回落到 `satvisorcom/satvisor-data` 社区 OMM 镜像，再使用最后有效快照。落后的镜像不能覆盖更新的缓存轨道。
 
-The public repository is https://github.com/beblugger/sjtu-transit-predictor.
-Static data is served at https://beblugger.github.io/sjtu-transit-predictor/data/manifest.json.
-No continuously running API server or aircraft provider is deployed.
+主站请求至少间隔两小时。先读取 GP 列表页的 `Current as of`，与上次成功下载对应的发布时间比较；相同则跳过目录下载。发布时间仅在有效目录保存后持久记录。无法解析时间或 HTTP 出错时停止本轮主站请求并回落；未更新响应不会刷新原始下载时间。
 
-`.github/workflows/backend.yml` builds on main pushes, manual dispatch, and
-at minute 23 of every even UTC hour (Beijing 00:23, 02:23, etc.). Each run
-installs Python 3.14, tests the backend, computes 96 hours, independently audits
-all exported events, and deploys the complete snapshot through GitHub Pages.
-The previous successful Pages deployment survives a failed build or audit.
-The root page only lists data links; the prediction frontend is not deployed.
+几何预报按 UTC 六小时分块缓存。轨道内容、算法、依赖版本、星历、校区或计算参数变化会使缓存失效；窗口滚动时只补算新增时间段。每次导出重新计算天气评分，清理七天前的几何缓存。
 
-Only the repository-provided `GITHUB_TOKEN` is used. There are no custom secrets,
-paid runners, paid APIs, or external cron services. Workflow actions are pinned
-to commit hashes and overlapping builds are serialized. DE421 is verified by
-SHA256 before use. Contents write permission is limited to the build job;
-Pages and OIDC write permissions are limited to deployment.
+## 自动部署
 
-Actions cache accelerates geometry and ephemeris reuse. A separate `state`
-branch stores a compact SQLite snapshot of orbit/weather inputs and original
-fetch/check times. It deliberately omits geometry and aircraft samples. Every run merges newer durable inputs into its restored calculation cache before
-fetching providers, including cooldowns written by failed runs. A cache miss
-restores the durable snapshot as a new database.
-After calculation, including a failed calculation, the workflow persists request
-attempts so retries retain the two-hour cooldown. It replaces **only the dedicated state branch** with a new
-root commit, leaving only the latest binary snapshot reachable. Main history
-is never rewritten. The state is public scientific data, with no credentials.
-This avoids retaining a growing Git history of large databases; GitHub controls
-when unreachable objects are garbage-collected. State updates contain actual
-new export metadata rather than empty keepalive commits.
+`.github/workflows/backend.yml` 在 main 推送、手动运行，以及北京时间每个偶数小时的 23 分触发。流程依次安装依赖、恢复状态、校验星历、运行测试、计算、独立验证几何结果，然后发布整批数据。失败时保留上次成功的 Pages 版本。
 
-Scheduled Actions can run late or be dropped, and GitHub can disable inactive
-public schedules after 60 days. Real state updates provide repository activity,
-but GitHub does not guarantee permanent operation. Monitor the Actions page and
-`manifest.generated_at`; a manual **Run workflow** can recover after an outage.
-Backend data includes original source timestamps and stale-data warnings.
-Actions cache eviction affects speed, not the durable input fallback.
+仅使用仓库自带的 `GITHUB_TOKEN`，无需自定义凭证。构建任务具有保存状态所需的 contents 写权限；部署任务具有 Pages 和 OIDC 写权限。工作流串行运行，顶层 Action 固定到提交版本。
 
-Official references: [Pages custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages),
-[scheduled workflow limitations](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule),
-and [cache limits](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching#usage-limits-and-eviction-policy).
+Actions cache 保存几何计算和星历；独立 `state` 分支持久保存压缩后的轨道、天气、更新时间和请求记录。每次运行都会合并更新的持久记录，避免旧计算缓存丢失失败请求的两小时冷却。即使计算失败，也会尝试保存这些记录。
 
-## Aircraft ADS-B source
+`state` 分支只保留最新快照对应的根提交，避免二进制数据库历史持续增长；main 历史不重写。旧版本状态中的废弃数据表会在打包时移除。缓存被清理后仍可恢复输入并重新计算。
 
-The public OpenSky, adsb.lol, and AirLabs demo feeds currently return no
-aircraft in the Shanghai bounding box. FlightADSB visibly covers Shanghai but
-does not expose a public API and its terms prohibit automated collection.
+GitHub 定时任务可能延迟或丢弃，公共仓库无活动达 60 天可能被停用。实际数据更新会写入 state 分支，但平台不保证永久运行；可查看构建记录和 `manifest.generated_at`，必要时手动运行工作流。
 
-The implemented provider therefore targets the official VariFlight DataWorks
-Radar ADS-B V2 area query. Request a 14-day trial and set:
+## 计算与验证
 
-```dotenv
-AIRCRAFT_ADS_PROVIDER=variflight
-AIRCRAFT_VARIFLIGHT_APP_ID=...
-AIRCRAFT_VARIFLIGHT_APP_SECURITY=...
-```
+SGP4 传播轨道，DE421 计算日月位置。搜索采用 60 秒有限轨迹弧、100 米校区网格和 25 米局部细化。筛选使用日月位置插值，最终最小角距及接触时间使用完整星历重新求解。出入凌是在选定观测位置上求时间根，接触搜索允许向两侧各扩展一小时。
 
-Without these values the satellite and weather services remain available while
-the aircraft module reports `aircraft_provider_unavailable`.
+独立验证脚本使用 Skyfield 的卫星地平坐标计算，检查文件哈希、校区范围、时间覆盖及一角秒内的几何一致性。这不代表真实轨道预报误差，也不证明候选搜索没有遗漏。轨道外推和机动可能造成实际预报偏差。
 
-## Weather policy
+## 数据来源
 
-For each Sun/Moon transit candidate the service computes:
-
-- `P0`: ensemble fraction clear at the event hour.
-- `P3`: clear fraction across the event plus/minus three hours.
-- `P12`: clear fraction across the event plus/minus twelve hours.
-- Each model score is `(P0 * P3 * P12) ** (1/3)`.
-- ECMWF and GFS scores are averaged. A model gap above 0.20 or a run-to-run
-  score change above 0.20 suppresses the event.
-- Announcement thresholds are 0.70, 0.78, 0.85, and 0.90 for lead-time bands
-  ending at 2, 12, 24, and 48 hours.
-
-All events within the 96-hour window use this policy. Missing or stale weather
-does not create a false "clear" result.
-
-## Tests
-
-```bash
-pytest
-```
-
-The test suite does not require external network access.
+- [CelesTrak GP 数据与使用说明](https://celestrak.org/NORAD/documentation/gp-data-formats.php)
+- [CelesTrak 使用政策](https://celestrak.org/usage-policy.php)
+- [社区备用镜像](https://github.com/satvisorcom/satvisor-data)
+- [Open-Meteo](https://open-meteo.com/)：免费接口用于非商业用途，天气数据按 CC BY 4.0 署名
+- [JPL 星历](https://ssd.jpl.nasa.gov/planets/eph_export.html)

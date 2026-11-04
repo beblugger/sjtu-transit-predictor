@@ -7,8 +7,6 @@ from pathlib import Path
 from threading import Lock
 
 from app.providers.celestrak import TLEEntry
-from app.providers.variflight import AircraftObservation
-from app.geo import Geodetic
 
 
 class DatabaseStore:
@@ -107,78 +105,6 @@ class DatabaseStore:
                 )
         return result
 
-    def save_observations(self, observations: list[AircraftObservation]) -> None:
-        if not observations:
-            return
-        with self._lock:
-            self._connection.executemany(
-                """
-                INSERT OR REPLACE INTO aircraft_samples(
-                  identifier, observed_at, latitude, longitude, altitude_m,
-                  callsign, icao24, aircraft_type, registration,
-                  ground_speed_mps, track_deg, vertical_rate_mps, source
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                [
-                    (
-                        obs.identifier,
-                        obs.observed_at.isoformat(),
-                        obs.position.latitude_deg,
-                        obs.position.longitude_deg,
-                        obs.position.altitude_m,
-                        obs.callsign,
-                        obs.icao24,
-                        obs.aircraft_type,
-                        obs.registration,
-                        obs.ground_speed_mps,
-                        obs.track_deg,
-                        obs.vertical_rate_mps,
-                        obs.source,
-                    )
-                    for obs in observations
-                ],
-            )
-            self._connection.commit()
-
-    def load_observations(
-        self,
-        since: datetime,
-    ) -> dict[str, list[AircraftObservation]]:
-        with self._lock:
-            rows = self._connection.execute(
-                "SELECT * FROM aircraft_samples WHERE observed_at >= ? ORDER BY observed_at",
-                (since.isoformat(),),
-            ).fetchall()
-        result: dict[str, list[AircraftObservation]] = {}
-        for row in rows:
-            observation = AircraftObservation(
-                identifier=row["identifier"],
-                observed_at=datetime.fromisoformat(row["observed_at"]),
-                position=Geodetic(
-                    float(row["latitude"]),
-                    float(row["longitude"]),
-                    float(row["altitude_m"]),
-                ),
-                callsign=row["callsign"],
-                icao24=row["icao24"],
-                aircraft_type=row["aircraft_type"],
-                registration=row["registration"],
-                ground_speed_mps=_optional_float(row["ground_speed_mps"]),
-                track_deg=_optional_float(row["track_deg"]),
-                vertical_rate_mps=_optional_float(row["vertical_rate_mps"]),
-                source=row["source"],
-            )
-            result.setdefault(observation.identifier, []).append(observation)
-        return result
-
-    def prune_observations(self, before: datetime) -> None:
-        with self._lock:
-            self._connection.execute(
-                "DELETE FROM aircraft_samples WHERE observed_at < ?",
-                (before.isoformat(),),
-            )
-            self._connection.commit()
-
     def _initialize(self) -> None:
         with self._lock:
             self._connection.executescript(
@@ -196,28 +122,6 @@ class DatabaseStore:
                   epoch TEXT NOT NULL,
                   fetched_at TEXT NOT NULL
                 );
-                CREATE TABLE IF NOT EXISTS aircraft_samples (
-                  identifier TEXT NOT NULL,
-                  observed_at TEXT NOT NULL,
-                  latitude REAL NOT NULL,
-                  longitude REAL NOT NULL,
-                  altitude_m REAL NOT NULL,
-                  callsign TEXT,
-                  icao24 TEXT,
-                  aircraft_type TEXT,
-                  registration TEXT,
-                  ground_speed_mps REAL,
-                  track_deg REAL,
-                  vertical_rate_mps REAL,
-                  source TEXT NOT NULL,
-                  PRIMARY KEY(identifier, observed_at)
-                );
-                CREATE INDEX IF NOT EXISTS idx_aircraft_time
-                  ON aircraft_samples(observed_at);
                 """
             )
             self._connection.commit()
-
-
-def _optional_float(value: object) -> float | None:
-    return None if value is None else float(value)

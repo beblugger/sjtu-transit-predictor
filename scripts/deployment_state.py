@@ -15,7 +15,8 @@ def pack(database: Path, destination: Path) -> None:
         with sqlite3.connect(database) as source, sqlite3.connect(snapshot) as target:
             source.backup(target)
             target.execute("DELETE FROM kv_cache WHERE key LIKE 'prediction:%'")
-            target.execute("DELETE FROM aircraft_samples")
+            # Remove the legacy table when recovering a pre-static-backend snapshot.
+            target.execute("DROP TABLE IF EXISTS aircraft_samples")
             target.commit()
             target.execute("PRAGMA journal_mode=DELETE")
             target.execute("VACUUM")

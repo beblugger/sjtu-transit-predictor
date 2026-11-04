@@ -11,3 +11,4 @@ htmlcov/
 .coverage
 dist/
 .state/
+uv.lock

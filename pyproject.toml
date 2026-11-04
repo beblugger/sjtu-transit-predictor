@@ -5,20 +5,16 @@ build-backend = "hatchling.build"
 [project]
 name = "sjtu-transit-predictor"
 version = "0.1.0"
-description = "Satellite and aircraft Sun/Moon transit predictor for SJTU Minhang campus"
+description = "Static satellite Sun/Moon transit predictor for SJTU Minhang campus"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-  "fastapi>=0.115,<1",
-  "uvicorn[standard]>=0.30,<1",
   "httpx>=0.27,<1",
   "pydantic-settings>=2.4,<3",
-  "jinja2>=3.1,<4",
   "numpy>=1.26,<3",
   "scipy>=1.11,<2",
   "skyfield>=1.49,<2",
   "sgp4>=2.23,<3",
-  "pyproj>=3.6,<4",
   "PyYAML>=5.4,<7",
 ]
 
@@ -28,7 +24,6 @@ dev = [
 ]
 
 [project.scripts]
-transit-predictor = "app.cli:main"
 transit-export = "app.export:main"
 
 [tool.hatch.build.targets.wheel]

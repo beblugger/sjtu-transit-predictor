@@ -20,6 +20,10 @@ def test_durable_inputs_override_old_cache_but_keep_geometry(tmp_path):
     durable.set_cache("weather_snapshot", "older weather", old)
     durable.set_cache("prediction:discard", ["disposable"], new)
     durable.close()
+    # An existing deployment can still restore a snapshot from before cleanup.
+    with sqlite3.connect(durable_db) as connection:
+        connection.execute("CREATE TABLE aircraft_samples (identifier TEXT)")
+        connection.execute("INSERT INTO aircraft_samples VALUES ('legacy')")
     snapshot = tmp_path / "inputs.db.gz"
     pack(durable_db, snapshot)
     merge(snapshot, cached_db)
@@ -34,3 +38,4 @@ def test_durable_inputs_override_old_cache_but_keep_geometry(tmp_path):
     merge(snapshot, empty)
     with sqlite3.connect(empty) as connection:
         assert connection.execute("PRAGMA quick_check").fetchone()[0] == "ok"
+        assert connection.execute("SELECT name FROM sqlite_master WHERE name='aircraft_samples'").fetchone() is None

@@ -14,7 +14,6 @@ class Target(str, Enum):
 
 class EventType(str, Enum):
     SATELLITE = "satellite"
-    AIRCRAFT = "aircraft"
 
 
 class Announcement(str, Enum):
@@ -78,21 +77,6 @@ class TransitEvent(BaseModel):
     orbit_epoch: datetime | None = None
     orbit_age_at_event_hours: float | None = None
     reason_codes: list[str] = Field(default_factory=list)
-    callsign: str | None = None
-    icao24: str | None = None
-    aircraft_type: str | None = None
-    model_used: str | None = None
-    position_sigma_m: float | None = None
-
-
-class EventListResponse(BaseModel):
-    generated_at: datetime
-    from_time: datetime
-    to_time: datetime
-    announced_only: bool
-    events: list[TransitEvent]
-    suppressed_count: int = 0
-    warnings: list[str] = Field(default_factory=list)
 
 
 class WeatherStatus(BaseModel):
@@ -105,19 +89,3 @@ class WeatherStatus(BaseModel):
     current_weather_code: int | None
     current_condition: Literal["clear", "overcast", "rain", "unknown"]
     models: list[str] = Field(default_factory=list)
-
-
-class ProviderHealth(BaseModel):
-    name: str
-    enabled: bool
-    healthy: bool
-    detail: str
-    updated_at: datetime | None = None
-
-
-class HealthResponse(BaseModel):
-    status: Literal["ok", "degraded"]
-    generated_at: datetime
-    providers: list[ProviderHealth]
-    tle_count: int
-    aircraft_track_count: int

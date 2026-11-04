@@ -1,4 +1,4 @@
-"""Batch backend for Pages: no web server, credentials, or aircraft polling."""
+"""Export satellite transit predictions and weather for the static Pages site."""
 from __future__ import annotations
 
 import argparse
@@ -16,7 +16,7 @@ from sgp4.exporter import export_tle
 
 from app.config import Settings
 from app.models import TransitEvent
-from app.services import build_services
+from app.runtime import build_runtime
 
 
 def _json(value) -> str:
@@ -82,7 +82,7 @@ async def export_snapshot(settings: Settings, output: Path, *, offline: bool = F
                           now: datetime | None = None) -> dict:
     started = time.monotonic()
     now = (now or datetime.now(timezone.utc)).astimezone(timezone.utc).replace(microsecond=0)
-    runtime = build_services(settings)
+    runtime = build_runtime(settings)
     warnings = []
     try:
         if not offline:

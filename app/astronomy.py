@@ -229,10 +229,6 @@ def angular_separation_rows(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     return np.arccos(dots)
 
 
-def local_vector_from_target(azimuth_deg: float, altitude_deg: float) -> np.ndarray:
-    return unit_from_az_alt(azimuth_deg, altitude_deg)
-
-
 def _julian_date(value: datetime) -> float:
     if value.tzinfo is None:
         value = value.replace(tzinfo=timezone.utc)

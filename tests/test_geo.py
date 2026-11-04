@@ -7,25 +7,17 @@ import numpy as np
 from app.geo import (
     angular_diameter_arcsec,
     ecef_to_enu,
-    ecef_to_geodetic,
-    enu_to_ecef,
     geodetic_to_ecef,
 )
 
 
-def test_wgs84_ecef_round_trip():
-    point = (31.02807, 121.42839, 12.5)
-    result = ecef_to_geodetic(geodetic_to_ecef(*point))
-    assert math.isclose(result.latitude_deg, point[0], abs_tol=1e-8)
-    assert math.isclose(result.longitude_deg, point[1], abs_tol=1e-8)
-    assert math.isclose(result.altitude_m, point[2], abs_tol=1e-5)
-
-
-def test_enu_round_trip():
-    lat, lon = 31.02807, 121.42839
-    ecef = enu_to_ecef(np.array([100.0, -250.0, 20.0]), lat, lon, 5.0)
-    enu = ecef_to_enu(ecef, lat, lon, 5.0)
-    np.testing.assert_allclose(enu, [100.0, -250.0, 20.0], atol=1e-7)
+def test_wgs84_ecef_and_local_frame():
+    # Equator at longitude zero has a known ECEF position and local axes.
+    np.testing.assert_allclose(geodetic_to_ecef(0, 0, 12), [6_378_149, 0, 0], atol=1e-7)
+    origin = geodetic_to_ecef(0, 0, 12)
+    np.testing.assert_allclose(ecef_to_enu(origin, 0, 0, 12), [0, 0, 0], atol=1e-7)
+    np.testing.assert_allclose(ecef_to_enu(origin + [20, 100, -250], 0, 0, 12),
+                               [100, -250, 20], atol=1e-7)
 
 
 def test_angular_diameter_limits():
