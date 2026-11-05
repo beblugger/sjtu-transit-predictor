@@ -46,7 +46,9 @@ def validate(root: Path, ephemeris: Path) -> dict:
             if visibility is not None:
                 region_count += 1
                 region = shape(visibility["geometry"])
-                if not region.is_valid or region.is_empty or not campus_geometry.buffer(1e-10).covers(region):
+                domain = shape(visibility["calculation_domain"]) if visibility.get("calculation_domain") else campus_geometry
+                if (not region.is_valid or region.is_empty or not domain.buffer(1e-10).covers(region)
+                        or region.intersection(campus_geometry).is_empty):
                     violations.append({"id": event["identifier"], "reason": "invalid_ground_region"})
                 for sample in visibility["boundary_samples"]:
                     boundary_count += 1
@@ -78,6 +80,12 @@ def validate(root: Path, ephemeris: Path) -> dict:
                     if abs(result.x) > width * .98 or error > allowance:
                         violations.append({"id": event["identifier"], "reason": "inverse_boundary_mismatch", "error_arcsec": error})
             observer = event["observer"]
+            # The search grid, event contacts and inverse regions must use the
+            # same WGS84 ellipsoid height declared in this snapshot.
+            if abs(observer["elevation_m"] - campus.center.altitude_m) > 1e-6:
+                violations.append({"id": event["identifier"], "reason": "observer_height_mismatch"})
+            if visibility is not None and abs(visibility["chart"]["observer_elevation_m"] - observer["elevation_m"]) > 1e-6:
+                violations.append({"id": event["identifier"], "reason": "region_height_mismatch"})
             if not campus.contains(observer["latitude"], observer["longitude"]):
                 violations.append({"id": event["identifier"], "reason": "observer_outside_campus"})
             minimum = datetime.fromisoformat(event["minimum_time"].replace("Z", "+00:00"))

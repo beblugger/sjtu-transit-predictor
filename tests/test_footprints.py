@@ -42,7 +42,7 @@ def make_case(curvature=0):
     campus=Campus('square',(ring,),(-.01,-.01,.01,.01),Geodetic(0,0))
     event=SimpleNamespace(target=Target.SUN,minimum_time=time,duration_ms=2000,observer=ObserverPoint(latitude=0,longitude=0))
     record=SimpleNamespace(satrec=object(),size=None)
-    return FootprintSolver(astronomy,campus,record,event,tolerance_m=2)
+    return FootprintSolver(astronomy,campus,record,event,tolerance_m=2,exterior_margin_m=0)
 
 
 def test_inverse_strip_has_physical_width_and_position_dependent_time():
@@ -72,3 +72,16 @@ def test_unconverged_inverse_is_not_published_as_a_valid_region():
     solver.max_depth=0
     with pytest.raises(RuntimeError,match='approximation failed'):
         solver.solve()
+
+
+def test_exterior_region_and_true_contact_boundaries_are_retained():
+    original = make_case()
+    solver = FootprintSolver(original.astronomy,
+        Campus('square', (tuple((x/original.east_scale,y/original.north_scale) for x,y in
+            [(-500,-500),(500,-500),(500,500),(-500,500),(-500,-500)]),),
+            (-.01,-.01,.01,.01), Geodetic(0,0)), original.record, original.event, exterior_margin_m=300)
+    result = solver.solve()
+    assert result['area_m2'] > result['campus_area_m2']
+    assert shape(result['geometry']).bounds[2] > 500/original.east_scale
+    assert not shape(result['boundaries']).is_empty
+    assert not shape(result['centerline']).is_empty

@@ -1,4 +1,5 @@
-export const PAGE_SIZE = 50;
+import {weatherCondition} from './presentation.mjs';
+export const PAGE_SIZE = 5;
 export const TARGETS = {sun: '太阳', moon: '月球'};
 export const WEATHER = {announced: '模型评分达标', suppressed: '模型评分未达标', unavailable: '天气不可用'};
 export const REASONS = {
@@ -28,7 +29,7 @@ export function formatTime(value, zone, milliseconds = false) {
   const p = Object.fromEntries(parts.map(part => [part.type, part.value]));
   return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}:${p.second}${milliseconds ? '.' + p.fractionalSecond : ''}`;
 }
-export const zoneName = zone => zone === 'UTC' ? 'UTC' : 'UTC+08:00';
+export const zoneName = zone => zone === 'UTC' ? 'UTC' : 'CST';
 export const inputTime = (value, zone) => formatTime(value, zone).replace(' ', 'T');
 export function inputInstant(value, zone) {
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?$/.test(value)) return NaN;
@@ -47,7 +48,7 @@ export function distanceMeters(a, b) {
   // Surface-height-zero ECEF chord, adequate for campus distances; not walking distance.
   return Math.hypot(...p.map((v, i) => v - q[i]));
 }
-export function filterEvents(events, filters, location = null) {
+export function filterEvents(events, filters, location = null, weather = null) {
   const needle = filters.search.trim().toLowerCase();
   const result = events.filter(event => {
     const t = Date.parse(event.minimum_time), diameter = event.object_angular_diameter_arcsec;
@@ -56,7 +57,7 @@ export function filterEvents(events, filters, location = null) {
       (!needle || `${event.name} ${event.identifier}`.toLowerCase().includes(needle)) &&
       event.altitude_deg >= filters.minAltitude &&
       (present(diameter) ? diameter >= filters.minDiameter : filters.keepUnknown) &&
-      (filters.weather === 'all' || filters.weather === event.weather.decision) &&
+      (filters.weather === 'all' || (['clear','overcast'].includes(filters.weather) ? filters.weather === weatherCondition(weather,event.minimum_time).kind : filters.weather === event.weather.decision)) &&
       (!filters.insideOnly || !location || visibilityAt(event, location)?.inside === true);
   });
   result.sort((a, b) => {
@@ -100,11 +101,11 @@ export function eventsCSV(events) {
   const fields = ['norad_id', 'name', 'target', 'start_time_utc', 'minimum_time_utc', 'end_time_utc',
     'duration_s', 'altitude_deg', 'azimuth_deg', 'range_km', 'angular_diameter_arcsec', 'maximum_size_m',
     'observer_latitude_deg_wgs84', 'observer_longitude_deg_wgs84', 'observer_elevation_m',
-    'orbit_epoch_utc', 'orbit_age_at_event_hours', 'weather_decision', 'weather_score', 'reason_codes', 'campus_visibility_area_m2', 'sampled_boundary_error_m'];
+    'orbit_epoch_utc', 'orbit_age_at_event_hours', 'weather_decision', 'weather_score', 'reason_codes', 'campus_visibility_area_m2', 'sampled_boundary_error_m', 'visibility_area_m2'];
   const rows = events.map(e => [e.identifier, e.name, e.target, e.start_time, e.minimum_time, e.end_time,
     e.duration_ms / 1000, e.altitude_deg, e.azimuth_deg, e.range_km, e.object_angular_diameter_arcsec, e.physical_size_m,
     e.observer.latitude, e.observer.longitude, e.observer.elevation_m, e.orbit_epoch,
-    e.orbit_age_at_event_hours, e.weather.decision, e.weather.score, e.reason_codes.join(';'), e.visibility?.area_m2, e.visibility?.maximum_sampled_boundary_error_m]);
+    e.orbit_age_at_event_hours, e.weather.decision, e.weather.score, e.reason_codes.join(';'), e.visibility?.campus_area_m2 ?? e.visibility?.area_m2, e.visibility?.maximum_sampled_boundary_error_m, e.visibility?.area_m2]);
   return '\ufeff' + [fields, ...rows].map(row => row.map(csvCell).join(',')).join('\r\n') + '\r\n';
 }
 
@@ -134,7 +135,7 @@ export function visibilityAt(event, location) {
   const {longitude, latitude, east_m_per_degree: sx, north_m_per_degree: sy} = v.chart;
   const project = point => [(point[0] - longitude) * sx, (point[1] - latitude) * sy];
   const p = project([location.longitude, location.latitude]);
-  if (Math.hypot(...p) > 5000) return {inside:false,distance_m:null,boundary_distance_m:null,minimum_time:null,near_boundary:false,outside_chart:true};
+  if (v.calculation_domain ? !regionContains(v.calculation_domain, [location.longitude, location.latitude]) : Math.hypot(...p) > 5000) return {inside:false,distance_m:null,boundary_distance_m:null,minimum_time:null,near_boundary:false,outside_chart:true};
   const inside = regionContains(v.geometry, [location.longitude, location.latitude]);
   let boundaryDistance = Infinity;
   const polygons = v.geometry.type === 'Polygon' ? [v.geometry.coordinates] : v.geometry.coordinates;

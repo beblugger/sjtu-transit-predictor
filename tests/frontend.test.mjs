@@ -71,3 +71,56 @@ test('inverse region membership, distance and local time use geometry instead of
   assert.equal(outside.minimum_time,null);
   assert.equal(filterEvents([e],{...filters,insideOnly:true},{longitude:.005,latitude:.003}).length,0);
 });
+
+test('overlay window uses two chronological neighbors on each side without backfill', async () => {
+  const {overlayEvents,nearestEvent}=await import('../deploy/map.mjs');
+  const rows=Array.from({length:8},(_,i)=>({...event(i%3,`2026-11-05T0${i}:00:00Z`),visibility:{}}));
+  assert.deepEqual(overlayEvents([...rows].reverse(),rows[3]),rows.slice(1,6));
+  assert.deepEqual(overlayEvents(rows,rows[0]),rows.slice(0,3));
+  assert.deepEqual(overlayEvents(rows,rows[7]),rows.slice(5));
+  assert.deepEqual(overlayEvents(rows,null),[]);
+  assert.equal(nearestEvent(rows,Date.parse('2026-11-05T03:10:00Z')),rows[3]);
+  assert.equal(nearestEvent([],0),null);
+  // A pagination boundary must not change the centered map window.
+  const many=Array.from({length:55},(_,i)=>({...event(i,new Date(i*60000).toISOString()),visibility:{}}));
+  assert.deepEqual(overlayEvents(many,many[49]),many.slice(47,52));
+});
+test('WGS84 geometry uses Web Mercator without GCJ offset', async () => {
+  const {worldPixel,mapView}=await import('../deploy/map.mjs');
+  assert.deepEqual(worldPixel([0,0],0),[128,128]);
+  assert.ok(worldPixel([0,45],0)[1]<128);
+  const visibility={calculation_domain:{type:'Polygon',coordinates:[[[121.39,31],[121.47,31],[121.47,31.05],[121.39,31.05],[121.39,31]]]}};
+  const view=mapView({},visibility);
+  assert.ok(view.project([121.43,31.025]).every(Number.isFinite));
+});
+
+test('zoom stays inside the prediction domain', async () => {
+  const {mapView,worldPixel}=await import('../deploy/map.mjs');
+  const domain={type:'Polygon',coordinates:[[[121.39,31],[121.47,31],[121.47,31.05],[121.39,31.05],[121.39,31]]]};
+  const base=mapView({}, {calculation_domain:domain});
+  const view=mapView({}, {calculation_domain:domain},16,[-1e9,1e9]);
+  const corners=domain.coordinates[0].map(p=>worldPixel(p,14));
+  assert.ok(view.cx-480/view.scale>=Math.min(...corners.map(p=>p[0]))-1e-7);
+  assert.ok(view.cy+280/view.scale<=Math.max(...corners.map(p=>p[1]))+1e-7);
+  assert.equal(view.scale/base.scale,16);
+
+});
+
+test('campus tiles use the source frontend WMS grid at native screen scale',async()=>{
+  const {mapView,campusTiles}=await import('../deploy/map.mjs');
+  const domain={type:'Polygon',coordinates:[[[121.39,31],[121.47,31],[121.47,31.05],[121.39,31.05],[121.39,31]]]};
+  const base=mapView({}, {calculation_domain:domain},2.5),closer=mapView({}, {calculation_domain:domain},5);
+  const tiles=campusTiles(base,1280),zoomed=campusTiles(closer,1280);
+  assert.ok(tiles.length>0&&tiles.length<64);
+  assert.ok(tiles.every(t=>t.size*1280/960>180&&t.size*1280/960<365));
+  assert.equal(zoomed[0].zoom,tiles[0].zoom+1);
+  for(const tile of tiles){
+    const url=new URL(tile.url);
+    assert.equal(url.origin,'https://map.sjtu.edu.cn');
+    assert.equal(url.searchParams.get('srs'),'EPSG:3857');
+    assert.equal(url.searchParams.get('width'),'256');
+    assert.equal(url.searchParams.get('height'),'256');
+    const [left,bottom,right,top]=url.searchParams.get('bbox').split(',').map(Number);
+    assert.ok(right>left&&top>bottom);assert.ok(Math.abs((right-left)-(top-bottom))<1e-6);
+  }
+});

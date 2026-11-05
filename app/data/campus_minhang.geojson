@@ -7,6 +7,7 @@
         "name": "上海交通大学闵行校区",
         "source": "https://map.sjtu.edu.cn/resources/jmap/sjtu_config.js",
         "center": [121.42839, 31.02807],
+        "observer_ellipsoid_height_m": 10.0,
         "bounds": [[121.4179, 31.0183], [121.4467, 31.0370]]
       },
       "geometry": {

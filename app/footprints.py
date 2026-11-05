@@ -21,7 +21,7 @@ from app.geo import Geodetic, WGS84_A, WGS84_E2, enu_rotation, unit_from_az_alt
 
 
 class FootprintSolver:
-    def __init__(self, astronomy, campus, record, event, *, tolerance_m=5.0, max_depth=6):
+    def __init__(self, astronomy, campus, record, event, *, tolerance_m=5.0, max_depth=6, exterior_margin_m=1500.0):
         self.astronomy, self.record, self.event = astronomy, record, event
         self.tolerance, self.max_depth = tolerance_m, max_depth
         self.lon0, self.lat0 = campus.center.longitude_deg, campus.center.latitude_deg
@@ -30,6 +30,12 @@ class FootprintSolver:
         self.east_scale = WGS84_A / w * math.cos(lat) * math.pi / 180
         self.north_scale = WGS84_A * (1 - WGS84_E2) / w ** 3 * math.pi / 180
         self.campus = unary_union([Polygon([self.xy(lon, lat) for lon, lat in ring]) for ring in campus.rings])
+        xmin, ymin, xmax, ymax = self.campus.bounds
+        width, height = xmax - xmin + 2 * exterior_margin_m, ymax - ymin + 2 * exterior_margin_m
+        width = max(width, height * 960 / 560)
+        self.domain = (box((xmin + xmax - width) / 2, (ymin + ymax - height) / 2,
+                           (xmin + xmax + width) / 2, (ymin + ymax + height) / 2)
+                       if exterior_margin_m else self.campus)
         reference = Geodetic(self.lat0, self.lon0, event.observer.elevation_m)
         target = astronomy.target_at(event.target.value, reference, event.minimum_time)
         u = enu_rotation(self.lat0, self.lon0).T @ unit_from_az_alt(target.azimuth_deg, target.altitude_deg)
@@ -37,6 +43,7 @@ class FootprintSolver:
         self.e1 = np.cross(u, axis); self.e1 /= np.linalg.norm(self.e1)
         self.e2 = np.cross(u, self.e1)
         self.models, self.areas, self.lines = [], [], []
+        self.contact_lines = []
         self.sampled_error, self.time_error = 0., 0.
         self.contact_samples = 0
         self.boundary_samples = []
@@ -95,7 +102,7 @@ class FootprintSolver:
         return LineString([center - extent * tangent, center + extent * tangent])
 
     def solve_tile(self, bounds, guess, depth):
-        cell = self.campus.intersection(box(*bounds))
+        cell = self.domain.intersection(box(*bounds))
         if cell.is_empty or cell.area < .001:
             return
         xmin, ymin, xmax, ymax = bounds
@@ -182,6 +189,8 @@ class FootprintSolver:
                                           'predicted_minimum_time': (self.event.minimum_time + timedelta(seconds=predicted(q))).isoformat(),
                                           'normal_gradient_rad_per_m': gradient})
         self.areas.append(area)
+        for level in (-radius, radius):
+            self.contact_lines.extend(components(area.buffer(1e-6).intersection(self.line(p, a, c, level, extent)), 'LineString'))
         self.lines.extend(components(area.intersection(self.line(p, a, c, 0, extent)), 'LineString'))
         self.models.append({'bounds_m': list(bounds), 'origin_m': p.tolist(),
                             'time_offset_s': t, 'time_gradient_s_per_m': time_gradient.tolist(),
@@ -189,17 +198,22 @@ class FootprintSolver:
                             'contact_radius_rad': radius})
 
     def solve(self):
-        self.solve_tile(self.campus.bounds, 0., 0)
+        self.solve_tile(self.domain.bounds, 0., 0)
         if not self.areas:
             raise RuntimeError('Transit event has no inverse ground region')
         region = unary_union(self.areas)
         polygons = components(region, 'Polygon')
         region = MultiPolygon(polygons)
         lines = MultiLineString(self.lines) if self.lines else MultiLineString([])
+        boundaries = unary_union(self.contact_lines) if self.contact_lines else MultiLineString([])
         convert = lambda x, y, z=None: (self.lon0 + np.asarray(x) / self.east_scale,
                                        self.lat0 + np.asarray(y) / self.north_scale)
         return {'method': 'adaptive_first_order_angular_inverse', 'coordinate_system': 'WGS84',
                 'geometry': mapping(transform(region, convert, interleaved=False)),
+                'boundaries': mapping(transform(boundaries, convert, interleaved=False)),
+                'calculation_domain': mapping(transform(self.domain, convert, interleaved=False)),
+                'campus_geometry': mapping(transform(region.intersection(self.campus), convert, interleaved=False)),
+                'campus_area_m2': float(region.intersection(self.campus).area),
                 'centerline': mapping(transform(lines, convert, interleaved=False)), 'area_m2': float(region.area),
                 'reference_time': self.event.minimum_time.isoformat(),
                 'chart': {'longitude': self.lon0, 'latitude': self.lat0,

@@ -42,6 +42,7 @@ class Campus:
                         ObserverPoint(
                             latitude=lat,
                             longitude=lon,
+                            elevation_m=self.center.altitude_m,
                             campus_cell_id=f"{row:03d}-{col:03d}",
                         )
                     )
@@ -62,6 +63,7 @@ class Campus:
                         ObserverPoint(
                             latitude=lat,
                             longitude=lon,
+                            elevation_m=self.center.altitude_m,
                             campus_cell_id=f"{point.campus_cell_id or 'refine'}-{di}{dj}",
                         )
                     )
@@ -104,5 +106,6 @@ def load_campus(path: Path) -> Campus:
         name=feature["properties"].get("name", "SJTU Minhang"),
         rings=rings,
         bounds=(min_lon, min_lat, max_lon, max_lat),
-        center=Geodetic(float(center_data[1]), float(center_data[0]), 4.0),
+        center=Geodetic(float(center_data[1]), float(center_data[0]),
+                        float(feature["properties"].get("observer_ellipsoid_height_m", 10.0))),
     )

@@ -247,7 +247,7 @@ class SatelliteService:
         center = Geodetic(
             self.campus.center.latitude_deg,
             self.campus.center.longitude_deg,
-            0.0,
+            self.campus.center.altitude_m,
         )
         result: list[TransitEvent] = []
         for target in (Target.SUN, Target.MOON):

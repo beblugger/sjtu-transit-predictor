@@ -61,7 +61,7 @@ jobs:
       - name: Test backend
         run: python -m pytest -q
       - name: Test frontend data handling
-        run: node --test tests/frontend.test.mjs
+        run: node --test tests/*.test.mjs
       - name: Compute next 96 hours
         run: python -m app.export --database .state/transit.db --output dist/data --hours 96
       - name: Save durable inputs (including failed request attempts)
@@ -89,7 +89,9 @@ jobs:
         run: python scripts/validate_export.py --data dist/data
       - name: Prepare static data site
         run: |
-          cp deploy/*.html deploy/*.css deploy/*.mjs dist/
+          cp deploy/*.html deploy/*.css deploy/*.mjs deploy/*.js dist/
+          cp -R deploy/assets dist/assets
+          cp DESIGN.md dist/design.md
           touch dist/.nojekyll
       - name: Save calculation cache
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4

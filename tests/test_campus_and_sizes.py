@@ -21,6 +21,9 @@ def test_campus_polygon_and_grid():
     assert campus.contains(31.02807, 121.42839)
     assert not campus.contains(31.00000, 121.00000)
     points = campus.grid(100.0)
+    assert campus.center.altitude_m == 10.0
+    assert all(point.elevation_m == 10.0 for point in points)
+    assert all(point.elevation_m == 10.0 for point in campus.refine(points[len(points)//2]))
     assert len(points) > 200
     assert all(campus.contains(point.latitude, point.longitude) for point in points)
 
