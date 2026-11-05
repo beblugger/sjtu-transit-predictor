@@ -80,12 +80,13 @@ async function loadSnapshot() {
     Object.assign(state, {manifest: snapshot.manifest, events: snapshot.payload.events, campus: snapshot.campus});
     state.selected=state.events.find(e=>eventKey(e)===oldKey)||null;
     $('application').hidden = false; $('filter-controls').disabled = false;
-    if(initial)setWindow(24);
+    // Default to the full snapshot coverage so past and future events are all inspectable.
+    if(initial)setWindow(0, true);
     renderMetadata(); render();
     const hashKey = initial && new URLSearchParams(location.hash.slice(1)).get('event');
     if (hashKey) {
       const event = state.events.find(e => eventKey(e) === hashKey);
-      if (event) { resetFilters(true);selectEvent(event,false,true); }
+      if (event) { resetFilters(true, true);selectEvent(event,false,true); }
       else $('share-status').textContent = '链接所指事件已不在本次数据中，可能已过期或因轨道更新而改变。';
     }
     if(offline)state.loadError='无法连接网络，正在显示本机保存的数据，时效以数据生成时间为准。';
@@ -118,11 +119,11 @@ function setWindow(hours, all = false) {
   $('from').value = inputTime(start, state.zone);
   $('to').value = inputTime(Math.max(start, end), state.zone);
 }
-function resetFilters(all = false) {
+function resetFilters(fullCoverage = true, relaxed = false) {
   state.sharedKey=null;
-  $('target').value = 'all'; $('search').value = ''; $('min-altitude').value = all ? '0' : '15';
+  $('target').value = 'all'; $('search').value = ''; $('min-altitude').value = relaxed ? '0' : '15';
   $('inside-only').checked = false; $('weather').value = 'clear'; $('max-distance').value = ''; $('sort').value = 'time';
-  setWindow(24, all); state.page = 0;
+  setWindow(0, fullCoverage); state.page = 0;
 }
 function readFilters() {
   return {from: inputInstant($('from').value, state.zone), to: inputInstant($('to').value, state.zone),
@@ -238,7 +239,7 @@ function selectSharedEvent() {
   const key = new URLSearchParams(location.hash.slice(1)).get('event');
   if (!key) return;
   const event = state.events.find(e => eventKey(e) === key);
-  if (event) { resetFilters(true);selectEvent(event,false,true); }
+  if (event) { resetFilters(true, true);selectEvent(event,false,true); }
   else $('share-status').textContent = '链接所指事件已不在本次数据中，可能已过期或因轨道更新而改变。';
 }
 function renderDetail() {
@@ -498,7 +499,7 @@ for(const field of ['weather','target']){
 $('filters').addEventListener('submit',event=>event.preventDefault());
 $('filters').addEventListener('input',()=>{state.sharedKey=null;state.page=0;render();});
 for (const button of document.querySelectorAll('[data-hours]')) button.addEventListener('click', () => { state.sharedKey=null;setWindow(Number(button.dataset.hours)); state.page = 0; render(); });
-$('all-coverage').addEventListener('click', () => { state.sharedKey=null;setWindow(96, true); state.page = 0; render(); });
+$('all-coverage').addEventListener('click', () => { state.sharedKey=null;setWindow(0, true); state.page = 0; render(); });
 $('reset').addEventListener('click', () => { resetFilters(); render(); });
 $('previous').addEventListener('click',()=>goToPage(state.page-1));
 $('next').addEventListener('click',()=>goToPage(state.page+1));
