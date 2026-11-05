@@ -55,7 +55,7 @@
       <label>排序 <select id="sort"><option value="time">时间从近到远</option><option value="altitude">高度角从高到低</option><option value="diameter">角直径从大到小</option><option value="distance">距可见区从近到远</option></select></label>
       <label>距可见区最大距离 (m) <input id="max-distance" type="number" min="0" step="any" placeholder="不限" disabled aria-describedby="distance-filter-hint"></label>
       <span id="distance-filter-hint" class="selection-hint">设置位置后可用，留空不限距离。</span>
-      <label class="checkbox-label"><input id="inside-only" type="checkbox" disabled> 仅显示位置可见的事件</label>
+      <label class="checkbox-label"><input id="inside-only" type="checkbox" disabled> 仅显示我的位置可见的事件</label>
       <div class="actions">
         <button type="button" data-hours="6">未来 6 小时</button><button type="button" data-hours="24">未来 24 小时</button><button type="button" data-hours="96">未来 96 小时</button>
         <button id="all-coverage" type="button">全部数据覆盖时段</button><button id="reset" type="button">恢复默认筛选</button>
@@ -89,6 +89,17 @@
     </form>
     <p id="location-status" role="status">未设置位置。位置只用于本机计算距可见区的距离，不会上传。</p>
   </section>
+  <section id="detail" aria-labelledby="detail-title" tabindex="-1">
+    <h2 id="detail-title">事件详情</h2><p id="detail-empty">从事件列表选择事件。</p>
+    <div id="detail-content" hidden>
+      <p id="detail-name"></p><figure id="transit-figure"><svg id="transit-diagram" viewBox="0 0 360 270" role="img" aria-labelledby="transit-title transit-description"></svg><figcaption id="transit-caption"></figcaption></figure><dl id="detail-fields" class="metadata"></dl>
+      <details id="calculation-detail"><summary>计算详情</summary><dl id="calculation-fields" class="metadata"></dl></details>
+
+
+      <div class="actions"><button id="share" type="button">复制事件链接</button></div>
+      <p id="share-status" role="status"></p>
+    </div>
+  </section>
   <section class="settings-card" aria-labelledby="settings-title">
     <div class="section-heading"><h2 id="settings-title">更新与提醒</h2><button id="install-app" type="button" hidden>安装 App</button></div>
     <div class="app-settings">
@@ -102,23 +113,8 @@
     <p id="notification-status" class="selection-hint" role="status">附近通知已关闭。</p>
     <p id="tracking-status" class="selection-hint" role="status">设备位置跟随已关闭。</p>
   </section>
-  <section id="detail" aria-labelledby="detail-title" tabindex="-1">
-    <h2 id="detail-title">事件详情</h2><p id="detail-empty">从事件列表选择事件。</p>
-    <div id="detail-content" hidden>
-      <p id="detail-name"></p><figure id="transit-figure"><svg id="transit-diagram" viewBox="0 0 360 270" role="img" aria-labelledby="transit-title transit-description"></svg><figcaption id="transit-caption"></figcaption></figure><dl id="detail-fields" class="metadata"></dl>
-      <details id="calculation-detail"><summary>计算详情</summary><dl id="calculation-fields" class="metadata"></dl></details>
-
-
-      <div class="actions"><button id="share" type="button">复制事件链接</button></div>
-      <p id="share-status" role="status"></p>
-    </div>
-  </section>
 </main>
 <footer>
-  <h2>读图说明</h2>
-  <p><a href="reading.html">字段定义、视觉编码与标准依据</a></p>
-  <p>来源：<a href="https://celestrak.org/">CelesTrak</a>、<a href="https://github.com/satvisorcom/satvisor-data">社区备用镜像</a>、<a href="https://open-meteo.com/">Open-Meteo</a>（<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>）、<a href="https://ssd.jpl.nasa.gov/planets/eph_export.html">JPL DE421</a>。</p>
-  <p><a href="https://github.com/beblugger/sjtu-transit-predictor/actions">构建状态</a> · <a href="https://github.com/beblugger/sjtu-transit-predictor">源代码</a> · <a href="https://map.sjtu.edu.cn/">交大电子地图</a></p>
   <section id="data-status" aria-labelledby="metadata-title">
     <h2 id="metadata-title">数据与时效</h2>
     <ul id="data-notices" aria-live="polite"></ul>
@@ -127,6 +123,10 @@
 
     <details><summary>数据版本详情</summary><dl id="metadata" class="metadata"></dl></details>
   </section>
+  <h2>读图说明</h2>
+  <p><a href="reading.html">字段定义、视觉编码与标准依据</a></p>
+  <p>来源：<a href="https://celestrak.org/">CelesTrak</a>、<a href="https://github.com/satvisorcom/satvisor-data">社区备用镜像</a>、<a href="https://open-meteo.com/">Open-Meteo</a>（<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>）、<a href="https://ssd.jpl.nasa.gov/planets/eph_export.html">JPL DE421</a>。</p>
+  <p><a href="https://github.com/beblugger/sjtu-transit-predictor/actions">构建状态</a> · <a href="https://github.com/beblugger/sjtu-transit-predictor">源代码</a> · <a href="https://map.sjtu.edu.cn/">交大电子地图</a></p>
 </footer>
 <div id="weather-tooltip" role="tooltip" hidden></div>
 <noscript><p>交互界面需要 JavaScript。</p></noscript>
