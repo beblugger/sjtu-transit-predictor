@@ -17,7 +17,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 75
     permissions:
       contents: write
     env:
