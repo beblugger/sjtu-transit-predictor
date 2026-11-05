@@ -70,6 +70,14 @@ test('inverse region membership, distance and local time use geometry instead of
   assert.equal(outside.inside,false);assert.ok(Math.abs(outside.distance_m-100)<.001);
   assert.equal(outside.minimum_time,null);
   assert.equal(filterEvents([e],{...filters,insideOnly:true},{longitude:.005,latitude:.003}).length,0);
+  const location={longitude:.005,latitude:.003};
+  assert.equal(filterEvents([e],{...filters,maxDistance:99},location).length,0);
+  assert.equal(filterEvents([e],{...filters,maxDistance:101},location).length,1);
+  assert.equal(filterEvents([e],{...filters,maxDistance:0},{longitude:.009,latitude:.001}).length,1);
+  assert.equal(filterEvents([e],{...filters,maxDistance:0}).length,1);
+  assert.equal(filterEvents([e],{...filters,maxDistance:null},location).length,1);
+  assert.equal(filterEvents([e],{...filters,maxDistance:10000},{longitude:1,latitude:1}).length,0);
+  assert.equal(filterEvents([event(2,'2026-11-04T00:00:00Z')],{...filters,maxDistance:1000},location).length,0);
 });
 
 test('overlay window uses two chronological neighbors on each side without backfill', async () => {

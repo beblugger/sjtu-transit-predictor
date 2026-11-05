@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from threading import Lock
 from typing import Iterable
@@ -99,6 +99,39 @@ class CelestialCalculator:
             distance_m=distance_m,
             angular_radius_arcsec=math.degrees(angular_radius) * 3600.0,
         )
+
+    def transit_diagram(self, satrec, target: str, observer: Geodetic, value: datetime) -> dict:
+        """Local tangent plane in arcseconds: celestial north up, east left."""
+        body = self.target_at(target, observer, value)
+        center = unit_from_az_alt(body.azimuth_deg, body.altitude_deg)
+        latitude = math.radians(observer.latitude_deg)
+        pole = np.array([0., math.cos(latitude), math.sin(latitude)])
+        north = pole - float(pole @ center) * center
+        north /= np.linalg.norm(north)
+        east = np.cross(north, center)
+
+        def project(vector):
+            denominator = float(vector @ center)
+            return [math.degrees(math.atan2(float(vector @ east), denominator)) * 3600,
+                    math.degrees(math.atan2(float(vector @ north), denominator)) * 3600]
+
+        points = []
+        for offset in (-1., 0., 1.):
+            instant = value + timedelta(seconds=offset)
+            sat = self.satellite_position(satrec, observer, instant)
+            moving_body = self.target_at(target, observer, instant)
+            relative = np.array(project(sat.vector_enu)) - np.array(project(
+                unit_from_az_alt(moving_body.azimuth_deg, moving_body.altitude_deg)))
+            points.append(relative.tolist())
+        result = {"path_arcsec": points, "radius_arcsec": body.angular_radius_arcsec}
+        if target == 'moon':
+            sun = self.target_at('sun', observer, value)
+            sun_vector = unit_from_az_alt(sun.azimuth_deg, sun.altitude_deg) * sun.distance_m
+            moon_to_sun = sun_vector - center * body.distance_m
+            moon_to_sun /= np.linalg.norm(moon_to_sun)
+            result['illuminated_fraction'] = (1 - float(moon_to_sun @ center)) / 2
+            result['bright_limb_angle_deg'] = math.degrees(math.atan2(float(moon_to_sun @ east), float(moon_to_sun @ north)))
+        return result
 
     def targets_at(self, target: str, observer: Geodetic, values: Iterable[datetime]):
         datetimes = list(values)

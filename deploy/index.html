@@ -43,11 +43,13 @@
       <label><input id="keep-unknown" type="checkbox" checked> 保留尺寸未知的事件</label>
       -->
       <div class="filter-choice"><span id="weather-title" class="weather-heading" data-weather-trigger aria-describedby="weather-tooltip">天气</span><div id="weather-filter-hint" class="filter-tabs" role="tablist" aria-labelledby="weather-title">
-        <button type="button" role="tab" id="weather-all" data-weather="all" aria-selected="true" tabindex="0">全部</button>
-        <button type="button" role="tab" id="weather-clear" data-weather="clear" aria-selected="false" tabindex="-1">晴天</button>
+        <button type="button" role="tab" id="weather-all" data-weather="all" aria-selected="false" tabindex="-1">全部</button>
+        <button type="button" role="tab" id="weather-clear" data-weather="clear" aria-selected="true" tabindex="0">晴天</button>
         <button type="button" role="tab" id="weather-overcast" data-weather="overcast" aria-selected="false" tabindex="-1">阴天</button>
-      </div></div><input type="hidden" id="weather" value="all">
+      </div></div><input type="hidden" id="weather" value="clear">
       <label>排序 <select id="sort"><option value="time">时间从近到远</option><option value="altitude">高度角从高到低</option><option value="diameter">角直径从大到小</option><option value="distance">距可见区从近到远</option></select></label>
+      <label>距可见区最大距离 (m) <input id="max-distance" type="number" min="0" step="any" placeholder="不限" disabled aria-describedby="distance-filter-hint"></label>
+      <span id="distance-filter-hint" class="selection-hint">设置参考位置后可用，留空不限距离。</span>
       <label><input id="inside-only" type="checkbox" disabled> 仅显示参考位置可见的事件</label>
       <div class="actions">
         <button type="button" data-hours="6">未来 6 小时</button><button type="button" data-hours="24">未来 24 小时</button><button type="button" data-hours="96">未来 96 小时</button>
@@ -59,12 +61,15 @@
 
   <section aria-labelledby="events-title">
     <h2 id="events-title">事件列表</h2>
+    <p class="selection-hint">每页 10 条 · 点击整行查看详情，方向键移动、回车选择。</p>
     <p id="result-count" role="status" aria-live="polite"></p>
     <div class="actions">
       <button id="previous" type="button">上一页</button><span id="page-status"></span><button id="next" type="button">下一页</button>
       <label>页码 <input id="page-jump" type="number" min="1" step="1" value="1" inputmode="numeric"></label><button id="go-page" type="button">跳转</button>
     </div>
-    <div class="table-scroll" tabindex="0" aria-label="可横向滚动的凌星事件表">
+    <p id="selected-event" class="selection-hint" role="status"></p>
+    <div class="table-scroll" tabindex="0" aria-label="凌星事件表">
+      <div id="events-header"></div>
       <div id="events" tabindex="0" aria-label="凌星事件分页列表，可上下滑动翻页"></div>
     </div>
   </section>
@@ -82,7 +87,7 @@
   <section id="detail" aria-labelledby="detail-title" tabindex="-1">
     <h2 id="detail-title">事件详情</h2><p id="detail-empty">从事件列表选择事件。</p>
     <div id="detail-content" hidden>
-      <p id="detail-name"></p><dl id="detail-fields" class="metadata"></dl>
+      <p id="detail-name"></p><figure id="transit-figure"><svg id="transit-diagram" viewBox="0 0 360 270" role="img" aria-labelledby="transit-title transit-description"></svg><figcaption id="transit-caption"></figcaption></figure><dl id="detail-fields" class="metadata"></dl>
       <details id="calculation-detail"><summary>计算详情</summary><dl id="calculation-fields" class="metadata"></dl></details>
 
 

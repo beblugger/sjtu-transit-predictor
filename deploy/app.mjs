@@ -95,13 +95,14 @@ function setWindow(hours, all = false) {
 }
 function resetFilters(all = false) {
   $('target').value = 'all'; $('search').value = ''; $('min-altitude').value = all ? '0' : '15';
-  $('inside-only').checked = false; $('weather').value = 'all'; $('sort').value = 'time';
+  $('inside-only').checked = false; $('weather').value = all ? 'all' : 'clear'; $('max-distance').value = ''; $('sort').value = 'time';
   setWindow(24, all); state.page = 0;
 }
 function readFilters() {
   return {from: inputInstant($('from').value, state.zone), to: inputInstant($('to').value, state.zone),
     target: $('target').value, search: $('search').value, minAltitude: $('min-altitude').valueAsNumber,
     minDiameter: 0, keepUnknown: true,
+    maxDistance: state.location && $('max-distance').value !== '' ? $('max-distance').valueAsNumber : null,
     weather: $('weather').value, sort: $('sort').value, insideOnly: $('inside-only').checked};
 }
 function render() {
@@ -110,6 +111,7 @@ function render() {
   const f = readFilters();
   const error = !Number.isFinite(f.from) || !Number.isFinite(f.to) ? '请输入完整的起止时间。' :
     f.from >= f.to ? '结束时间必须晚于起始时间；若数据已过期，可选择“全部数据覆盖时段”。' :
+    f.maxDistance !== null && (!Number.isFinite(f.maxDistance) || f.maxDistance < 0) ? '距可见区最大距离须为非负数，留空表示不限。' :
     !present(f.minAltitude) || f.minAltitude < 0 || f.minAltitude > 90 || !present(f.minDiameter) || f.minDiameter < 0 ? '高度角须为 0–90°，最小角直径须为非负数。' : '';
   $('filter-error').textContent = error;
   state.filtered = error ? [] : filterEvents(state.events, f, state.location,state.weather);
@@ -122,29 +124,33 @@ function render() {
   }
   const overlays = overlayEvents(state.filtered, state.selected);
   $('result-count').textContent = `${state.filtered.length} / ${state.events.length} 条符合条件。${f.sort === 'distance' && !state.location ? '尚未设置参考位置，暂按时间排序。' : ''}`;
+  $('selected-event').textContent=state.selected ? `已选：${state.selected.name} / ${state.selected.identifier} · ${formatTime(state.selected.minimum_time,state.zone)}` : '尚无选中事件';
   const rows=state.filtered.map(event => {
     const row = node('tr'); row.dataset.eventKey = eventKey(event);
     row.dataset.overlay = String(overlays.includes(event)); row.setAttribute('aria-selected', String(!!state.selected && eventKey(state.selected) === eventKey(event)));
-    const values = [`${overlays.includes(event) ? `[${overlays.indexOf(event)+1}] ` : ''}${event.name} / ${event.identifier}`, TARGETS[event.target], formatTime(event.minimum_time, state.zone),
+    const values = [`${event.name} / ${event.identifier}`, TARGETS[event.target], formatTime(event.minimum_time, state.zone),
       number(event.altitude_deg, 1), number(event.duration_ms / 1000, 3), number(event.object_angular_diameter_arcsec, 2),
       number(event.range_km, 1), weatherCondition(state.weather,event.minimum_time).label, state.location ? number(visibilityAt(event, state.location)?.distance_m, 0) : '未设置'];
     values.forEach((value, index) => row.append(node('td', value, [3, 4, 5, 6, 8].includes(index) ? {class: 'number'} : {})));
-    const active = event === state.selected;
-    const button = node('button', active ? '已选中' : '选择', {type: 'button', 'aria-label': `查看 ${event.name} ${TARGETS[event.target]} ${formatTime(event.minimum_time, state.zone)} 的详情`});
-    button.setAttribute('aria-pressed', String(active));
-    button.addEventListener('click', () => {
-      selectEvent(event, false);
-      $('events').querySelector('button[aria-pressed=true]')?.focus({preventScroll:true});
+    row.tabIndex = 0;
+    row.setAttribute('aria-label', `查看 ${event.name} ${TARGETS[event.target]} ${formatTime(event.minimum_time, state.zone)} 的详情`);
+    const choose = () => { selectEvent(event, false); $('events').querySelector('tr[aria-selected=true]')?.focus({preventScroll:true}); };
+    row.addEventListener('click', choose);
+    row.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(); }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault(); const next = e.key === 'ArrowDown' ? row.nextElementSibling : row.previousElementSibling;
+        if (next?.hasAttribute('data-event-key')) next.focus();
+      }
     });
-    row.addEventListener('click', e => { if (!e.target.closest('button')) selectEvent(event, false); });
-    const cell = node('td'); cell.append(button); row.append(cell); return row;
+    return row;
   });
   renderEventPages(rows,pages,error);
   $('weather-tooltip').hidden=true;
   drawMap(); renderDetail();renderNotices();
 }
 function renderEventPages(rows,pages,error){
-  const headers=['卫星 / NORAD','目标',`最小角距时刻 (${zoneName(state.zone)})`,'高度 (°)','持续 (s)','角直径 (″)','距离 (km)','天气','距可见区 (m)','选择'];
+  const headers=['卫星 / NORAD','目标',`最小角距时刻 (${zoneName(state.zone)})`,'高度 (°)','持续 (s)','角直径 (″)','距离 (km)','天气','距可见区 (m)'];
   const groups=[];
   for(let i=0;i<pages;i++){
     const group=node('div',undefined,{class:'event-page','data-page':i,role:'group','aria-label':`第 ${i+1} 页`});
@@ -157,11 +163,16 @@ function renderEventPages(rows,pages,error){
     });
     head.append(heading);const body=node('tbody');
     const pageRows=rows.slice(i*PAGE_SIZE,(i+1)*PAGE_SIZE);body.append(...pageRows);
-    if(!rows.length){const row=node('tr');row.append(node('td',error||'此时段和筛选条件下没有事件。可扩大时间范围、降低高度限制或恢复默认筛选。',{colspan:10}));body.append(row);}
+    if(!rows.length){const row=node('tr');row.append(node('td',error||'此时段和筛选条件下没有事件。可扩大时间范围、降低高度限制或恢复默认筛选。',{colspan:9}));body.append(row);}
     else for(let empty=pageRows.length;empty<PAGE_SIZE;empty++){
       const row=node('tr',undefined,{'aria-hidden':'true',class:'empty-event-row'});for(let j=0;j<headers.length;j++)row.append(node('td',''));body.append(row);
     }
-    table.append(head,body);group.append(table);groups.push(group);
+    if(i===0){const headerTable=node('table',undefined,{class:'events-header'});headerTable.append(head);$('events-header').replaceChildren(headerTable);}
+    table.append(body);
+    for(const target of [table,...(i===0?[$('events-header').firstChild]:[])]){
+      const columns=node('colgroup');for(const width of [19,6,17,8,8,10,10,9,13])columns.append(node('col',undefined,{style:`width:${width}%`}));target.prepend(columns);
+    }
+    group.append(table);groups.push(group);
   }
   const scroller=$('events');scroller.replaceChildren(...groups);scroller.scrollTop=state.page*scroller.clientHeight;updatePageControls();
 }
@@ -207,6 +218,7 @@ function renderDetail() {
   const e = state.selected;
   $('detail-empty').hidden = !!e; $('detail-content').hidden = !e;
   if (!e) return;
+  drawTransit(e);
   const local = visibilityAt(e, state.location);
   $('detail-name').textContent = `${e.name} · NORAD ${e.identifier} · 凌${TARGETS[e.target] === '太阳' ? '日' : '月'}`;
   const entries=visibleDetailEntries([
@@ -309,13 +321,7 @@ function drawMap() {
       layers.append(svg('path',{d:line.map((p,i)=>`${i?'L':'M'}${project(p).join(',')}`).join(' '),fill:'none',stroke:color,
         'stroke-width':selected?2.5:1.8,'stroke-dasharray':'8 5',class:'visibility-centerline','data-satellite':event.identifier}));
     }
-    // Label one visible centerline per event, even when adaptive cells split it.
-    const labelPoint=centerlines.flatMap(line=>line.slice(1).map((p,i)=>{
-      const a=project(line[i]),b=project(p);return [(a[0]+b[0])/2,(a[1]+b[1])/2];
-    })).find(([x,y])=>x>30&&x<890&&y>20&&y<530);
-    if(labelPoint){const [x,y]=labelPoint;
-      layers.append(svg('text',{x:x+7,y:y-7,'paint-order':'stroke',stroke:'#fff','stroke-width':4},`[${index+1}]`));
-    }
+
   }
   if(state.location){const [x,y]=project([state.location.longitude,state.location.latitude]);
     if(x>=0&&x<=960&&y>=0&&y<=560)layers.append(svg('path',{d:`M${x-8} ${y}h16M${x} ${y-8}v16`,stroke:'#161616','stroke-width':2}));}
@@ -461,16 +467,16 @@ $('go-page').addEventListener('click',jumpPage);
 $('page-jump').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();jumpPage();}});
 $('location-form').addEventListener('submit', event => {
   event.preventDefault(); state.location = {latitude: $('latitude').valueAsNumber, longitude: $('longitude').valueAsNumber};
-  $('inside-only').disabled = false;
+  $('inside-only').disabled = false; $('max-distance').disabled = false;
   $('location-status').textContent = '已设置 WGS84 参考位置；距离和区域判断针对已计算的反解区域。轨道实际位置误差未量化。'; render();
 });
-$('clear-location').addEventListener('click', () => { state.location = null; $('inside-only').checked = false; $('inside-only').disabled = true; $('location-status').textContent = '已清除参考位置。'; render(); });
+$('clear-location').addEventListener('click', () => { state.location = null; $('inside-only').checked = false; $('inside-only').disabled = true; $('max-distance').disabled = true; $('max-distance').value = ''; $('location-status').textContent = '已清除参考位置。'; render(); });
 $('locate').addEventListener('click', () => {
   if (!navigator.geolocation) { $('location-status').textContent = '此浏览器不支持定位，请手动输入 WGS84 坐标。'; return; }
   $('location-status').textContent = '正在请求设备位置……';
   navigator.geolocation.getCurrentPosition(position => {
     state.location = {latitude: position.coords.latitude, longitude: position.coords.longitude};
-    $('inside-only').disabled = false;
+    $('inside-only').disabled = false; $('max-distance').disabled = false;
     $('latitude').value = state.location.latitude; $('longitude').value = state.location.longitude;
     $('location-status').textContent = `设备定位精度报告：约 ${number(position.coords.accuracy, 0)} m；此精度不是凌星预测误差。位置仅在本机使用。`; render();
   }, error => { $('location-status').textContent = `定位失败：${error.message}。可手动输入 WGS84 坐标。`; }, {enableHighAccuracy: true, timeout: 15000, maximumAge: 30000});
@@ -481,3 +487,33 @@ $('share').addEventListener('click', async () => {
 });
 setInterval(() => { if (state.manifest) { renderMetadata(); render(); } }, 60000);
 loadSnapshot();
+
+function drawTransit(e) {
+  const chart = $('transit-diagram'), d = e.transit_diagram;
+  chart.replaceChildren(svg('title', {id:'transit-title'}, '凌星示意图：天球北朝上，天球东朝左'),
+    svg('desc', {id:'transit-description'}, '按事件观测点绘制，箭头表示卫星运动方向。'),
+    svg('text', {x:12,y:22}, `方位角 ${number(e.target_azimuth_deg,1)}° · 高度角 ${number(e.target_altitude_deg,1)}°`),
+    svg('path', {d:'M180 65V35m-4 7 4-7 4 7',stroke:'#333',fill:'none'}),
+    svg('text', {x:192,y:49}, '天球北 N'), svg('text',{x:15,y:145},'东 E'));
+  const r=67,cx=180,cy=145;
+  chart.append(svg('circle',{cx,cy,r,fill:e.target==='sun'?'#ffdc7d':'#384351',stroke:'#66717c'}));
+  if(e.target==='moon' && Number.isFinite(d?.illuminated_fraction)) {
+    // Orthographic sphere terminator, rotated toward the projected Sun.
+    const k=2*d.illuminated_fraction-1;
+    const points=[];
+    for(let i=0;i<=64;i++){const a=-Math.PI/2+i*Math.PI/64;points.push([r*Math.cos(a),r*Math.sin(a)]);}
+    for(let i=64;i>=0;i--){const a=-Math.PI/2+i*Math.PI/64;points.push([-k*r*Math.cos(a),r*Math.sin(a)]);}
+    chart.append(svg('path',{d:points.map(([x,y],i)=>`${i?'L':'M'}${x} ${y}`).join(' ')+'Z',fill:'#e6e9ed',transform:`translate(${cx} ${cy}) rotate(${-d.bright_limb_angle_deg-90})`}));
+  }
+  if(d?.path_arcsec?.length>=2 && d.radius_arcsec>0) {
+    const defs=svg('defs'),marker=svg('marker',{id:'transit-arrow',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto'});
+    marker.append(svg('path',{d:'M0 0L10 5L0 10Z',fill:'#0075b5'}));defs.append(marker);chart.append(defs);
+    const scale=r/d.radius_arcsec, p=d.path_arcsec,mid=p[1],delta=[p.at(-1)[0]-p[0][0],p.at(-1)[1]-p[0][1]],length=Math.hypot(...delta);
+    if(length>0){const extent=95/scale,ends=[-1,1].map(sign=>[cx-(mid[0]+sign*delta[0]/length*extent)*scale,cy-(mid[1]+sign*delta[1]/length*extent)*scale]);
+      chart.append(svg('path',{d:`M${ends[0]}L${ends[1]}`,stroke:'#fff','stroke-width':5}),svg('path',{d:`M${ends[0]}L${ends[1]}`,stroke:'#0075b5','stroke-width':2.5,'marker-end':'url(#transit-arrow)'}));}
+    chart.append(svg('circle',{cx:cx-mid[0]*scale,cy:cy-mid[1]*scale,r:3,fill:'#0075b5'}));
+  }
+  const phase=e.target==='moon' ? Number.isFinite(d?.illuminated_fraction)?`月相：照明 ${(d.illuminated_fraction*100).toFixed(1)}%`:'月相：数据待更新' : '太阳';
+  chart.append(svg('text',{x:12,y:239},phase),svg('text',{x:12,y:259},d?'蓝箭头：卫星路径 · 圆点：最小角距':'卫星路径：数据待更新'));
+  $('transit-caption').textContent='事件观测点 · 天球北朝上、东朝左；方位角北 0°、东 90°。路径为最小角距附近的直线近似。';
+}

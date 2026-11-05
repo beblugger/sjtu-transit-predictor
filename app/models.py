@@ -78,6 +78,7 @@ class TransitEvent(BaseModel):
     orbit_age_at_event_hours: float | None = None
     reason_codes: list[str] = Field(default_factory=list)
     visibility: dict | None = None
+    transit_diagram: dict | None = None
 
 
 class WeatherStatus(BaseModel):

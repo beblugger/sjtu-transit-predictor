@@ -42,7 +42,6 @@ li { overflow-wrap:anywhere; }
 #events tr[aria-selected=true] { background: #e2eef6; outline: 2px solid #005a9c; }
 #events tr[aria-selected=true] td:first-child { border-left: 6px solid #005a9c; }
 #events tr[data-overlay=true]:not([aria-selected=true]) td:first-child { border-left: 6px solid #626b73; }
-#events button[aria-pressed=true] { background: #005a9c; color: #fff; font-weight: 700; }
 
 #data-notices { padding-left: 1.4rem; }
 #data-notices li { margin-block: .4rem; padding-left: .5rem; border-left: 4px solid #666; }
@@ -61,13 +60,27 @@ li { overflow-wrap:anywhere; }
 #calculation-detail { margin-top: 1rem; }
 
 #page-jump { width: 4rem; }
-#events { height: 27rem; min-width: 72rem; overflow-y: auto; overflow-x: hidden; scroll-snap-type: y mandatory; overscroll-behavior-y: contain; }
+#events { height: 36rem; min-width: 0; overflow-y: auto; overflow-x: hidden; scroll-snap-type: y mandatory; overscroll-behavior-y: contain; }
 .event-page { height: 100%; box-sizing: border-box; scroll-snap-align: start; scroll-snap-stop: always; }
-.event-page table { height: 100%; table-layout: fixed; }
-.event-page thead { height: 3.5rem; }
-.event-page th { position: static; }
-.event-page th:first-child { width: 19%; }
-.event-page th:nth-child(3) { width: 17%; }
-.event-page tbody tr { height: 4.7rem; }
-.event-page td { overflow-wrap: anywhere; }
+.event-page table { height: 100%; }
+.events-header, .event-page table { table-layout: fixed; font-size: .875rem; line-height: 1.35; }
+.events-header thead { height: 3rem; }
+.events-header th { position: static; white-space: normal; }
+.events-header th, .event-page td { padding: .35rem .4rem; overflow-wrap: anywhere; vertical-align: middle; }
+.event-page .number { white-space: normal; }
 #events .empty-event-row { cursor: default; }
+#events tr[data-event-key]:hover { background: #eaf2f7; }
+.selection-hint { font-size: .875rem; color: #555; margin-block: .3rem; }
+#transit-figure { float: right; width: min(360px, 100%); margin: 0 0 1rem 1rem; }
+#transit-diagram { width: 100%; display: block; background: #f5f7fa; border: 1px solid #bbc5cf; }
+#transit-diagram text { font: 13px system-ui, sans-serif; fill: #161616; }
+#transit-caption { font-size: .8rem; color: #555; }
+#detail-content::after { content: ''; display: block; clear: both; }
+@media (max-width: 700px) {
+  #events, #events-header { min-width: 850px; }
+  #transit-figure { float: none; margin: 0 0 1rem; }
+}
+
+#events-header { padding-right: 0; }
+#events { scrollbar-gutter: stable; }
+#events-header { overflow-y: scroll; scrollbar-gutter: stable; }

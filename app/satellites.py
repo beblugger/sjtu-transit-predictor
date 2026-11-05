@@ -569,6 +569,8 @@ class SatelliteService:
         if tle_age > 3 * 3600:
             confidence *= 0.9
         return TransitEvent(
+            transit_diagram=self.astronomy.transit_diagram(
+                record.satrec, target.value, geodetic_for_observer(conjunction.observer), conjunction.minimum_time),
             event_type=EventType.SATELLITE,
             target=target,
             name=record.entry.name,

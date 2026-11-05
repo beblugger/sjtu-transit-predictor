@@ -1,5 +1,5 @@
 import {weatherCondition} from './presentation.mjs';
-export const PAGE_SIZE = 5;
+export const PAGE_SIZE = 10;
 export const TARGETS = {sun: '太阳', moon: '月球'};
 export const WEATHER = {announced: '模型评分达标', suppressed: '模型评分未达标', unavailable: '天气不可用'};
 export const REASONS = {
@@ -52,7 +52,9 @@ export function filterEvents(events, filters, location = null, weather = null) {
   const needle = filters.search.trim().toLowerCase();
   const result = events.filter(event => {
     const t = Date.parse(event.minimum_time), diameter = event.object_angular_diameter_arcsec;
-    return t >= filters.from && t < filters.to &&
+    const distance = location && present(filters.maxDistance) ? visibilityAt(event, location)?.distance_m : null;
+    return (!location || !present(filters.maxDistance) || (present(distance) && distance <= filters.maxDistance)) &&
+      t >= filters.from && t < filters.to &&
       (filters.target === 'all' || filters.target === event.target) &&
       (!needle || `${event.name} ${event.identifier}`.toLowerCase().includes(needle)) &&
       event.altitude_deg >= filters.minAltitude &&

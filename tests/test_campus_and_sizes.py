@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 
 import math
 
-from app.astronomy import SatellitePosition, TargetPosition
+from app.astronomy import CelestialCalculator, SatellitePosition, TargetPosition
 from app.campus import load_campus
 from app.config import Settings
 from app.geo import Geodetic, unit_from_az_alt
@@ -38,12 +38,14 @@ def test_satellite_size_angular_range():
     assert catalog.get(999999) is None
 
 
-class FixedAstronomy:
+class FixedAstronomy(CelestialCalculator):
     def __init__(self, center_time, rate=0.2):
         self.center_time = center_time
         self.rate = rate
 
     def target_at(self, target, observer, value):
+        if target == "sun":
+            return TargetPosition(120.0, 40.0, 150_000_000_000.0, 960.0)
         return TargetPosition(0.0, 30.0, 380_000_000.0, 900.0)
 
     def satellite_position(self, satrec, observer, value):
@@ -133,3 +135,14 @@ def test_contact_between_last_doubling_step_and_limit_is_not_truncated():
         return (None, None, None, abs(offset))
     assert math.isclose(_crossing_offset(evaluate, 0, 60, 55, direction=1), 55)
     assert math.isclose(_crossing_offset(evaluate, 0, -60, 55, direction=-1), -55)
+
+
+def test_transit_diagram_celestial_axes_and_phase():
+    now = datetime.now(timezone.utc)
+    calculator = FixedAstronomy(now)
+    diagram = calculator.transit_diagram(object(), 'moon', Geodetic(31, 121), now)
+    before, center, after = diagram['path_arcsec']
+    assert abs(center[0]) < 1e-8 and abs(center[1]) < 1e-8
+    assert before[0] > 0 > after[0]  # north of the pole, increasing azimuth points west
+    assert 0 <= diagram['illuminated_fraction'] <= 1
+    assert diagram['radius_arcsec'] == 900
