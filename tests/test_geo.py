@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 
 import numpy as np
+import pytest
 
 from app.geo import (
     angular_diameter_arcsec,
@@ -24,3 +25,6 @@ def test_angular_diameter_limits():
     assert math.isclose(angular_diameter_arcsec(1.0, 206_264.806), 1.0, rel_tol=1e-8)
     iss = angular_diameter_arcsec(109.0, 400_000.0)
     assert 55.0 < iss < 58.0
+    for diameter, distance in ((float('nan'), 400000), (1, float('inf')), (0, 1), (1, 0)):
+        with pytest.raises(ValueError):
+            angular_diameter_arcsec(diameter, distance)

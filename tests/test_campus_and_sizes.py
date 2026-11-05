@@ -4,6 +4,7 @@ from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
 import math
+import pytest
 
 from app.astronomy import CelestialCalculator, SatellitePosition, TargetPosition
 from app.campus import load_campus
@@ -36,6 +37,26 @@ def test_satellite_size_angular_range():
     low, high = iss.angular_diameter_range_arcsec(400_000.0)
     assert low < diameter <= high
     assert catalog.get(999999) is None
+
+
+def test_rcs_equivalent_size_is_separate_from_known_physical_spans():
+    catalog = SatelliteSizeCatalog(Path("app/data/satellite_sizes.yaml"))
+    size = catalog.get(694)
+    assert size is not None and size.method == "rcs_sphere"
+    assert size.maximum_m == pytest.approx(2 * math.sqrt(6.388 / math.pi))
+    fields = size.event_fields(400_000)
+    assert fields["object_angular_radius_arcsec"] * 2 == fields["object_angular_diameter_arcsec"]
+    assert fields["equivalent_diameter_m"] == size.maximum_m
+    assert fields["angular_size_confidence"] == "low"
+    assert "physical_size_m" not in fields
+    assert "object_angular_diameter_min_arcsec" not in fields
+    assert size.angular_radius_arcsec(800_000) < size.angular_radius_arcsec(400_000)
+    iss = catalog.get(25544)
+    assert iss.method == "max_dimension" and iss.maximum_m == 109
+    assert iss.event_fields(400_000)["physical_size_min_m"] == 20
+    assert catalog.get(20580).maximum_m == 13.2
+    # A standard magnitude alone says nothing about size.
+    assert catalog.get(48229) is None
 
 
 class FixedAstronomy(CelestialCalculator):
@@ -108,6 +129,16 @@ def test_satellite_refinement_and_angular_diameter_field():
     assert 55.0 < event.object_angular_diameter_arcsec < 58.0
     assert event.physical_size_m == 109.0
     assert event.size_unknown is False
+    astronomy.satellite_sunlit = lambda *args: True
+    illuminated = service._build_event(record, Target.MOON, conjunction, now)
+    assert illuminated.satellite_magnitude_model == "stellarium-standard"
+    assert math.isfinite(illuminated.satellite_magnitude)
+    assert 0 <= illuminated.satellite_phase_angle_deg <= 180
+    assert illuminated.model_dump(mode="json")["satellite_magnitude"] == illuminated.satellite_magnitude
+    astronomy.satellite_sunlit = lambda *args: False
+    shadowed = service._build_event(record, Target.MOON, conjunction, now)
+    assert shadowed.satellite_magnitude is None
+    assert shadowed.satellite_magnitude_model is None
 
 
 def test_slow_transit_contacts_extend_past_coarse_search_window():
@@ -128,6 +159,31 @@ def test_slow_transit_contacts_extend_past_coarse_search_window():
         assert abs(separation - conjunction.threshold_arcsec) < 0.01
     # Being inside the disk at a search boundary is not a minimum.
     assert service._refine_at_observer(record, Target.MOON, point, now + timedelta(seconds=100)) is None
+
+
+def test_rcs_radius_changes_contacts_and_is_exported_as_an_estimate():
+    campus = load_campus(Path("app/data/campus_minhang.geojson"))
+    sizes = SatelliteSizeCatalog(Path("app/data/satellite_sizes.yaml"))
+    now = datetime.now(timezone.utc).replace(microsecond=0)
+    service = SatelliteService(Settings(), campus, FixedAstronomy(now), sizes,
+                               AnnouncingWeather(), provider=object(), fallback_provider=object())
+    point = ObserverPoint(latitude=31.028, longitude=121.428)
+    known_rcs = SatelliteRecord(TLEEntry("RCS demo", 694, "", "", now), object(), sizes.get(694))
+    unknown = SatelliteRecord(TLEEntry("unknown", 999999, "", "", now), object(), None)
+    estimated = service._refine_at_observer(known_rcs, Target.MOON, point, now)
+    baseline = service._refine_at_observer(unknown, Target.MOON, point, now)
+    assert estimated.threshold_arcsec - baseline.threshold_arcsec == pytest.approx(known_rcs.size.angular_radius_arcsec(400_000))
+    assert estimated.start_time < baseline.start_time
+    assert estimated.end_time > baseline.end_time
+    event = service._build_event(known_rcs, Target.MOON, estimated, now)
+    assert event.angular_diameter_method == "rcs_sphere"
+    assert event.object_angular_radius_arcsec * 2 == event.object_angular_diameter_arcsec
+    assert event.physical_size_m is None and event.physical_size_min_m is None
+    assert event.equivalent_diameter_m > 0
+    assert event.object_angular_diameter_min_arcsec is None
+    assert "object_size_rcs_estimate" in event.reason_codes
+    assert "object_size_unknown_centerline_only" not in event.reason_codes
+    assert event.confidence == .95
 
 
 def test_contact_between_last_doubling_step_and_limit_is_not_truncated():

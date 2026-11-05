@@ -34,6 +34,7 @@ from app.providers.celestrak import (
     tle_age_seconds,
 )
 from app.satellite_sizes import SatelliteSize, SatelliteSizeCatalog
+from app.photometry import estimate_magnitude, load_photometry_catalog
 from app.store import DatabaseStore
 from app.weather import WeatherService
 
@@ -81,6 +82,7 @@ class SatelliteService:
         self.campus = campus
         self.astronomy = astronomy
         self.sizes = sizes
+        self.photometry = load_photometry_catalog()
         self.weather = weather
         self.provider = provider or CelestrakProvider(
             settings.celestrak_active_url,
@@ -118,7 +120,10 @@ class SatelliteService:
             primary_error = None
             try:
                 entries = await self.provider.fetch_active(
-                    max_targets=self.settings.satellite_max_targets
+                    max_targets=self.settings.satellite_max_targets,
+                    allow_download=(
+                        not self.records or self._primary_download_allowed(now)
+                    ),
                 )
                 source = "celestrak-active"
             except CatalogUnchanged as exc:
@@ -171,8 +176,36 @@ class SatelliteService:
                 self.store.set_cache("orbit_source", source, self.updated_at)
                 if source == "celestrak-active" and self.provider.known_update_at is not None:
                     self.store.set_cache("orbit_primary_update", self.provider.known_update_at.isoformat(), self.updated_at)
+                if source == "celestrak-active":
+                    self._record_primary_download(now)
         except Exception as exc:
             self.last_error = str(exc)
+
+    def _primary_download_allowed(self, now: datetime) -> bool:
+        if self.store is None:
+            return True
+        cached = self.store.get_cache("orbit_primary_downloads")
+        if cached is None or not isinstance(cached[0], dict):
+            return True
+        value = cached[0]
+        if value.get("date") != now.date().isoformat():
+            return True
+        return int(value.get("count", 0)) < self.settings.celestrak_daily_download_limit
+
+    def _record_primary_download(self, now: datetime) -> None:
+        if self.store is None:
+            return
+        cached = self.store.get_cache("orbit_primary_downloads")
+        count = 0
+        if cached is not None and isinstance(cached[0], dict):
+            value = cached[0]
+            if value.get("date") == now.date().isoformat():
+                count = int(value.get("count", 0))
+        self.store.set_cache(
+            "orbit_primary_downloads",
+            {"date": now.date().isoformat(), "count": count + 1},
+            now,
+        )
 
     def _restore_cached_catalog(self) -> None:
         assert self.store is not None
@@ -304,7 +337,7 @@ class SatelliteService:
         if finite_ranges.size == 0:
             return []
         sat_radius = (
-            record.size.angular_diameter_arcsec(float(np.min(finite_ranges))) / 2.0
+            record.size.angular_radius_arcsec(float(np.min(finite_ranges)))
             if record.size
             else 0.0
         )
@@ -496,7 +529,7 @@ class SatelliteService:
         minimum_time, sat_pos, target_pos, min_sep = evaluate(float(opt.x))
         if target_pos.altitude_deg <= 0.0 or sat_pos.altitude_deg <= 0.0:
             return None
-        sat_radius = record.size.angular_diameter_arcsec(sat_pos.range_m) / 2.0 if record.size else 0.0
+        sat_radius = record.size.angular_radius_arcsec(sat_pos.range_m) if record.size else 0.0
         threshold = target_pos.angular_radius_arcsec + sat_radius
         if min_sep > threshold:
             return None
@@ -536,27 +569,12 @@ class SatelliteService:
         now: datetime,
     ) -> TransitEvent:
         weather = self.weather.evaluate(target.value, conjunction.minimum_time, now)
-        diameter_arcsec = None
-        diameter_min_arcsec = None
-        diameter_max_arcsec = None
-        size_min = None
-        size_max = None
-        physical_size = None
-        size_source = None
-        size_confidence = None
-        if record.size:
-            physical_size = record.size.maximum_m
-            size_min = record.size.minimum_m
-            size_max = record.size.maximum_m
-            diameter_min_arcsec, diameter_max_arcsec = (
-                record.size.angular_diameter_range_arcsec(conjunction.satellite.range_m)
-            )
-            diameter_arcsec = diameter_max_arcsec
-            size_source = record.size.source_url
-            size_confidence = record.size.confidence
+        size_fields = record.size.event_fields(conjunction.satellite.range_m) if record.size else {}
         reasons = list(weather.evidence.reasons)
         if record.size is None:
             reasons.append("object_size_unknown_centerline_only")
+        elif record.size.method == "rcs_sphere":
+            reasons.append("object_size_rcs_estimate")
         tle_age = tle_age_seconds(record.entry, now)
         propagation_age = abs((conjunction.minimum_time - record.entry.epoch).total_seconds()) / 3600.0
         if tle_age > self.settings.tle_stale_seconds:
@@ -564,11 +582,24 @@ class SatelliteService:
         if propagation_age > 24:
             reasons.append("long_orbit_extrapolation")
         confidence = weather.evidence.score
-        if record.size is not None:
+        if record.size is not None and record.size.method == "max_dimension":
             confidence = min(1.0, confidence * 1.05)
         if tle_age > 3 * 3600:
             confidence *= 0.9
+        sunlit = self.astronomy.satellite_sunlit(record.satrec, conjunction.minimum_time)
+        phase_angle = self.astronomy.satellite_phase_angle(
+            geodetic_for_observer(conjunction.observer), conjunction.minimum_time, conjunction.satellite
+        ) if sunlit is True else None
+        brightness = estimate_magnitude(
+            record.entry.name, conjunction.satellite.range_m / 1000, phase_angle,
+            sunlit=sunlit, **self.photometry.get(str(record.entry.norad_id), {}),
+        )
         return TransitEvent(
+            **size_fields,
+            satellite_sunlit=sunlit,
+            satellite_magnitude=brightness.magnitude if brightness else None,
+            satellite_magnitude_model=brightness.model if brightness else None,
+            satellite_phase_angle_deg=phase_angle,
             transit_diagram=self.astronomy.transit_diagram(
                 record.satrec, target.value, geodetic_for_observer(conjunction.observer), conjunction.minimum_time),
             event_type=EventType.SATELLITE,
@@ -581,15 +612,6 @@ class SatelliteService:
             duration_ms=max(0, int((conjunction.end_time - conjunction.start_time).total_seconds() * 1000)),
             min_separation_arcsec=conjunction.minimum_separation_arcsec,
             target_angular_radius_arcsec=conjunction.target_position.angular_radius_arcsec,
-            object_angular_diameter_arcsec=diameter_arcsec,
-            object_angular_diameter_min_arcsec=diameter_min_arcsec,
-            object_angular_diameter_max_arcsec=diameter_max_arcsec,
-            physical_size_m=physical_size,
-            physical_size_min_m=size_min,
-            physical_size_max_m=size_max,
-            physical_size_source=size_source,
-            physical_size_confidence=size_confidence,
-            angular_diameter_method="max_dimension" if record.size else "unknown",
             size_unknown=record.size is None,
             range_km=conjunction.satellite.range_m / 1000.0,
             observer=conjunction.observer,

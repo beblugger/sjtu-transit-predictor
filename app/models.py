@@ -57,6 +57,7 @@ class TransitEvent(BaseModel):
     min_separation_arcsec: float
     target_angular_radius_arcsec: float
     object_angular_diameter_arcsec: float | None = None
+    object_angular_radius_arcsec: float | None = None
     object_angular_diameter_min_arcsec: float | None = None
     object_angular_diameter_max_arcsec: float | None = None
     physical_size_m: float | None = None
@@ -64,7 +65,11 @@ class TransitEvent(BaseModel):
     physical_size_max_m: float | None = None
     physical_size_source: str | None = None
     physical_size_confidence: str | None = None
-    angular_diameter_method: Literal["max_dimension", "unknown"] = "unknown"
+    angular_diameter_method: Literal["max_dimension", "rcs_sphere", "unknown"] = "unknown"
+    angular_size_source: str | None = None
+    angular_size_confidence: str | None = None
+    equivalent_diameter_m: float | None = None
+    satellite_rcs_m2: float | None = None
     size_unknown: bool = False
     range_km: float
     observer: ObserverPoint
@@ -79,6 +84,10 @@ class TransitEvent(BaseModel):
     reason_codes: list[str] = Field(default_factory=list)
     visibility: dict | None = None
     transit_diagram: dict | None = None
+    satellite_sunlit: bool | None = None
+    satellite_magnitude: float | None = None
+    satellite_magnitude_model: Literal["stellarium-starlink", "stellarium-standard", "stellarium-rcs"] | None = None
+    satellite_phase_angle_deg: float | None = None
 
 
 class WeatherStatus(BaseModel):

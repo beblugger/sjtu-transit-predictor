@@ -9,7 +9,7 @@ from typing import Iterable
 
 import numpy as np
 from sgp4.api import Satrec, jday
-from skyfield.api import load, load_file, wgs84
+from skyfield.api import EarthSatellite, load, load_file, wgs84
 
 from app.geo import (
     Geodetic,
@@ -132,6 +132,21 @@ class CelestialCalculator:
             result['illuminated_fraction'] = (1 - float(moon_to_sun @ center)) / 2
             result['bright_limb_angle_deg'] = math.degrees(math.atan2(float(moon_to_sun @ east), float(moon_to_sun @ north)))
         return result
+
+    def satellite_sunlit(self, satrec, value: datetime) -> bool | None:
+        """Geometric sunlight at closest approach; no photometric assumption."""
+        if getattr(self, 'eph', None) is None:
+            return None
+        satellite = EarthSatellite.from_satrec(satrec, self.ts)
+        return bool(satellite.at(self.time(value)).is_sunlit(self.eph))
+
+    def satellite_phase_angle(self, observer: Geodetic, value: datetime, satellite: SatellitePosition) -> float:
+        """Sun–satellite–observer angle, with all vectors in the same ENU frame."""
+        sun = self.target_at("sun", observer, value)
+        to_satellite = satellite.vector_enu * satellite.range_m
+        to_sun = unit_from_az_alt(sun.azimuth_deg, sun.altitude_deg) * sun.distance_m - to_satellite
+        cosine = float((-satellite.vector_enu) @ (to_sun / np.linalg.norm(to_sun)))
+        return math.degrees(math.acos(float(np.clip(cosine, -1.0, 1.0))))
 
     def targets_at(self, target: str, observer: Geodetic, values: Iterable[datetime]):
         datetimes = list(values)

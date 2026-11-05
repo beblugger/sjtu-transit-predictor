@@ -43,6 +43,13 @@ test('CSV carries units, six digit IDs and UTC instants, escapes text and leaves
   assert.ok(csv.includes('"100001"')); assert.ok(csv.includes('"\'=test,""quoted"""'));
   assert.ok(csv.includes('"0.3"')); assert.ok(csv.includes('"500","",""'));
   assert.ok(csv.endsWith('\r\n'));
+  const equivalent={...e,physical_size_m:null,angular_diameter_method:'rcs_sphere',equivalent_diameter_m:10,
+    object_angular_radius_arcsec:1,object_angular_diameter_arcsec:2,satellite_rcs_m2:78.54,angular_size_confidence:'low'};
+  const output=eventsCSV([equivalent]).split('\r\n'),columns=output[0].slice(1).split(',').map(x=>x.slice(1,-1));
+  // Parse the final columns only; the satellite name deliberately contains commas.
+  const values=output[1].split(',').slice(-6).map(x=>x.slice(1,-1));
+  assert.deepEqual(values,['1','rcs_sphere','10','78.54','','low']);
+  assert.ok(columns.includes('rcs_equivalent_diameter_m'));
 });
 test('mixed publications and malformed events cannot be silently presented', () => {
   const e = event(1, '2026-11-04T00:00:00Z');
@@ -120,7 +127,7 @@ test('campus tiles use the source frontend WMS grid at native screen scale',asyn
   const base=mapView({}, {calculation_domain:domain},2.5),closer=mapView({}, {calculation_domain:domain},5);
   const tiles=campusTiles(base,1280),zoomed=campusTiles(closer,1280);
   assert.ok(tiles.length>0&&tiles.length<64);
-  assert.ok(tiles.every(t=>t.size*1280/960>180&&t.size*1280/960<365));
+  assert.ok(tiles.every(t=>t.size*1280/960>128&&t.size*1280/960<257));
   assert.equal(zoomed[0].zoom,tiles[0].zoom+1);
   for(const tile of tiles){
     const url=new URL(tile.url);
@@ -131,4 +138,39 @@ test('campus tiles use the source frontend WMS grid at native screen scale',asyn
     const [left,bottom,right,top]=url.searchParams.get('bbox').split(',').map(Number);
     assert.ok(right>left&&top>bottom);assert.ok(Math.abs((right-left)-(top-bottom))<1e-6);
   }
+});
+
+
+test('exterior tiles sharpen on zoom and resize while preserving geographic alignment',async()=>{
+  const {mapView,exteriorTiles,worldPixel}=await import('../deploy/map.mjs');
+  const domain={type:'Polygon',coordinates:[[[121.39,31],[121.47,31],[121.47,31.05],[121.39,31.05],[121.39,31]]]};
+  const view=mapView({}, {calculation_domain:domain},2.5);
+  const tiles=exteriorTiles(view,1280);
+  assert.ok(tiles[0].zoom>14);
+  assert.equal(exteriorTiles(mapView({}, {calculation_domain:domain},5),1280)[0].zoom,tiles[0].zoom+1);
+  assert.equal(exteriorTiles(view,2560)[0].zoom,tiles[0].zoom+1);
+  assert.ok(tiles.every(t=>t.size*1280/960<257));
+  const [px,py]=worldPixel([121.43,31.03],tiles[0].zoom),tx=Math.floor(px/256),ty=Math.floor(py/256);
+  const tile=tiles.find(t=>new URL(t.url).pathname.endsWith(`/${tx}/${ty}.png`));
+  const expected=view.project([121.43,31.03]);
+  assert.ok(Math.abs(tile.x+(px/256-tx)*(tile.size-.2)-expected[0])<1e-6);
+  assert.ok(Math.abs(tile.y+(py/256-ty)*(tile.size-.2)-expected[1])<1e-6);
+  assert.ok(Math.min(...tiles.map(t=>t.x))<=0&&Math.max(...tiles.map(t=>t.x+t.size))>=960);
+  assert.ok(Math.min(...tiles.map(t=>t.y))<=0&&Math.max(...tiles.map(t=>t.y+t.size))>=560);
+});
+
+test('dense campus tiles increase pixel resolution without moving their bounds',async()=>{
+  const {campusTiles,worldPixel}=await import('../deploy/map.mjs');
+  const [cx,cy]=worldPixel([121.43,31.03],14),view={cx,cy,scale:4};
+  const normal=campusTiles(view,1280),dense=campusTiles(view,1280,2),capped=campusTiles(view,1280,3);
+  assert.ok(normal.length>0);
+  assert.equal(normal.length,dense.length);
+  dense.forEach((tile,i)=>{
+    const url=new URL(tile.url);
+    assert.equal(url.searchParams.get('width'),'512');
+    assert.equal(url.searchParams.get('height'),'512');
+    assert.equal(url.searchParams.get('bbox'),new URL(normal[i].url).searchParams.get('bbox'));
+    assert.deepEqual([tile.x,tile.y,tile.size],[normal[i].x,normal[i].y,normal[i].size]);
+    assert.equal(tile.url,capped[i].url);
+  });
 });

@@ -46,6 +46,19 @@ def test_position_matches_independent_skyfield_topocentric(tmp_path):
         assert vectors[index] == pytest.approx(actual.vector_enu, abs=1e-10)
 
 
+def test_sunlight_and_shadow_are_exported_without_guessing_magnitude(tmp_path):
+    calculator = CelestialCalculator(tmp_path / "missing.bsp")
+    satrec = entry().to_satrec()
+    assert calculator.satellite_sunlit(satrec, EPOCH) is None
+    kernel = Path("~/.cache/sjtu-transit/de421.bsp").expanduser()
+    if not kernel.exists():
+        pytest.skip("DE421 not available locally")
+    calculator = CelestialCalculator(kernel)
+    # Across a complete low Earth orbit there must be both illumination states.
+    states = {calculator.satellite_sunlit(satrec, EPOCH + timedelta(minutes=m)) for m in range(0, 100, 5)}
+    assert states == {True, False}
+
+
 def test_omm_six_digit_id_and_database_roundtrip(tmp_path):
     fields = entry().as_omm()
     fields["NORAD_CAT_ID"] = 100001
@@ -270,3 +283,51 @@ def test_window_interpolation_matches_exact_topocentric_places(tmp_path, target,
     runtime.store.close()
     if runtime.astronomy.eph:
         runtime.astronomy.eph.close()
+
+
+def test_daily_primary_download_limit_survives_restart(tmp_path):
+    calls = []
+    published = ["2026 Nov 04 12:23:24"]
+    def handler(request):
+        calls.append(request.url.path)
+        if request.url.path == "/index":
+            return httpx.Response(200, text=f"<h3>Current as of {published[0]} UTC (Day 308)</h3>")
+        return httpx.Response(200, json=[entry().as_omm()])
+    settings = Settings(
+        database_path=tmp_path / "cache.db",
+        ephemeris_path=tmp_path / "missing.bsp",
+        celestrak_daily_download_limit=1,
+    )
+    runtime = build_runtime(settings)
+    provider = CelestrakProvider(
+        "https://primary.test/gp",
+        update_url="https://primary.test/index",
+        transport=httpx.MockTransport(handler),
+    )
+    runtime.satellites.provider = provider
+    asyncio.run(runtime.satellites.refresh_catalog())
+    assert calls == ["/index", "/gp"]
+    today = datetime.now(timezone.utc).date().isoformat()
+    assert runtime.store.get_cache("orbit_primary_downloads")[0] == {"date": today, "count": 1}
+    first_download = runtime.satellites.updated_at
+    runtime.store.close()
+
+    # A fresh run must see the saved daily count and keep the cached catalog.
+    published[0] = "2026 Nov 04 14:23:38"
+    runtime = build_runtime(settings)
+    provider.known_update_at = runtime.satellites.provider.known_update_at
+    runtime.satellites.provider = provider
+    runtime.store.set_cache("orbit_primary_attempt", True, EPOCH)
+    asyncio.run(runtime.satellites.refresh_catalog())
+    assert calls == ["/index", "/gp", "/index"]
+    assert runtime.satellites.updated_at == first_download
+    assert "daily download limit" in runtime.satellites.last_error
+
+    # A new UTC day resets the budget and allows another download.
+    runtime.store.set_cache("orbit_primary_downloads", {"date": "2000-01-01", "count": 99}, EPOCH)
+    runtime.store.set_cache("orbit_primary_attempt", True, EPOCH)
+    runtime.satellites.provider.known_update_at = datetime(2026, 11, 4, 12, 23, 24, tzinfo=timezone.utc)
+    asyncio.run(runtime.satellites.refresh_catalog())
+    assert calls[-2:] == ["/index", "/gp"]
+    assert runtime.store.get_cache("orbit_primary_downloads")[0] == {"date": today, "count": 1}
+    runtime.store.close()

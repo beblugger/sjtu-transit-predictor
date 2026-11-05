@@ -11,6 +11,7 @@ from app.footprints import FootprintSolver
 from app.geo import Geodetic, unit_from_az_alt, WGS84_A, WGS84_E2
 from app.astronomy import TargetPosition, SatellitePosition
 from app.models import Target, ObserverPoint
+from app.satellite_sizes import SatelliteSize
 
 
 class LinearSky:
@@ -58,6 +59,17 @@ def test_inverse_strip_has_physical_width_and_position_dependent_time():
     geometry=shape(result['geometry'])
     assert geometry.covers(Point(0,0))
     assert not geometry.covers(Point(0,.003))
+
+
+def test_rcs_equivalent_radius_is_used_for_inverse_boundaries():
+    solver = make_case()
+    solver.record.size = SatelliteSize(999, "RCS demo", 100, None, None, "test", "2026-11-05",
+                                       "low", "rcs_sphere", math.pi * 50**2)
+    result = solver.solve()
+    expected_radius = 100 + math.degrees(math.atan(50 / 500000)) * 3600
+    assert result["area_m2"] == pytest.approx(2 * expected_radius * 1000, rel=.01)
+    assert shape(result["geometry"]).covers(Point(0, 110 / solver.north_scale))
+    assert result["maximum_sampled_boundary_error_m"] <= 2
 
 
 def test_nonlinear_boundary_triggers_adaptive_piecewise_inversion():

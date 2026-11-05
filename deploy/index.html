@@ -6,19 +6,24 @@
   <meta name="color-scheme" content="light">
   <title>交大日月凌星预报</title>
   <link rel="icon" href="data:,">
+  <meta name="theme-color" content="#193f64">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="app.mjs"></script>
 </head>
 <body>
-<header>
-  <h1>交大日月凌星预报</h1>
+<a class="skip-link" href="#application">跳至预测内容</a>
+<header class="site-header">
+  <div class="brand"><span class="brand-mark" aria-hidden="true">◉</span><div><p class="eyebrow">SJTU · TRANSIT OBSERVATORY</p><h1>交大日月凌星预报</h1></div></div>
+  <div class="header-meta"><span>上海交通大学 · 闵行校区</span><span class="timezone">CST / UTC+08:00</span></div>
 </header>
 <main id="application" hidden>
-  <section aria-labelledby="map-title">
-    <h2 id="map-title">预测图</h2>
-    <div class="actions">
+  <section class="map-card" aria-labelledby="map-title">
+    <div class="section-heading"><h2 id="map-title">预测图</h2><span class="section-note">日月凌星 · 地面可见区域</span></div>
+    <div class="actions map-toolbar">
       <button id="zoom-in" type="button" aria-label="放大地图">＋</button><button id="zoom-out" type="button" aria-label="缩小地图">−</button><button id="zoom-reset" type="button">全部</button><output id="zoom-level">1×</output>
-      <span>彩色实线：边界 · 彩色虚线：中心线 · 灰线：校区 · 蓝色：当前选中 · 灰色：相邻事件</span>
+      <div class="map-legend" aria-label="地图图例"><span><i class="legend-line" aria-hidden="true"></i>接触边界</span><span><i class="legend-line dashed" aria-hidden="true"></i>中心线</span><span><i class="legend-line campus" aria-hidden="true"></i>校区</span><span><i class="legend-dot" aria-hidden="true"></i>当前选中</span><span><i class="legend-dot adjacent" aria-hidden="true"></i>相邻事件</span></div>
     </div>
     <div class="map-frame" tabindex="0" aria-label="校区预测范围图，可拖动平移，用加减键、滚轮或双指缩放"><svg id="map" viewBox="0 0 960 560" role="group" aria-labelledby="map-description"><title id="map-description">WGS84 校区范围和选中事件的反解可见区域</title></svg></div>
     <p id="map-status"></p>
@@ -26,15 +31,15 @@
   </section>
 
   <form id="filters" aria-labelledby="filter-title">
-    <h2 id="filter-title">筛选</h2>
+    <div class="section-heading"><h2 id="filter-title">筛选</h2><span class="section-note">找到适合你的观测时刻</span></div>
     <fieldset id="filter-controls" disabled>
-      <legend>事件条件</legend>
+      <legend class="visually-hidden">事件条件</legend>
       <div class="filter-choice"><span id="target-title">目标</span><div class="filter-tabs" role="tablist" aria-labelledby="target-title">
         <button type="button" role="tab" data-target="all" aria-selected="true" tabindex="0">全部</button>
         <button type="button" role="tab" data-target="sun" aria-selected="false" tabindex="-1">太阳</button>
         <button type="button" role="tab" data-target="moon" aria-selected="false" tabindex="-1">月亮</button>
       </div></div><input type="hidden" id="target" value="all">
-      <label>搜索卫星名 / NORAD 编号 <input id="search" type="search" autocomplete="off"></label>
+      <label>搜索卫星名 / NORAD 编号 <input id="search" type="search" autocomplete="off" placeholder="卫星名称或编号"></label>
       <label>起始时间（CST） <input id="from" type="datetime-local" step="1" required></label>
       <label>结束时间（CST） <input id="to" type="datetime-local" step="1" required></label>
       <label>最低高度角 (°) <input id="min-altitude" type="number" min="0" max="90" step="1" value="15"></label>
@@ -49,8 +54,8 @@
       </div></div><input type="hidden" id="weather" value="clear">
       <label>排序 <select id="sort"><option value="time">时间从近到远</option><option value="altitude">高度角从高到低</option><option value="diameter">角直径从大到小</option><option value="distance">距可见区从近到远</option></select></label>
       <label>距可见区最大距离 (m) <input id="max-distance" type="number" min="0" step="any" placeholder="不限" disabled aria-describedby="distance-filter-hint"></label>
-      <span id="distance-filter-hint" class="selection-hint">设置参考位置后可用，留空不限距离。</span>
-      <label><input id="inside-only" type="checkbox" disabled> 仅显示参考位置可见的事件</label>
+      <span id="distance-filter-hint" class="selection-hint">设置位置后可用，留空不限距离。</span>
+      <label class="checkbox-label"><input id="inside-only" type="checkbox" disabled> 仅显示位置可见的事件</label>
       <div class="actions">
         <button type="button" data-hours="6">未来 6 小时</button><button type="button" data-hours="24">未来 24 小时</button><button type="button" data-hours="96">未来 96 小时</button>
         <button id="all-coverage" type="button">全部数据覆盖时段</button><button id="reset" type="button">恢复默认筛选</button>
@@ -59,7 +64,7 @@
     <p id="filter-error" role="alert"></p>
   </form>
 
-  <section aria-labelledby="events-title">
+  <section class="events-card" aria-labelledby="events-title">
     <h2 id="events-title">事件列表</h2>
     <p class="selection-hint">每页 10 条 · 点击整行查看详情，方向键移动、回车选择。</p>
     <p id="result-count" role="status" aria-live="polite"></p>
@@ -75,14 +80,27 @@
   </section>
 
 
-  <section aria-labelledby="location-title">
-    <h2 id="location-title">参考位置（可选）</h2>
+  <section class="location-card" aria-labelledby="location-title">
+    <h2 id="location-title">位置（可选）</h2>
     <form id="location-form">
       <label>纬度 (°N, WGS84) <input id="latitude" type="number" min="-90" max="90" step="any" value="31.02807" required></label>
       <label>经度 (°E, WGS84) <input id="longitude" type="number" min="-180" max="180" step="any" value="121.42839" required></label>
-      <button type="submit">设置参考位置</button><button id="locate" type="button">使用设备定位</button><button id="clear-location" type="button">清除参考位置</button>
+      <button type="submit">设置位置</button><button id="locate" type="button">使用设备定位</button><button id="clear-location" type="button">清除位置</button>
     </form>
-    <p id="location-status" role="status">未设置参考位置。位置只用于本机计算距可见区的距离，不会上传。</p>
+    <p id="location-status" role="status">未设置位置。位置只用于本机计算距可见区的距离，不会上传。</p>
+  </section>
+  <section class="settings-card" aria-labelledby="settings-title">
+    <div class="section-heading"><h2 id="settings-title">更新与提醒</h2><button id="install-app" type="button" hidden>安装 App</button></div>
+    <div class="app-settings">
+      <label class="checkbox-label"><input id="auto-update" type="checkbox" checked> 自动更新数据（每 5 分钟及回到 App 时）</label>
+      <label class="checkbox-label"><input id="nearby-notifications" type="checkbox"> 附近事件通知（100 米内 · 未来 10 分钟）</label>
+      <label class="checkbox-label"><input id="follow-device" type="checkbox"> 跟随设备位置</label>
+    </div>
+    <p class="selection-hint">提醒以你设置的位置到可见区的距离为准，检查全部事件，不受列表筛选影响。跟随设备位置开启后使用实时定位；关闭时使用手动位置。</p>
+    <p class="selection-hint">请保持 App 打开；系统挂起或关闭后无法保证更新与提醒。iPhone / iPad 请先添加到主屏幕，再开启通知。</p>
+    <p id="app-status" class="selection-hint" role="status"></p>
+    <p id="notification-status" class="selection-hint" role="status">附近通知已关闭。</p>
+    <p id="tracking-status" class="selection-hint" role="status">设备位置跟随已关闭。</p>
   </section>
   <section id="detail" aria-labelledby="detail-title" tabindex="-1">
     <h2 id="detail-title">事件详情</h2><p id="detail-empty">从事件列表选择事件。</p>

@@ -4,6 +4,7 @@ export const TARGETS = {sun: '太阳', moon: '月球'};
 export const WEATHER = {announced: '模型评分达标', suppressed: '模型评分未达标', unavailable: '天气不可用'};
 export const REASONS = {
   object_size_unknown_centerline_only: '卫星尺寸未知，计算采用卫星中心穿过日/月视圆盘的条件',
+  object_size_rcs_estimate: '卫星尺寸采用 RCS 等效圆近似，角半径、接触时刻和可见区据此估算；不代表真实光学轮廓',
   orbit_epoch_old: '轨道历元距本次生成时间超过六小时',
   long_orbit_extrapolation: '事件时刻距轨道历元超过 24 小时',
   weather_window_not_covered: '天气数据未覆盖完整评分窗口',
@@ -103,11 +104,13 @@ export function eventsCSV(events) {
   const fields = ['norad_id', 'name', 'target', 'start_time_utc', 'minimum_time_utc', 'end_time_utc',
     'duration_s', 'altitude_deg', 'azimuth_deg', 'range_km', 'angular_diameter_arcsec', 'maximum_size_m',
     'observer_latitude_deg_wgs84', 'observer_longitude_deg_wgs84', 'observer_elevation_m',
-    'orbit_epoch_utc', 'orbit_age_at_event_hours', 'weather_decision', 'weather_score', 'reason_codes', 'campus_visibility_area_m2', 'sampled_boundary_error_m', 'visibility_area_m2'];
+    'orbit_epoch_utc', 'orbit_age_at_event_hours', 'weather_decision', 'weather_score', 'reason_codes', 'campus_visibility_area_m2', 'sampled_boundary_error_m', 'visibility_area_m2',
+    'angular_radius_arcsec','angular_diameter_method','rcs_equivalent_diameter_m','radar_cross_section_m2','angular_size_source','angular_size_confidence'];
   const rows = events.map(e => [e.identifier, e.name, e.target, e.start_time, e.minimum_time, e.end_time,
     e.duration_ms / 1000, e.altitude_deg, e.azimuth_deg, e.range_km, e.object_angular_diameter_arcsec, e.physical_size_m,
     e.observer.latitude, e.observer.longitude, e.observer.elevation_m, e.orbit_epoch,
-    e.orbit_age_at_event_hours, e.weather.decision, e.weather.score, e.reason_codes.join(';'), e.visibility?.campus_area_m2 ?? e.visibility?.area_m2, e.visibility?.maximum_sampled_boundary_error_m, e.visibility?.area_m2]);
+    e.orbit_age_at_event_hours, e.weather.decision, e.weather.score, e.reason_codes.join(';'), e.visibility?.campus_area_m2 ?? e.visibility?.area_m2, e.visibility?.maximum_sampled_boundary_error_m, e.visibility?.area_m2,
+    e.object_angular_radius_arcsec,e.angular_diameter_method,e.equivalent_diameter_m,e.satellite_rcs_m2,e.angular_size_source,e.angular_size_confidence]);
   return '\ufeff' + [fields, ...rows].map(row => row.map(csvCell).join(',')).join('\r\n') + '\r\n';
 }
 

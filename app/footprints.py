@@ -70,7 +70,7 @@ class FootprintSolver:
         vector *= angle / max(float(np.linalg.norm(vector)), 1e-30)
         radius = target.angular_radius_arcsec
         if self.record.size:
-            radius += self.record.size.angular_diameter_arcsec(sat.range_m) / 2
+            radius += self.record.size.angular_radius_arcsec(sat.range_m)
         return vector, math.radians(radius / 3600), min(target.altitude_deg, sat.altitude_deg)
 
     def closest(self, p, guess):

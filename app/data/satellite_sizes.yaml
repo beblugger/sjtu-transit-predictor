@@ -1,5 +1,5 @@
-# Physical dimensions are used only when a documented characteristic span
-# exists. TLE and radar cross-section are deliberately not treated as size.
+# Documented physical spans take priority over the separate Stellarium RCS
+# equivalent diameter estimates. RCS estimates are never stored as physical spans.
 satellites:
   "25544":
     name: International Space Station

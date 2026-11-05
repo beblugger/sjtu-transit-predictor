@@ -83,6 +83,6 @@ def angular_separation_arcsec(a_az_deg: float, a_alt_deg: float, b_az_deg: float
 
 
 def angular_diameter_arcsec(diameter_m: float, range_m: float) -> float:
-    if diameter_m <= 0.0 or range_m <= 0.0:
-        raise ValueError("diameter and range must be positive")
+    if not math.isfinite(diameter_m) or not math.isfinite(range_m) or diameter_m <= 0.0 or range_m <= 0.0:
+        raise ValueError("diameter and range must be finite and positive")
     return 2.0 * math.atan(diameter_m / (2.0 * range_m)) * ARCSEC_PER_RADIAN

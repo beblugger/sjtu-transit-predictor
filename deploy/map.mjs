@@ -35,14 +35,19 @@ export function asLines(geometry) {
   return geometry.type==='LineString'?[geometry.coordinates]:geometry.coordinates;
 }
 
-// Outside campus, intentionally retain a coarse, fixed z14 basemap.
-export function exteriorTiles(view) {
-  const minX=Math.floor((view.cx-480/view.scale)/256),maxX=Math.ceil((view.cx+480/view.scale)/256)-1;
-  const minY=Math.floor((view.cy-280/view.scale)/256),maxY=Math.ceil((view.cy+280/view.scale)/256)-1;
+// Choose the next native level so raster tiles are never enlarged in CSS pixels.
+// Keep the same z14 world coordinates for scientific geometry at every tile level.
+function tileZoom(view, displayWidth) {
+  return Math.max(14,Math.min(19,14+Math.ceil(Math.log2(Math.max(.01,view.scale*displayWidth/960)))));
+}
+export function exteriorTiles(view,displayWidth=960) {
+  const zoom=tileZoom(view,displayWidth),tileSpan=256/2**(zoom-14);
+  const minX=Math.floor((view.cx-480/view.scale)/tileSpan),maxX=Math.ceil((view.cx+480/view.scale)/tileSpan)-1;
+  const minY=Math.floor((view.cy-280/view.scale)/tileSpan),maxY=Math.ceil((view.cy+280/view.scale)/tileSpan)-1;
   const tiles=[];
   for(let x=minX;x<=maxX;x++)for(let y=minY;y<=maxY;y++)tiles.push({
-    url:`https://tile.openstreetmap.org/14/${x}/${y}.png`,
-    x:480+(x*256-view.cx)*view.scale,y:280+(y*256-view.cy)*view.scale,size:256*view.scale+.2,
+    url:`https://tile.openstreetmap.org/${zoom}/${x}/${y}.png`,zoom,
+    x:480+(x*tileSpan-view.cx)*view.scale,y:280+(y*tileSpan-view.cy)*view.scale,size:tileSpan*view.scale+.2,
   });
   return tiles;
 }
@@ -53,8 +58,10 @@ export const CAMPUS_LAYERS=[
   {name:'jmap:minhang_2d',bounds:[121.4179,31.0183,121.4467,31.037]},
   {name:'jmap:nyby_2d',bounds:[121.4311,31.0358,121.4332,31.0384]},
 ];
-export function campusTiles(view,displayWidth=960){
-  const zoom=Math.max(14,Math.min(19,14+Math.round(Math.log2(Math.max(.01,view.scale*displayWidth/960)))));
+export function campusTiles(view,displayWidth=960,pixelRatio=1){
+  const zoom=tileZoom(view,displayWidth);
+  // Request more pixels for the same geographic tile on dense displays, capped at 2×.
+  const resolution=String(256*(pixelRatio>1?2:1));
   const factor=2**(zoom-14),world=256*2**zoom,tileSpan=256/factor,extent=20037508.342789244;
   const result=[];
   for(const layer of CAMPUS_LAYERS){
@@ -67,7 +74,7 @@ export function campusTiles(view,displayWidth=960){
       const left=x*256/world*2*extent-extent,right=(x+1)*256/world*2*extent-extent;
       const top=extent-y*256/world*2*extent,bottom=extent-(y+1)*256/world*2*extent;
       const url=new URL('https://map.sjtu.edu.cn/geoserver/jmap/wms');
-      url.search=new URLSearchParams({service:'WMS',request:'GetMap',version:'1.1.1',layers:layer.name,styles:'',srs:'EPSG:3857',bbox:[left,bottom,right,top].join(','),width:'256',height:'256',format:'image/png',transparent:'true',tiled:'true'});
+      url.search=new URLSearchParams({service:'WMS',request:'GetMap',version:'1.1.1',layers:layer.name,styles:'',srs:'EPSG:3857',bbox:[left,bottom,right,top].join(','),width:resolution,height:resolution,format:'image/png',transparent:'true',tiled:'true'});
       result.push({url:url.href,zoom,x:480+(x*tileSpan-view.cx)*view.scale,y:280+(y*tileSpan-view.cy)*view.scale,size:tileSpan*view.scale+.2,layer:layer.name});
     }
   }

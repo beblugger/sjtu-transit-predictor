@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     community_orbit_url: str = "https://raw.githubusercontent.com/satvisorcom/satvisor-data/master/celestrak/json/active.json"
     celestrak_update_url: str = "https://celestrak.org/NORAD/elements/"
     celestrak_timeout_seconds: float = 20.0
+    celestrak_daily_download_limit: int = Field(default=3, ge=1)
     tle_refresh_seconds: int = Field(default=7200, ge=7200)
     tle_stale_seconds: int = 6 * 3600
     satellite_hours: int = Field(default=96, ge=1, le=96)

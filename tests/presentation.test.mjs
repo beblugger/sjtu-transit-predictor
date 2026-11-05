@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {weatherCondition,visibleDetailEntries,dataNotices} from '../deploy/presentation.mjs';
+import {weatherCondition,visibleDetailEntries,dataNotices,brightnessLabel} from '../deploy/presentation.mjs';
 import {filterEvents} from '../deploy/core.mjs';
 const weather={deterministic:{hourly:{times:['2026-11-05T00:00:00Z','2026-11-05T01:00:00Z','2026-11-05T02:00:00Z'],cloud_cover_pct:[5,95,60],weather_code:[0,3,2],precipitation_mm:[0,0,0]}}};
 test('sky conditions are independent of composite scores and do not extrapolate unavailable weather',()=>{
@@ -16,7 +16,8 @@ test('sky conditions are independent of composite scores and do not extrapolate 
   assert.deepEqual(filterEvents(events,{...f,weather:'overcast'},null,weather),[events[1]]);
 });
 test('unknown detail values disappear while real zero measurements remain',()=>{
-  assert.deepEqual(visibleDetailEntries([['a','未知'],['b','未知 — 5 m'],['c',null],['d','0.00 m'],['e','未设置参考位置'],['f','unknown']]),[['d','0.00 m']]);
+  assert.deepEqual(visibleDetailEntries([['a','未知'],['b','未知 — 5 m'],['c',null],['d','0.00 m'],['e','未设置位置'],['f','unknown']]),[['d','0.00 m']]);
+  assert.equal(visibleDetailEntries([['亮度',brightnessLabel({satellite_sunlit:true})]]).length,1);
 });
 test('confirmed backend failure has priority; inability to check never claims shutdown',()=>{
   const manifest={from_time:'2026-11-05T00:00:00Z',to_time:'2026-11-06T00:00:00Z',weather_status:{},warnings:[]};

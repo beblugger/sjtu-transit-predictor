@@ -16,6 +16,7 @@ from sgp4.exporter import export_tle
 
 from app.config import Settings
 from app.models import TransitEvent
+from app.photometry import PHOTOMETRY_PATH
 from app.runtime import build_runtime
 
 
@@ -33,7 +34,8 @@ def prediction_fingerprint(runtime) -> str:
     for path in (runtime.settings.campus_geojson_path, runtime.settings.satellite_sizes_path,
                  Path(__file__).with_name("satellites.py"), Path(__file__).with_name("astronomy.py"),
                  Path(__file__).with_name("geo.py"), Path(__file__).with_name("campus.py"),
-                 Path(__file__).with_name("satellite_sizes.py"), Path(__file__).with_name("footprints.py")):
+                 Path(__file__).with_name("satellite_sizes.py"), Path(__file__).with_name("footprints.py"),
+                 Path(__file__).with_name("photometry.py"), PHOTOMETRY_PATH):
         digest.update(path.read_bytes())
     digest.update(_json({
         "step": runtime.settings.satellite_coarse_step_seconds,
@@ -69,7 +71,7 @@ async def predict_cached(runtime, start: datetime, end: datetime) -> tuple[list[
                 event.weather = runtime.weather.evaluate(event.target.value, event.minimum_time, start).evidence
                 event.confidence = event.weather.score
                 event.reason_codes = [code for code in event.reason_codes
-                                      if code in ("object_size_unknown_centerline_only", "long_orbit_extrapolation")]
+                                      if code in ("object_size_unknown_centerline_only", "object_size_rcs_estimate", "long_orbit_extrapolation")]
                 if event.orbit_epoch and (start - event.orbit_epoch).total_seconds() > runtime.settings.tle_stale_seconds:
                     event.reason_codes.append("orbit_epoch_old")
                 event.reason_codes.extend(event.weather.reasons)

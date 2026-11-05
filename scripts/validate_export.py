@@ -8,6 +8,7 @@ import argparse
 from datetime import datetime
 import hashlib
 import json
+import math
 from pathlib import Path
 
 import numpy as np
@@ -18,6 +19,28 @@ from shapely.geometry import shape
 from app.campus import load_campus
 from app.geo import angular_separation_arcsec
 from app.providers.celestrak import parse_omm_elements
+
+
+def size_violations(event: dict) -> list[str]:
+    """Audit exported radii and RCS equivalents without using the size catalog."""
+    violations = []
+    diameter = event.get("object_angular_diameter_arcsec")
+    radius = event.get("object_angular_radius_arcsec")
+    if radius is not None and (diameter is None or not math.isclose(2 * radius, diameter, rel_tol=1e-10, abs_tol=1e-10)):
+        violations.append("angular_radius_diameter_mismatch")
+    span = event.get("physical_size_m")
+    if event.get("angular_diameter_method") == "rcs_sphere":
+        rcs, equivalent = event.get("satellite_rcs_m2"), event.get("equivalent_diameter_m")
+        if rcs is None or rcs <= 0 or equivalent is None or not math.isclose(equivalent, 2 * math.sqrt(rcs / math.pi), rel_tol=1e-10):
+            violations.append("rcs_equivalent_diameter_mismatch")
+        if any(event.get(key) is not None for key in ("physical_size_m", "physical_size_min_m", "physical_size_max_m", "object_angular_diameter_min_arcsec", "object_angular_diameter_max_arcsec")):
+            violations.append("rcs_estimate_reported_as_physical_size")
+        span = equivalent
+    if span is not None:
+        expected = 2 * math.degrees(math.atan(span / (2 * event["range_km"] * 1000))) * 3600
+        if diameter is None or not math.isclose(diameter, expected, rel_tol=1e-9, abs_tol=1e-9):
+            violations.append("angular_size_distance_mismatch")
+    return violations
 
 
 def validate(root: Path, ephemeris: Path) -> dict:
@@ -42,6 +65,7 @@ def validate(root: Path, ephemeris: Path) -> dict:
     end = datetime.fromisoformat(manifest["to_time"])
     try:
         for event in events:
+            violations.extend({"id": event["identifier"], "reason": reason} for reason in size_violations(event))
             visibility = event.get("visibility")
             if visibility is not None:
                 region_count += 1
@@ -65,8 +89,9 @@ def validate(root: Path, ephemeris: Path) -> dict:
                         angle = satellite_position.separation_from(target_position).arcseconds()
                         radius = 695_700_000 if event["target"] == "sun" else 1_737_400
                         threshold = np.degrees(2 * np.arctan(radius / (2 * target_position.distance().m))) * 3600
-                        if event["physical_size_m"] is not None:
-                            threshold += np.degrees(np.arctan(event["physical_size_m"] / (2 * satellite_position.distance().m))) * 3600
+                        span = event.get("physical_size_m") or event.get("equivalent_diameter_m")
+                        if span is not None:
+                            threshold += np.degrees(np.arctan(span / (2 * satellite_position.distance().m))) * 3600
                         return float(angle), float(threshold)
                     width = max(3., min(600., event["duration_ms"] / 1000 * 1.5 + 3))
                     result = minimize_scalar(lambda offset: residual(offset)[0] ** 2,

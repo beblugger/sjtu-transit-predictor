@@ -1,0 +1,7658 @@
+{
+  "source": "https://github.com/Stellarium/stellarium/blob/60e6060f843dd6b373cee5c14631969a9b5f1647/plugins/Satellites/resources/satellites.json",
+  "model_source": "https://github.com/Stellarium/stellarium/blob/60e6060f843dd6b373cee5c14631969a9b5f1647/plugins/Satellites/src/Satellite.cpp",
+  "revision": "60e6060f843dd6b373cee5c14631969a9b5f1647",
+  "retrieved_at": "2026-11-05",
+  "source_sha256": "e5b8847f32186a3857298db5d750f37617ee4f2032799acd07dbdd843d8b2468",
+  "license": "GPL-2.0-or-later",
+  "satellites": {
+    "694": {
+      "standard_magnitude": 2,
+      "rcs_m2": 6.388
+    },
+    "733": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 4.474
+    },
+    "877": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 5.6361
+    },
+    "900": {
+      "rcs_m2": 0.051
+    },
+    "902": {
+      "rcs_m2": 0.0457
+    },
+    "1361": {
+      "standard_magnitude": 6,
+      "rcs_m2": 0.8083
+    },
+    "1512": {
+      "rcs_m2": 0.068
+    },
+    "1520": {
+      "standard_magnitude": 8,
+      "rcs_m2": 0.052
+    },
+    "2802": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.3558
+    },
+    "2826": {
+      "standard_magnitude": 6.5,
+      "rcs_m2": 0.403
+    },
+    "2874": {
+      "standard_magnitude": 8.5,
+      "rcs_m2": 0.6606
+    },
+    "3230": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 4.111
+    },
+    "3597": {
+      "standard_magnitude": 5,
+      "rcs_m2": 2.288
+    },
+    "3669": {
+      "standard_magnitude": 7.5,
+      "rcs_m2": 1.853
+    },
+    "4327": {
+      "standard_magnitude": 5,
+      "rcs_m2": 4.467
+    },
+    "5118": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 6.3096
+    },
+    "5398": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 0.9548
+    },
+    "5560": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 8.152
+    },
+    "5730": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 5.234
+    },
+    "6153": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 6.42
+    },
+    "6155": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 11.584
+    },
+    "6235": {
+      "standard_magnitude": 6,
+      "rcs_m2": 2.3278
+    },
+    "7530": {
+      "rcs_m2": 0.7542
+    },
+    "7646": {
+      "standard_magnitude": 8,
+      "rcs_m2": 0.1687
+    },
+    "8459": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 4.0731
+    },
+    "8820": {
+      "rcs_m2": 0.3981
+    },
+    "10114": {
+      "standard_magnitude": 4,
+      "rcs_m2": 5.9376
+    },
+    "10508": {
+      "standard_magnitude": 5
+    },
+    "10941": {
+      "standard_magnitude": 2
+    },
+    "10967": {
+      "standard_magnitude": 2.5,
+      "rcs_m2": 9.412
+    },
+    "11060": {
+      "standard_magnitude": 5,
+      "rcs_m2": 4.08
+    },
+    "11267": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.0015
+    },
+    "11574": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 4.6928
+    },
+    "11672": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 3.8825
+    },
+    "12139": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 5.479
+    },
+    "12465": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 5.3152
+    },
+    "12904": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 5.3523
+    },
+    "13068": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 4.512
+    },
+    "13154": {
+      "standard_magnitude": 4,
+      "rcs_m2": 5.275
+    },
+    "13403": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 5.8217
+    },
+    "13553": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.0839
+    },
+    "13819": {
+      "standard_magnitude": 4,
+      "rcs_m2": 5.4579
+    },
+    "14129": {
+      "rcs_m2": 1.0067
+    },
+    "14208": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 6.0788
+    },
+    "14699": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 6.2222
+    },
+    "14781": {
+      "standard_magnitude": 7.5,
+      "rcs_m2": 0.4029
+    },
+    "14820": {
+      "standard_magnitude": 4,
+      "rcs_m2": 3.8208
+    },
+    "15427": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 4.297
+    },
+    "15483": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.5157
+    },
+    "15772": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 13.142
+    },
+    "15945": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.252
+    },
+    "16182": {
+      "standard_magnitude": 2.5,
+      "rcs_m2": 10.9102
+    },
+    "16496": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.0562
+    },
+    "16719": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 7.7814
+    },
+    "16792": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.4704
+    },
+    "16882": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.2918
+    },
+    "16908": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 4.228
+    },
+    "17567": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.099
+    },
+    "17589": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.1063
+    },
+    "17590": {
+      "standard_magnitude": 2.5,
+      "rcs_m2": 8.4627
+    },
+    "17912": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.4461
+    },
+    "17973": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 15.0575
+    },
+    "18153": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.3795
+    },
+    "18187": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 3.293
+    },
+    "18749": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.2105
+    },
+    "18958": {
+      "standard_magnitude": 4,
+      "rcs_m2": 6.947
+    },
+    "19046": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 5.6314
+    },
+    "19120": {
+      "standard_magnitude": 2,
+      "rcs_m2": 10.008
+    },
+    "19210": {
+      "standard_magnitude": 3,
+      "rcs_m2": 8.1311
+    },
+    "19257": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.161
+    },
+    "19548": {
+      "rcs_m2": 38.9782
+    },
+    "19573": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 5.0143
+    },
+    "19574": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 4.495
+    },
+    "19650": {
+      "standard_magnitude": 2,
+      "rcs_m2": 11.3883
+    },
+    "19751": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 1.2589
+    },
+    "20026": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 1.0251
+    },
+    "20253": {
+      "rcs_m2": 32.5418
+    },
+    "20261": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 7.039
+    },
+    "20262": {
+      "standard_magnitude": 5,
+      "rcs_m2": 4.4193
+    },
+    "20323": {
+      "standard_magnitude": 4,
+      "rcs_m2": 8.3925
+    },
+    "20442": {
+      "rcs_m2": 0.1459
+    },
+    "20443": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 9.736
+    },
+    "20453": {
+      "standard_magnitude": 4,
+      "rcs_m2": 9.5315
+    },
+    "20465": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 8.6028
+    },
+    "20466": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 4.231
+    },
+    "20511": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 4.1323
+    },
+    "20580": {
+      "standard_magnitude": 1.5,
+      "rcs_m2": 28.0799
+    },
+    "20625": {
+      "standard_magnitude": 2,
+      "rcs_m2": 12.3842
+    },
+    "20663": {
+      "standard_magnitude": 4,
+      "rcs_m2": 6.7111
+    },
+    "20666": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.32
+    },
+    "20775": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 5.7465
+    },
+    "20776": {
+      "rcs_m2": 11.1055
+    },
+    "21088": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 4.54
+    },
+    "21397": {
+      "standard_magnitude": 4,
+      "rcs_m2": 8.213
+    },
+    "21422": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 5.6699
+    },
+    "21423": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.281
+    },
+    "21574": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 10.3234
+    },
+    "21610": {
+      "standard_magnitude": 3,
+      "rcs_m2": 14.2265
+    },
+    "21639": {
+      "rcs_m2": 20.8608
+    },
+    "21819": {
+      "standard_magnitude": 4,
+      "rcs_m2": 7.324
+    },
+    "21876": {
+      "standard_magnitude": 4,
+      "rcs_m2": 5.594
+    },
+    "21938": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 3.9165
+    },
+    "21949": {
+      "standard_magnitude": 4
+    },
+    "22195": {
+      "rcs_m2": 0.3981
+    },
+    "22219": {
+      "standard_magnitude": 3,
+      "rcs_m2": 6.51
+    },
+    "22220": {
+      "standard_magnitude": 2,
+      "rcs_m2": 12.8027
+    },
+    "22236": {
+      "standard_magnitude": 3,
+      "rcs_m2": 6.9758
+    },
+    "22285": {
+      "standard_magnitude": 2,
+      "rcs_m2": 9.007
+    },
+    "22286": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 4.607
+    },
+    "22314": {
+      "rcs_m2": 28.6701
+    },
+    "22490": {
+      "standard_magnitude": 8.5,
+      "rcs_m2": 0.8234
+    },
+    "22519": {
+      "standard_magnitude": 4
+    },
+    "22566": {
+      "standard_magnitude": 2,
+      "rcs_m2": 10.9494
+    },
+    "22626": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 8.317
+    },
+    "22787": {
+      "rcs_m2": 0.003
+    },
+    "22803": {
+      "standard_magnitude": 2,
+      "rcs_m2": 9.7827
+    },
+    "22824": {
+      "rcs_m2": 0.17
+    },
+    "22825": {
+      "rcs_m2": 0.18
+    },
+    "22826": {
+      "rcs_m2": 0.1624
+    },
+    "22830": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 9.264
+    },
+    "22988": {
+      "standard_magnitude": 2
+    },
+    "23087": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 12.7967
+    },
+    "23088": {
+      "standard_magnitude": 2,
+      "rcs_m2": 10.2638
+    },
+    "23097": {
+      "standard_magnitude": 3.29
+    },
+    "23343": {
+      "standard_magnitude": 2,
+      "rcs_m2": 8.232
+    },
+    "23405": {
+      "standard_magnitude": 2,
+      "rcs_m2": 8.5057
+    },
+    "23439": {
+      "standard_magnitude": 6,
+      "rcs_m2": 0.6192
+    },
+    "23467": {
+      "rcs_m2": 30.352
+    },
+    "23561": {
+      "standard_magnitude": 3,
+      "rcs_m2": 13.892
+    },
+    "23609": {
+      "standard_magnitude": 3.39
+    },
+    "23613": {
+      "standard_magnitude": 2.5,
+      "rcs_m2": 22.3872
+    },
+    "23705": {
+      "standard_magnitude": 2,
+      "rcs_m2": 9.548
+    },
+    "23802": {
+      "rcs_m2": 6.0269
+    },
+    "23839": {
+      "rcs_m2": 1.1784
+    },
+    "23855": {
+      "standard_magnitude": 2
+    },
+    "23862": {
+      "standard_magnitude": 4
+    },
+    "24278": {
+      "standard_magnitude": 9,
+      "rcs_m2": 0.2437
+    },
+    "24298": {
+      "standard_magnitude": 2,
+      "rcs_m2": 8.4888
+    },
+    "24307": {
+      "rcs_m2": 830.0351
+    },
+    "24674": {
+      "rcs_m2": 28.1837
+    },
+    "24883": {
+      "standard_magnitude": 6,
+      "rcs_m2": 2.6748
+    },
+    "24920": {
+      "standard_magnitude": 7,
+      "rcs_m2": 1.3502
+    },
+    "25034": {
+      "standard_magnitude": 1.27
+    },
+    "25118": {
+      "standard_magnitude": 8.5,
+      "rcs_m2": 0.5105
+    },
+    "25153": {
+      "rcs_m2": 14.5
+    },
+    "25159": {
+      "standard_magnitude": 8,
+      "rcs_m2": 0.883
+    },
+    "25338": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 5.292
+    },
+    "25397": {
+      "standard_magnitude": 8.5,
+      "rcs_m2": 0.1988
+    },
+    "25400": {
+      "standard_magnitude": 2,
+      "rcs_m2": 9.9528
+    },
+    "25407": {
+      "standard_magnitude": 2,
+      "rcs_m2": 11.3423
+    },
+    "25415": {
+      "standard_magnitude": 8.5,
+      "rcs_m2": 0.5242
+    },
+    "25416": {
+      "standard_magnitude": 7.5,
+      "rcs_m2": 0.679
+    },
+    "25481": {
+      "standard_magnitude": 7,
+      "rcs_m2": 0.659
+    },
+    "25504": {
+      "standard_magnitude": 7,
+      "rcs_m2": 0.4591
+    },
+    "25544": {
+      "standard_magnitude": -2.5,
+      "rcs_m2": 399.0524
+    },
+    "25560": {
+      "standard_magnitude": 5,
+      "rcs_m2": 1.8056
+    },
+    "25732": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 6.0514
+    },
+    "25746": {
+      "standard_magnitude": 2,
+      "rcs_m2": 20
+    },
+    "25757": {
+      "rcs_m2": 0.2619
+    },
+    "25860": {
+      "standard_magnitude": 3,
+      "rcs_m2": 18.374
+    },
+    "25861": {
+      "standard_magnitude": 2,
+      "rcs_m2": 12.344
+    },
+    "25867": {
+      "standard_magnitude": 2.5,
+      "rcs_m2": 8.3048
+    },
+    "25876": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 8.6876
+    },
+    "25924": {
+      "rcs_m2": 39.8107
+    },
+    "25967": {
+      "rcs_m2": 0.5186
+    },
+    "25977": {
+      "standard_magnitude": 5,
+      "rcs_m2": 6.7564
+    },
+    "25982": {
+      "standard_magnitude": 9,
+      "rcs_m2": 0.8489
+    },
+    "25984": {
+      "standard_magnitude": 8.5,
+      "rcs_m2": 0.5581
+    },
+    "25989": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 10.0237
+    },
+    "25994": {
+      "standard_magnitude": 2,
+      "rcs_m2": 12.444
+    },
+    "26070": {
+      "standard_magnitude": 2,
+      "rcs_m2": 10.3713
+    },
+    "26107": {
+      "rcs_m2": 25.1188
+    },
+    "26113": {
+      "standard_magnitude": 5,
+      "rcs_m2": 2.395
+    },
+    "26388": {
+      "rcs_m2": 26.766
+    },
+    "26407": {
+      "rcs_m2": 5.24
+    },
+    "26410": {
+      "rcs_m2": 1.9953
+    },
+    "26464": {
+      "rcs_m2": 1.5887
+    },
+    "26474": {
+      "standard_magnitude": 2,
+      "rcs_m2": 13.7878
+    },
+    "26554": {
+      "rcs_m2": 19.9526
+    },
+    "26580": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 13.6109
+    },
+    "26694": {
+      "rcs_m2": 26.3777
+    },
+    "26702": {
+      "standard_magnitude": 6,
+      "rcs_m2": 1.155
+    },
+    "26857": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 33.183
+    },
+    "26900": {
+      "rcs_m2": 14.1589
+    },
+    "26905": {
+      "standard_magnitude": 3
+    },
+    "26907": {
+      "standard_magnitude": 3
+    },
+    "26931": {
+      "standard_magnitude": 9.5,
+      "rcs_m2": 0.1788
+    },
+    "26958": {
+      "standard_magnitude": 9.1,
+      "rcs_m2": 0.21
+    },
+    "26998": {
+      "standard_magnitude": 5,
+      "rcs_m2": 2.7177
+    },
+    "27004": {
+      "standard_magnitude": 8,
+      "rcs_m2": 0.349
+    },
+    "27168": {
+      "standard_magnitude": 1.5
+    },
+    "27380": {
+      "rcs_m2": 23.7928
+    },
+    "27386": {
+      "standard_magnitude": 3,
+      "rcs_m2": 18.597
+    },
+    "27422": {
+      "standard_magnitude": 2.5,
+      "rcs_m2": 7.7882
+    },
+    "27424": {
+      "standard_magnitude": 4,
+      "rcs_m2": 7.8419
+    },
+    "27426": {
+      "standard_magnitude": 4,
+      "rcs_m2": 12.5892
+    },
+    "27432": {
+      "standard_magnitude": 3,
+      "rcs_m2": 6.1808
+    },
+    "27438": {
+      "rcs_m2": 15.8865
+    },
+    "27445": {
+      "standard_magnitude": 4,
+      "rcs_m2": 33.4954
+    },
+    "27513": {
+      "rcs_m2": 22.2955
+    },
+    "27597": {
+      "standard_magnitude": 2,
+      "rcs_m2": 17.287
+    },
+    "27601": {
+      "standard_magnitude": 2,
+      "rcs_m2": 24.5997
+    },
+    "27607": {
+      "rcs_m2": 0.0905
+    },
+    "27632": {
+      "standard_magnitude": 5,
+      "rcs_m2": 111.2871
+    },
+    "27640": {
+      "standard_magnitude": 4,
+      "rcs_m2": 5.0821
+    },
+    "27651": {
+      "standard_magnitude": 6.5,
+      "rcs_m2": 1.7809
+    },
+    "27663": {
+      "rcs_m2": 10
+    },
+    "27711": {
+      "standard_magnitude": 2
+    },
+    "27718": {
+      "rcs_m2": 25.1189
+    },
+    "27811": {
+      "rcs_m2": 15.8489
+    },
+    "27825": {
+      "rcs_m2": 10.0237
+    },
+    "27831": {
+      "rcs_m2": 25.1188
+    },
+    "27843": {
+      "rcs_m2": 0.2867
+    },
+    "27844": {
+      "rcs_m2": 0.069
+    },
+    "27848": {
+      "rcs_m2": 0.0293
+    },
+    "27858": {
+      "standard_magnitude": 8,
+      "rcs_m2": 0.6788
+    },
+    "27875": {
+      "standard_magnitude": 3
+    },
+    "27937": {
+      "standard_magnitude": 1.1
+    },
+    "27939": {
+      "standard_magnitude": 8,
+      "rcs_m2": 0.687
+    },
+    "27944": {
+      "rcs_m2": 0.136
+    },
+    "27954": {
+      "rcs_m2": 25.4101
+    },
+    "28051": {
+      "standard_magnitude": 5,
+      "rcs_m2": 5.7845
+    },
+    "28054": {
+      "standard_magnitude": 5,
+      "rcs_m2": 4.3007
+    },
+    "28059": {
+      "standard_magnitude": 4,
+      "rcs_m2": 5.8035
+    },
+    "28089": {
+      "rcs_m2": 79.4328
+    },
+    "28095": {
+      "standard_magnitude": 3
+    },
+    "28097": {
+      "standard_magnitude": 3
+    },
+    "28117": {
+      "rcs_m2": 10
+    },
+    "28184": {
+      "rcs_m2": 10
+    },
+    "28190": {
+      "rcs_m2": 7.9432
+    },
+    "28220": {
+      "standard_magnitude": 6.5,
+      "rcs_m2": 1.5466
+    },
+    "28222": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 11.628
+    },
+    "28353": {
+      "standard_magnitude": 2,
+      "rcs_m2": 8.3023
+    },
+    "28358": {
+      "rcs_m2": 21.2048
+    },
+    "28366": {
+      "rcs_m2": 0.0543
+    },
+    "28369": {
+      "rcs_m2": 0.0485
+    },
+    "28370": {
+      "rcs_m2": 0.06
+    },
+    "28371": {
+      "rcs_m2": 0.265
+    },
+    "28372": {
+      "rcs_m2": 0.0575
+    },
+    "28376": {
+      "rcs_m2": 9.4421
+    },
+    "28378": {
+      "standard_magnitude": 4,
+      "rcs_m2": 36.6346
+    },
+    "28380": {
+      "standard_magnitude": 6,
+      "rcs_m2": 1.849
+    },
+    "28415": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 4.078
+    },
+    "28446": {
+      "standard_magnitude": 4,
+      "rcs_m2": 22.4085
+    },
+    "28474": {
+      "rcs_m2": 2.5118
+    },
+    "28480": {
+      "standard_magnitude": 3,
+      "rcs_m2": 10.0454
+    },
+    "28485": {
+      "standard_magnitude": 3,
+      "rcs_m2": 7.6859
+    },
+    "28493": {
+      "rcs_m2": 0.2712
+    },
+    "28499": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 16.0376
+    },
+    "28521": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 1.8312
+    },
+    "28526": {
+      "standard_magnitude": 4,
+      "rcs_m2": 9.5199
+    },
+    "28537": {
+      "standard_magnitude": 3.5
+    },
+    "28541": {
+      "standard_magnitude": 3.5
+    },
+    "28628": {
+      "rcs_m2": 5.0119
+    },
+    "28649": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.6921
+    },
+    "28654": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 4.9159
+    },
+    "28659": {
+      "standard_magnitude": 3,
+      "rcs_m2": 16.6707
+    },
+    "28702": {
+      "standard_magnitude": 4,
+      "rcs_m2": 16.7962
+    },
+    "28737": {
+      "standard_magnitude": 5,
+      "rcs_m2": 3.0739
+    },
+    "28738": {
+      "standard_magnitude": 4,
+      "rcs_m2": 12.177
+    },
+    "28786": {
+      "rcs_m2": 15.8677
+    },
+    "28868": {
+      "standard_magnitude": 4,
+      "rcs_m2": 12.5892
+    },
+    "28874": {
+      "rcs_m2": 3.2653
+    },
+    "28885": {
+      "rcs_m2": 23.5772
+    },
+    "28890": {
+      "rcs_m2": 0.3512
+    },
+    "28893": {
+      "rcs_m2": 0.7061
+    },
+    "28895": {
+      "rcs_m2": 0.0151
+    },
+    "28899": {
+      "rcs_m2": 4.4668
+    },
+    "28912": {
+      "rcs_m2": 2.0767
+    },
+    "28924": {
+      "rcs_m2": 5.4972
+    },
+    "28931": {
+      "standard_magnitude": 2.5,
+      "rcs_m2": 13.593
+    },
+    "28932": {
+      "standard_magnitude": 3,
+      "rcs_m2": 15.7388
+    },
+    "28935": {
+      "standard_magnitude": 3,
+      "rcs_m2": 22.7066
+    },
+    "28945": {
+      "rcs_m2": 26.7038
+    },
+    "29045": {
+      "rcs_m2": 19.9526
+    },
+    "29055": {
+      "rcs_m2": 14.4313
+    },
+    "29228": {
+      "standard_magnitude": 3,
+      "rcs_m2": 8.7657
+    },
+    "29236": {
+      "standard_magnitude": 4,
+      "rcs_m2": 251.785
+    },
+    "29249": {
+      "standard_magnitude": 2
+    },
+    "29268": {
+      "rcs_m2": 2.067
+    },
+    "29270": {
+      "rcs_m2": 31.6228
+    },
+    "29272": {
+      "rcs_m2": 31.6228
+    },
+    "29349": {
+      "rcs_m2": 25.1189
+    },
+    "29479": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 5.7356
+    },
+    "29486": {
+      "rcs_m2": 11.7863
+    },
+    "29494": {
+      "standard_magnitude": 4,
+      "rcs_m2": 271.1266
+    },
+    "29495": {
+      "rcs_m2": 3.9811
+    },
+    "29505": {
+      "standard_magnitude": 6.5,
+      "rcs_m2": 1.159
+    },
+    "29506": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 2.4781
+    },
+    "29507": {
+      "standard_magnitude": 2,
+      "rcs_m2": 3.951
+    },
+    "29522": {
+      "standard_magnitude": 5,
+      "rcs_m2": 4.481
+    },
+    "29526": {
+      "rcs_m2": 0.003
+    },
+    "29601": {
+      "rcs_m2": 4.8064
+    },
+    "29643": {
+      "rcs_m2": 262.6219
+    },
+    "29658": {
+      "standard_magnitude": 5,
+      "rcs_m2": 2.2985
+    },
+    "29709": {
+      "rcs_m2": 0.363
+    },
+    "30580": {
+      "rcs_m2": 0.3981
+    },
+    "30794": {
+      "rcs_m2": 41.806
+    },
+    "30797": {
+      "rcs_m2": 0.5012
+    },
+    "30798": {
+      "rcs_m2": 0.6325
+    },
+    "31102": {
+      "rcs_m2": 28.2172
+    },
+    "31113": {
+      "standard_magnitude": 7,
+      "rcs_m2": 1.3606
+    },
+    "31114": {
+      "standard_magnitude": 2.5,
+      "rcs_m2": 7.807
+    },
+    "31118": {
+      "rcs_m2": 0.703
+    },
+    "31119": {
+      "rcs_m2": 0.072
+    },
+    "31121": {
+      "rcs_m2": 0.0661
+    },
+    "31124": {
+      "rcs_m2": 0.054
+    },
+    "31125": {
+      "rcs_m2": 0.0748
+    },
+    "31127": {
+      "rcs_m2": 0.0701
+    },
+    "31306": {
+      "rcs_m2": 18.3351
+    },
+    "31307": {
+      "standard_magnitude": 5,
+      "rcs_m2": 12.6832
+    },
+    "31573": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 2.4163
+    },
+    "31574": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 2.2696
+    },
+    "31598": {
+      "standard_magnitude": 3,
+      "rcs_m2": 4.682
+    },
+    "31698": {
+      "standard_magnitude": 6,
+      "rcs_m2": 2.2673
+    },
+    "31701": {
+      "standard_magnitude": 3
+    },
+    "31708": {
+      "standard_magnitude": 3
+    },
+    "31792": {
+      "standard_magnitude": 2.5,
+      "rcs_m2": 6.4839
+    },
+    "31793": {
+      "standard_magnitude": 2,
+      "rcs_m2": 8.6948
+    },
+    "31797": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 2.5
+    },
+    "32060": {
+      "rcs_m2": 5.48
+    },
+    "32253": {
+      "rcs_m2": 23.7915
+    },
+    "32258": {
+      "rcs_m2": 15.8866
+    },
+    "32260": {
+      "rcs_m2": 9.2724
+    },
+    "32265": {
+      "standard_magnitude": 4.3,
+      "rcs_m2": 1.9408
+    },
+    "32275": {
+      "rcs_m2": 5.0913
+    },
+    "32276": {
+      "rcs_m2": 3.1623
+    },
+    "32287": {
+      "standard_magnitude": 5
+    },
+    "32289": {
+      "standard_magnitude": 5,
+      "rcs_m2": 5.129
+    },
+    "32294": {
+      "rcs_m2": 15.8866
+    },
+    "32299": {
+      "rcs_m2": 20
+    },
+    "32376": {
+      "standard_magnitude": 4,
+      "rcs_m2": 5.5722
+    },
+    "32378": {
+      "standard_magnitude": 3
+    },
+    "32382": {
+      "standard_magnitude": 5,
+      "rcs_m2": 8.381
+    },
+    "32384": {
+      "rcs_m2": 2
+    },
+    "32388": {
+      "rcs_m2": 17.3208
+    },
+    "32393": {
+      "rcs_m2": 5.0119
+    },
+    "32395": {
+      "rcs_m2": 5.0238
+    },
+    "32404": {
+      "rcs_m2": 7.9621
+    },
+    "32476": {
+      "standard_magnitude": 6.08,
+      "rcs_m2": 1.5
+    },
+    "32487": {
+      "rcs_m2": 31.6228
+    },
+    "32706": {
+      "standard_magnitude": 3.54
+    },
+    "32708": {
+      "rcs_m2": 13.1101
+    },
+    "32711": {
+      "rcs_m2": 5.0119
+    },
+    "32729": {
+      "rcs_m2": 6.3246
+    },
+    "32750": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 2.9
+    },
+    "32763": {
+      "rcs_m2": 14.1589
+    },
+    "32767": {
+      "rcs_m2": 12.5893
+    },
+    "32768": {
+      "rcs_m2": 10.7588
+    },
+    "32783": {
+      "standard_magnitude": 6,
+      "rcs_m2": 2.316
+    },
+    "32785": {
+      "rcs_m2": 0.102
+    },
+    "32790": {
+      "rcs_m2": 0.0652
+    },
+    "32791": {
+      "rcs_m2": 0.049
+    },
+    "32794": {
+      "rcs_m2": 42.973
+    },
+    "32951": {
+      "standard_magnitude": 4,
+      "rcs_m2": 20.9813
+    },
+    "32953": {
+      "rcs_m2": 0.3852
+    },
+    "32958": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 6.5849
+    },
+    "33051": {
+      "rcs_m2": 19.9526
+    },
+    "33053": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 4.9326
+    },
+    "33055": {
+      "rcs_m2": 29.0999
+    },
+    "33056": {
+      "rcs_m2": 24.7919
+    },
+    "33207": {
+      "rcs_m2": 32.4063
+    },
+    "33244": {
+      "standard_magnitude": 6,
+      "rcs_m2": 2.7
+    },
+    "33274": {
+      "rcs_m2": 12.6191
+    },
+    "33278": {
+      "rcs_m2": 12.6191
+    },
+    "33320": {
+      "rcs_m2": 1.466
+    },
+    "33321": {
+      "standard_magnitude": 7,
+      "rcs_m2": 1.372
+    },
+    "33331": {
+      "standard_magnitude": 5,
+      "rcs_m2": 4.937
+    },
+    "33373": {
+      "standard_magnitude": 2.5,
+      "rcs_m2": 10.0118
+    },
+    "33376": {
+      "standard_magnitude": 3,
+      "rcs_m2": 15.8677
+    },
+    "33396": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 2.8441
+    },
+    "33408": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 1.301
+    },
+    "33409": {
+      "standard_magnitude": 5,
+      "rcs_m2": 2.3517
+    },
+    "33412": {
+      "standard_magnitude": 5,
+      "rcs_m2": 3.9248
+    },
+    "33434": {
+      "standard_magnitude": 6,
+      "rcs_m2": 0.539
+    },
+    "33436": {
+      "rcs_m2": 10.0237
+    },
+    "33446": {
+      "rcs_m2": 3.175
+    },
+    "33459": {
+      "rcs_m2": 6.3245
+    },
+    "33492": {
+      "rcs_m2": 4.6494
+    },
+    "33498": {
+      "rcs_m2": 0.124
+    },
+    "33499": {
+      "rcs_m2": 0.0853
+    },
+    "33504": {
+      "standard_magnitude": 6,
+      "rcs_m2": 4.1823
+    },
+    "33591": {
+      "standard_magnitude": 5,
+      "rcs_m2": 5.123
+    },
+    "33595": {
+      "rcs_m2": 54.0998
+    },
+    "33749": {
+      "rcs_m2": 50.1187
+    },
+    "34111": {
+      "standard_magnitude": 4,
+      "rcs_m2": 17.6011
+    },
+    "34713": {
+      "standard_magnitude": 3,
+      "rcs_m2": 5.0119
+    },
+    "34810": {
+      "rcs_m2": 14.9314
+    },
+    "34941": {
+      "rcs_m2": 10
+    },
+    "35362": {
+      "rcs_m2": 31.6228
+    },
+    "35491": {
+      "rcs_m2": 17.6453
+    },
+    "35493": {
+      "rcs_m2": 10
+    },
+    "35496": {
+      "rcs_m2": 17.2973
+    },
+    "35681": {
+      "rcs_m2": 0.226
+    },
+    "35682": {
+      "rcs_m2": 1.2204
+    },
+    "35683": {
+      "rcs_m2": 0.414
+    },
+    "35684": {
+      "rcs_m2": 0.1099
+    },
+    "35686": {
+      "rcs_m2": 0.1127
+    },
+    "35696": {
+      "rcs_m2": 15.8489
+    },
+    "35752": {
+      "rcs_m2": 6.3
+    },
+    "35755": {
+      "rcs_m2": 50.1187
+    },
+    "35756": {
+      "rcs_m2": 6.3096
+    },
+    "35815": {
+      "standard_magnitude": 0.89
+    },
+    "35873": {
+      "rcs_m2": 94.7185
+    },
+    "35931": {
+      "rcs_m2": 4.0639
+    },
+    "35932": {
+      "rcs_m2": 0.0465
+    },
+    "35933": {
+      "rcs_m2": 0.029
+    },
+    "35935": {
+      "rcs_m2": 0.034
+    },
+    "35937": {
+      "standard_magnitude": 3.5
+    },
+    "35938": {
+      "standard_magnitude": 3.5
+    },
+    "35942": {
+      "rcs_m2": 11.0159
+    },
+    "35943": {
+      "rcs_m2": 7.9433
+    },
+    "35946": {
+      "standard_magnitude": 5,
+      "rcs_m2": 7.0279
+    },
+    "35951": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 3.9811
+    },
+    "36032": {
+      "rcs_m2": 7.9433
+    },
+    "36033": {
+      "rcs_m2": 7.0794
+    },
+    "36036": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 2.8692
+    },
+    "36037": {
+      "rcs_m2": 0.442
+    },
+    "36086": {
+      "rcs_m2": 11.1757
+    },
+    "36097": {
+      "standard_magnitude": 5,
+      "rcs_m2": 25.9029
+    },
+    "36101": {
+      "rcs_m2": 12.5893
+    },
+    "36104": {
+      "standard_magnitude": 4
+    },
+    "36106": {
+      "rcs_m2": 12.5893
+    },
+    "36108": {
+      "standard_magnitude": 4,
+      "rcs_m2": 10
+    },
+    "36110": {
+      "rcs_m2": 3.3259
+    },
+    "36111": {
+      "rcs_m2": 5.0119
+    },
+    "36112": {
+      "rcs_m2": 6.3096
+    },
+    "36122": {
+      "rcs_m2": 0.3075
+    },
+    "36125": {
+      "standard_magnitude": 3
+    },
+    "36131": {
+      "rcs_m2": 14.1132
+    },
+    "36287": {
+      "rcs_m2": 79.4328
+    },
+    "36358": {
+      "rcs_m2": 39.8107
+    },
+    "36395": {
+      "rcs_m2": 5.1714
+    },
+    "36397": {
+      "standard_magnitude": 5,
+      "rcs_m2": 266.9529
+    },
+    "36402": {
+      "rcs_m2": 4.7754
+    },
+    "36411": {
+      "rcs_m2": 6.3096
+    },
+    "36499": {
+      "rcs_m2": 46.2338
+    },
+    "36508": {
+      "standard_magnitude": 4.5,
+      "rcs_m2": 2.5642
+    },
+    "36516": {
+      "rcs_m2": 26.9753
+    },
+    "36519": {
+      "standard_magnitude": 5,
+      "rcs_m2": 1.6976
+    },
+    "36581": {
+      "rcs_m2": 8.168
+    },
+    "36582": {
+      "rcs_m2": 6.3096
+    },
+    "36585": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 5.9608
+    },
+    "36590": {
+      "rcs_m2": 52.4
+    },
+    "36592": {
+      "rcs_m2": 15.8489
+    },
+    "36605": {
+      "standard_magnitude": 6,
+      "rcs_m2": 2.487
+    },
+    "36744": {
+      "rcs_m2": 15.8489
+    },
+    "36745": {
+      "rcs_m2": 11.1427
+    },
+    "36792": {
+      "rcs_m2": 6.3096
+    },
+    "36795": {
+      "rcs_m2": 2.249
+    },
+    "36799": {
+      "rcs_m2": 0.053
+    },
+    "36828": {
+      "rcs_m2": 31.6228
+    },
+    "36830": {
+      "rcs_m2": 59.7633
+    },
+    "36831": {
+      "rcs_m2": 65.9677
+    },
+    "36834": {
+      "rcs_m2": 4.795
+    },
+    "36868": {
+      "standard_magnitude": 3,
+      "rcs_m2": 7.9433
+    },
+    "37162": {
+      "standard_magnitude": 2.5
+    },
+    "37180": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 2.447
+    },
+    "37185": {
+      "rcs_m2": 12.6191
+    },
+    "37188": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 4.8334
+    },
+    "37189": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 4.8795
+    },
+    "37190": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 4.5767
+    },
+    "37191": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 4.7854
+    },
+    "37192": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 4.7436
+    },
+    "37193": {
+      "rcs_m2": 4.6863
+    },
+    "37207": {
+      "rcs_m2": 10
+    },
+    "37210": {
+      "rcs_m2": 19.9526
+    },
+    "37214": {
+      "rcs_m2": 6.2136
+    },
+    "37216": {
+      "standard_magnitude": 5.5,
+      "rcs_m2": 4.403
+    },
+    "37218": {
+      "standard_magnitude": 1.5,
+      "rcs_m2": 0.003
+    },
+    "37222": {
+      "standard_magnitude": 5
+    },
+    "37228": {
+      "standard_magnitude": 5
+    },
+    "37229": {
+      "standard_magnitude": 5.5
+    },
+    "37237": {
+      "rcs_m2": 119.9526
+    },
+    "37238": {
+      "rcs_m2": 6.3096
+    },
+    "37256": {
+      "rcs_m2": 21.5765
+    },
+    "37258": {
+      "rcs_m2": 15.8489
+    },
+    "37264": {
+      "rcs_m2": 7.0794
+    },
+    "37265": {
+      "rcs_m2": 19.9526
+    },
+    "37384": {
+      "rcs_m2": 31.6228
+    },
+    "37386": {
+      "standard_magnitude": 3
+    },
+    "37387": {
+      "standard_magnitude": 5,
+      "rcs_m2": 5.5918
+    },
+    "37388": {
+      "rcs_m2": 0.688
+    },
+    "37389": {
+      "rcs_m2": 0.4684
+    },
+    "37391": {
+      "standard_magnitude": 3
+    },
+    "37392": {
+      "rcs_m2": 25.1189
+    },
+    "37393": {
+      "rcs_m2": 31.6228
+    },
+    "37481": {
+      "rcs_m2": 19.9526
+    },
+    "37602": {
+      "rcs_m2": 12.5893
+    },
+    "37605": {
+      "rcs_m2": 6.3096
+    },
+    "37606": {
+      "rcs_m2": 5.6234
+    },
+    "37677": {
+      "rcs_m2": 50.1187
+    },
+    "37731": {
+      "rcs_m2": 8.4175
+    },
+    "37739": {
+      "standard_magnitude": 5,
+      "rcs_m2": 4.6744
+    },
+    "37740": {
+      "standard_magnitude": 5,
+      "rcs_m2": 5.0376
+    },
+    "37741": {
+      "standard_magnitude": 5,
+      "rcs_m2": 4.932
+    },
+    "37742": {
+      "standard_magnitude": 5,
+      "rcs_m2": 5.0038
+    },
+    "37743": {
+      "standard_magnitude": 5,
+      "rcs_m2": 4.86
+    },
+    "37744": {
+      "standard_magnitude": 5,
+      "rcs_m2": 5.1557
+    },
+    "37748": {
+      "rcs_m2": 19.9526
+    },
+    "37749": {
+      "rcs_m2": 7.0794
+    },
+    "37763": {
+      "rcs_m2": 16.2984
+    },
+    "37775": {
+      "rcs_m2": 7.9433
+    },
+    "37776": {
+      "rcs_m2": 23.5886
+    },
+    "37779": {
+      "rcs_m2": 14.6852
+    },
+    "37781": {
+      "standard_magnitude": 4,
+      "rcs_m2": 4.629
+    },
+    "37791": {
+      "rcs_m2": 0.581
+    },
+    "37792": {
+      "rcs_m2": 0.106
+    },
+    "37793": {
+      "rcs_m2": 0.1735
+    },
+    "37809": {
+      "standard_magnitude": 5,
+      "rcs_m2": 9.3468
+    },
+    "37810": {
+      "rcs_m2": 11.148
+    },
+    "37813": {
+      "standard_magnitude": 5.49
+    },
+    "37816": {
+      "rcs_m2": 15.8489
+    },
+    "37826": {
+      "rcs_m2": 219.4788
+    },
+    "37834": {
+      "rcs_m2": 37.7529
+    },
+    "37836": {
+      "rcs_m2": 7.6593
+    },
+    "37839": {
+      "rcs_m2": 0.1464
+    },
+    "37841": {
+      "rcs_m2": 0.2037
+    },
+    "37843": {
+      "rcs_m2": 3.9811
+    },
+    "37846": {
+      "rcs_m2": 12.6191
+    },
+    "37847": {
+      "rcs_m2": 20.1111
+    },
+    "37849": {
+      "standard_magnitude": 3.5,
+      "rcs_m2": 5.7802
+    },
+    "37867": {
+      "rcs_m2": 6.3096
+    },
+    "37868": {
+      "rcs_m2": 5.566
+    },
+    "37869": {
+      "rcs_m2": 6.3096
+    },
+    "37875": {
+      "rcs_m2": 5.7479
+    },
+    "37933": {
+      "rcs_m2": 45.0715
+    },
+    "37948": {
+      "rcs_m2": 12.5893
+    },
+    "37951": {
+      "rcs_m2": 25.1189
+    },
+    "37954": {
+      "standard_magnitude": 4.49
+    },
+    "38012": {
+      "rcs_m2": 5.3462
+    },
+    "38014": {
+      "rcs_m2": 18.4944
+    },
+    "38038": {
+      "rcs_m2": 4.5644
+    },
+    "38040": {
+      "standard_magnitude": 6,
+      "rcs_m2": 4.6037
+    },
+    "38041": {
+      "standard_magnitude": 6,
+      "rcs_m2": 4.5491
+    },
+    "38042": {
+      "standard_magnitude": 6,
+      "rcs_m2": 4.6934
+    },
+    "38043": {
+      "standard_magnitude": 6,
+      "rcs_m2": 4.667
+    },
+    "38044": {
+      "standard_magnitude": 6,
+      "rcs_m2": 4.548
+    },
+    "38045": {
+      "standard_magnitude": 6,
+      "rcs_m2": 4.5242
+    },
+    "38070": {
+      "rcs_m2": 15.8583
+    },
+    "38077": {
+      "rcs_m2": 0.0379
+    },
+    "38087": {
+      "rcs_m2": 63.3469
+    },
+    "38091": {
+      "rcs_m2": 10.1705
+    },
+    "38093": {
+      "rcs_m2": 39.8107
+    },
+    "38098": {
+      "rcs_m2": 0.003
+    },
+    "38107": {
+      "rcs_m2": 0.003
+    },
+    "38109": {
+      "standard_magnitude": 2.5
+    },
+    "38245": {
+      "rcs_m2": 10
+    },
+    "38250": {
+      "rcs_m2": 7.1433
+    },
+    "38251": {
+      "rcs_m2": 7.9433
+    },
+    "38254": {
+      "rcs_m2": 11.32
+    },
+    "38331": {
+      "rcs_m2": 39.8107
+    },
+    "38332": {
+      "rcs_m2": 26.482
+    },
+    "38337": {
+      "rcs_m2": 6.2395
+    },
+    "38338": {
+      "rcs_m2": 5.259
+    },
+    "38341": {
+      "standard_magnitude": 2.5,
+      "rcs_m2": 17.152
+    },
+    "38342": {
+      "standard_magnitude": 5,
+      "rcs_m2": 14.093
+    },
+    "38352": {
+      "rcs_m2": 19.9526
+    },
+    "38356": {
+      "rcs_m2": 15.8188
+    },
+    "38358": {
+      "rcs_m2": 1.2619
+    },
+    "38528": {
+      "standard_magnitude": 1.08
+    },
+    "38551": {
+      "rcs_m2": 12.5893
+    },
+    "38552": {
+      "rcs_m2": 4.3946
+    },
+    "38652": {
+      "rcs_m2": 37.7081
+    },
+    "38709": {
+      "rcs_m2": 0.553
+    },
+    "38740": {
+      "rcs_m2": 1.2308
+    },
+    "38741": {
+      "rcs_m2": 5.0119
+    },
+    "38749": {
+      "standard_magnitude": 5,
+      "rcs_m2": 52.4
+    },
+    "38755": {
+      "rcs_m2": 3.797
+    },
+    "38758": {
+      "standard_magnitude": 3
+    },
+    "38771": {
+      "rcs_m2": 13.648
+    },
+    "38773": {
+      "standard_magnitude": 3
+    },
+    "38775": {
+      "rcs_m2": 10
+    },
+    "38778": {
+      "rcs_m2": 17.601
+    },
+    "38779": {
+      "rcs_m2": 13.8482
+    },
+    "38833": {
+      "rcs_m2": 5.4748
+    },
+    "38857": {
+      "rcs_m2": 8.5737
+    },
+    "38860": {
+      "rcs_m2": 2.5335
+    },
+    "38867": {
+      "rcs_m2": 113.2145
+    },
+    "38953": {
+      "rcs_m2": 2.5119
+    },
+    "38977": {
+      "rcs_m2": 251.1897
+    },
+    "38978": {
+      "rcs_m2": 17.7827
+    },
+    "38991": {
+      "rcs_m2": 113.2145
+    },
+    "38992": {
+      "rcs_m2": 5.1523
+    },
+    "39008": {
+      "rcs_m2": 3.7932
+    },
+    "39017": {
+      "rcs_m2": 63.0957
+    },
+    "39019": {
+      "rcs_m2": 5.438
+    },
+    "39020": {
+      "rcs_m2": 22.5893
+    },
+    "39022": {
+      "rcs_m2": 39.8107
+    },
+    "39030": {
+      "rcs_m2": 1.6464
+    },
+    "39034": {
+      "rcs_m2": 5.6742
+    },
+    "39035": {
+      "rcs_m2": 79.4454
+    },
+    "39059": {
+      "rcs_m2": 1.474
+    },
+    "39061": {
+      "rcs_m2": 3.606
+    },
+    "39070": {
+      "rcs_m2": 25.1189
+    },
+    "39072": {
+      "rcs_m2": 4.343
+    },
+    "39073": {
+      "rcs_m2": 4.8199
+    },
+    "39074": {
+      "rcs_m2": 4.7808
+    },
+    "39075": {
+      "rcs_m2": 4.5814
+    },
+    "39076": {
+      "rcs_m2": 4.3422
+    },
+    "39077": {
+      "rcs_m2": 4.8715
+    },
+    "39078": {
+      "rcs_m2": 318.7396
+    },
+    "39079": {
+      "rcs_m2": 50.1187
+    },
+    "39084": {
+      "rcs_m2": 7.1149
+    },
+    "39086": {
+      "rcs_m2": 1.6825
+    },
+    "39088": {
+      "rcs_m2": 0.6034
+    },
+    "39089": {
+      "rcs_m2": 0.377
+    },
+    "39090": {
+      "rcs_m2": 0.0582
+    },
+    "39091": {
+      "rcs_m2": 0.104
+    },
+    "39120": {
+      "rcs_m2": 13.5893
+    },
+    "39122": {
+      "rcs_m2": 423.226
+    },
+    "39127": {
+      "rcs_m2": 212.1155
+    },
+    "39150": {
+      "rcs_m2": 2.587
+    },
+    "39151": {
+      "rcs_m2": 0.019
+    },
+    "39155": {
+      "rcs_m2": 6.4166
+    },
+    "39157": {
+      "rcs_m2": 25.1189
+    },
+    "39159": {
+      "rcs_m2": 0.3352
+    },
+    "39160": {
+      "rcs_m2": 0.7405
+    },
+    "39163": {
+      "rcs_m2": 64.9296
+    },
+    "39166": {
+      "rcs_m2": 11
+    },
+    "39168": {
+      "rcs_m2": 17.9433
+    },
+    "39172": {
+      "rcs_m2": 79.6214
+    },
+    "39188": {
+      "rcs_m2": 49.7749
+    },
+    "39190": {
+      "rcs_m2": 36.0795
+    },
+    "39191": {
+      "rcs_m2": 45.1267
+    },
+    "39197": {
+      "rcs_m2": 1.318
+    },
+    "39199": {
+      "rcs_m2": 3.4785
+    },
+    "39206": {
+      "rcs_m2": 23.1149
+    },
+    "39215": {
+      "rcs_m2": 16.3096
+    },
+    "39216": {
+      "rcs_m2": 22.1585
+    },
+    "39222": {
+      "rcs_m2": 35.8016
+    },
+    "39227": {
+      "rcs_m2": 3.4646
+    },
+    "39232": {
+      "standard_magnitude": 4
+    },
+    "39233": {
+      "rcs_m2": 12.5119
+    },
+    "39234": {
+      "rcs_m2": 14.285
+    },
+    "39237": {
+      "rcs_m2": 7.9433
+    },
+    "39249": {
+      "rcs_m2": 1.678
+    },
+    "39251": {
+      "rcs_m2": 1.6473
+    },
+    "39253": {
+      "rcs_m2": 1.9392
+    },
+    "39256": {
+      "rcs_m2": 19.9526
+    },
+    "39260": {
+      "rcs_m2": 7.436
+    },
+    "39265": {
+      "rcs_m2": 2.057
+    },
+    "39269": {
+      "rcs_m2": 0.0185
+    },
+    "39270": {
+      "rcs_m2": 0.0184
+    },
+    "39285": {
+      "rcs_m2": 7.7968
+    },
+    "39358": {
+      "rcs_m2": 8.2723
+    },
+    "39360": {
+      "rcs_m2": 11.3214
+    },
+    "39375": {
+      "rcs_m2": 63.0957
+    },
+    "39416": {
+      "rcs_m2": 0.11
+    },
+    "39417": {
+      "rcs_m2": 0.069
+    },
+    "39418": {
+      "rcs_m2": 0.3086
+    },
+    "39419": {
+      "rcs_m2": 1.777
+    },
+    "39422": {
+      "rcs_m2": 0.4632
+    },
+    "39423": {
+      "rcs_m2": 0.171
+    },
+    "39425": {
+      "rcs_m2": 0.1186
+    },
+    "39427": {
+      "rcs_m2": 0.1199
+    },
+    "39430": {
+      "rcs_m2": 0.0533
+    },
+    "39440": {
+      "rcs_m2": 0.1111
+    },
+    "39441": {
+      "rcs_m2": 0.0098
+    },
+    "39444": {
+      "rcs_m2": 0.0552
+    },
+    "39446": {
+      "rcs_m2": 0.0316
+    },
+    "39451": {
+      "rcs_m2": 2.5959
+    },
+    "39452": {
+      "rcs_m2": 2.2407
+    },
+    "39453": {
+      "rcs_m2": 2.365
+    },
+    "39460": {
+      "rcs_m2": 53.3274
+    },
+    "39462": {
+      "standard_magnitude": 3.07
+    },
+    "39476": {
+      "rcs_m2": 7.1723
+    },
+    "39481": {
+      "rcs_m2": 40.9678
+    },
+    "39483": {
+      "rcs_m2": 1.5568
+    },
+    "39484": {
+      "rcs_m2": 1.7028
+    },
+    "39485": {
+      "rcs_m2": 1.669
+    },
+    "39487": {
+      "rcs_m2": 50.1187
+    },
+    "39490": {
+      "rcs_m2": 0.6777
+    },
+    "39491": {
+      "rcs_m2": 0.675
+    },
+    "39498": {
+      "rcs_m2": 4.829
+    },
+    "39500": {
+      "rcs_m2": 12.5893
+    },
+    "39504": {
+      "rcs_m2": 7.9433
+    },
+    "39508": {
+      "rcs_m2": 0.3533
+    },
+    "39509": {
+      "rcs_m2": 3.9811
+    },
+    "39522": {
+      "rcs_m2": 7.7719
+    },
+    "39533": {
+      "rcs_m2": 19.9413
+    },
+    "39574": {
+      "rcs_m2": 8.104
+    },
+    "39612": {
+      "rcs_m2": 3.619
+    },
+    "39613": {
+      "rcs_m2": 47.4717
+    },
+    "39616": {
+      "rcs_m2": 163.5012
+    },
+    "39617": {
+      "rcs_m2": 21.6238
+    },
+    "39620": {
+      "rcs_m2": 6.4006
+    },
+    "39634": {
+      "rcs_m2": 4.9676
+    },
+    "39635": {
+      "rcs_m2": 6.3096
+    },
+    "39679": {
+      "rcs_m2": 10.2641
+    },
+    "39727": {
+      "rcs_m2": 22.5893
+    },
+    "39728": {
+      "standard_magnitude": 0.55,
+      "rcs_m2": 0.003
+    },
+    "39731": {
+      "rcs_m2": 4.2216
+    },
+    "39741": {
+      "rcs_m2": 20.5188
+    },
+    "39761": {
+      "rcs_m2": 1.692
+    },
+    "39762": {
+      "rcs_m2": 1.7164
+    },
+    "39763": {
+      "rcs_m2": 1.7561
+    },
+    "39766": {
+      "rcs_m2": 4.096
+    },
+    "39773": {
+      "rcs_m2": 79.4381
+    },
+    "40001": {
+      "rcs_m2": 11.3214
+    },
+    "40010": {
+      "rcs_m2": 0.4047
+    },
+    "40011": {
+      "rcs_m2": 0.466
+    },
+    "40012": {
+      "rcs_m2": 0.264
+    },
+    "40013": {
+      "rcs_m2": 1.7984
+    },
+    "40014": {
+      "rcs_m2": 0.2726
+    },
+    "40015": {
+      "rcs_m2": 0.3517
+    },
+    "40016": {
+      "rcs_m2": 0.442
+    },
+    "40018": {
+      "rcs_m2": 0.1317
+    },
+    "40019": {
+      "rcs_m2": 0.1329
+    },
+    "40020": {
+      "rcs_m2": 0.103
+    },
+    "40021": {
+      "rcs_m2": 0.037
+    },
+    "40024": {
+      "rcs_m2": 0.037
+    },
+    "40025": {
+      "rcs_m2": 0.062
+    },
+    "40030": {
+      "rcs_m2": 0.0081
+    },
+    "40032": {
+      "rcs_m2": 0.063
+    },
+    "40037": {
+      "rcs_m2": 0.1525
+    },
+    "40039": {
+      "rcs_m2": 0.129
+    },
+    "40042": {
+      "rcs_m2": 0.072
+    },
+    "40043": {
+      "rcs_m2": 0.06
+    },
+    "40044": {
+      "rcs_m2": 0.064
+    },
+    "40045": {
+      "rcs_m2": 0.0179
+    },
+    "40046": {
+      "rcs_m2": 0.0122
+    },
+    "40053": {
+      "rcs_m2": 3.6769
+    },
+    "40055": {
+      "rcs_m2": 0.101
+    },
+    "40056": {
+      "rcs_m2": 0.101
+    },
+    "40059": {
+      "rcs_m2": 1.154
+    },
+    "40063": {
+      "rcs_m2": 1.7151
+    },
+    "40069": {
+      "rcs_m2": 8.6621
+    },
+    "40071": {
+      "rcs_m2": 0.344
+    },
+    "40072": {
+      "rcs_m2": 0.362
+    },
+    "40074": {
+      "rcs_m2": 0.118
+    },
+    "40076": {
+      "rcs_m2": 0.5187
+    },
+    "40079": {
+      "rcs_m2": 7.4489
+    },
+    "40080": {
+      "rcs_m2": 1.4019
+    },
+    "40081": {
+      "rcs_m2": 12.5893
+    },
+    "40082": {
+      "rcs_m2": 3.9905
+    },
+    "40086": {
+      "rcs_m2": 0.442
+    },
+    "40105": {
+      "rcs_m2": 10.7868
+    },
+    "40107": {
+      "rcs_m2": 44.8232
+    },
+    "40115": {
+      "rcs_m2": 6.222
+    },
+    "40118": {
+      "rcs_m2": 3.506
+    },
+    "40119": {
+      "rcs_m2": 0.103
+    },
+    "40128": {
+      "rcs_m2": 4.1215
+    },
+    "40129": {
+      "rcs_m2": 2
+    },
+    "40141": {
+      "rcs_m2": 56.4283
+    },
+    "40143": {
+      "rcs_m2": 4.9968
+    },
+    "40146": {
+      "rcs_m2": 51.5754
+    },
+    "40147": {
+      "rcs_m2": 65.6076
+    },
+    "40208": {
+      "standard_magnitude": 2.55
+    },
+    "40267": {
+      "rcs_m2": 35.8016
+    },
+    "40269": {
+      "standard_magnitude": 1.01,
+      "rcs_m2": 0.003
+    },
+    "40271": {
+      "rcs_m2": 316.3552
+    },
+    "40272": {
+      "rcs_m2": 85.7424
+    },
+    "40275": {
+      "rcs_m2": 3.1623
+    },
+    "40277": {
+      "rcs_m2": 22.5893
+    },
+    "40294": {
+      "rcs_m2": 15.7869
+    },
+    "40298": {
+      "rcs_m2": 2.648
+    },
+    "40310": {
+      "rcs_m2": 4.2274
+    },
+    "40315": {
+      "rcs_m2": 18.8988
+    },
+    "40332": {
+      "rcs_m2": 63.2456
+    },
+    "40333": {
+      "rcs_m2": 34.1347
+    },
+    "40336": {
+      "rcs_m2": 3.7804
+    },
+    "40344": {
+      "standard_magnitude": 3.72
+    },
+    "40345": {
+      "rcs_m2": 59.7633
+    },
+    "40348": {
+      "rcs_m2": 0.4981
+    },
+    "40349": {
+      "rcs_m2": 12.2583
+    },
+    "40350": {
+      "rcs_m2": 7.8074
+    },
+    "40351": {
+      "rcs_m2": 16.3813
+    },
+    "40362": {
+      "rcs_m2": 4.769
+    },
+    "40364": {
+      "rcs_m2": 0.003
+    },
+    "40367": {
+      "rcs_m2": 23.1149
+    },
+    "40374": {
+      "rcs_m2": 20.8608
+    },
+    "40376": {
+      "rcs_m2": 4.277
+    },
+    "40381": {
+      "rcs_m2": 3.3742
+    },
+    "40384": {
+      "rcs_m2": 16.5703
+    },
+    "40424": {
+      "rcs_m2": 6.019
+    },
+    "40425": {
+      "rcs_m2": 5.4794
+    },
+    "40482": {
+      "rcs_m2": 3.2865
+    },
+    "40483": {
+      "rcs_m2": 3.373
+    },
+    "40484": {
+      "rcs_m2": 2.6555
+    },
+    "40485": {
+      "rcs_m2": 2.1286
+    },
+    "40505": {
+      "rcs_m2": 12.9055
+    },
+    "40534": {
+      "rcs_m2": 30.7354
+    },
+    "40536": {
+      "rcs_m2": 5.363
+    },
+    "40538": {
+      "rcs_m2": 6.1254
+    },
+    "40544": {
+      "rcs_m2": 8.4512
+    },
+    "40545": {
+      "rcs_m2": 9.4592
+    },
+    "40549": {
+      "rcs_m2": 11.7883
+    },
+    "40552": {
+      "rcs_m2": 1.6379
+    },
+    "40553": {
+      "rcs_m2": 1.5906
+    },
+    "40554": {
+      "rcs_m2": 1.59
+    },
+    "40613": {
+      "rcs_m2": 70.0714
+    },
+    "40614": {
+      "rcs_m2": 14.7693
+    },
+    "40617": {
+      "rcs_m2": 8.9433
+    },
+    "40663": {
+      "rcs_m2": 42.7129
+    },
+    "40664": {
+      "rcs_m2": 75.685
+    },
+    "40697": {
+      "rcs_m2": 3.451
+    },
+    "40701": {
+      "rcs_m2": 5.0119
+    },
+    "40715": {
+      "rcs_m2": 1.5728
+    },
+    "40716": {
+      "rcs_m2": 1.5082
+    },
+    "40717": {
+      "rcs_m2": 1.5157
+    },
+    "40718": {
+      "rcs_m2": 0.501
+    },
+    "40730": {
+      "rcs_m2": 23.1
+    },
+    "40732": {
+      "rcs_m2": 4.001
+    },
+    "40733": {
+      "rcs_m2": 23.3101
+    },
+    "40746": {
+      "rcs_m2": 7.2473
+    },
+    "40748": {
+      "rcs_m2": 16.1785
+    },
+    "40749": {
+      "rcs_m2": 21.5375
+    },
+    "40874": {
+      "rcs_m2": 16.5703
+    },
+    "40875": {
+      "rcs_m2": 7.4159
+    },
+    "40878": {
+      "rcs_m2": 3.094
+    },
+    "40880": {
+      "rcs_m2": 2
+    },
+    "40882": {
+      "rcs_m2": 49.8107
+    },
+    "40887": {
+      "rcs_m2": 99.6156
+    },
+    "40890": {
+      "rcs_m2": 8.8826
+    },
+    "40892": {
+      "rcs_m2": 65.167
+    },
+    "40894": {
+      "rcs_m2": 3.683
+    },
+    "40895": {
+      "rcs_m2": 44.8226
+    },
+    "40908": {
+      "rcs_m2": 0.095
+    },
+    "40920": {
+      "rcs_m2": 1.5579
+    },
+    "40921": {
+      "rcs_m2": 1.5039
+    },
+    "40922": {
+      "rcs_m2": 1.5012
+    },
+    "40930": {
+      "rcs_m2": 4.8771
+    },
+    "40931": {
+      "rcs_m2": 0.2216
+    },
+    "40938": {
+      "rcs_m2": 61.2179
+    },
+    "40940": {
+      "rcs_m2": 51.5754
+    },
+    "40941": {
+      "rcs_m2": 81.4064
+    },
+    "40946": {
+      "rcs_m2": 25.0379
+    },
+    "40959": {
+      "rcs_m2": 0.453
+    },
+    "40960": {
+      "rcs_m2": 0.4006
+    },
+    "40961": {
+      "rcs_m2": 2.2889
+    },
+    "40964": {
+      "standard_magnitude": 4.06
+    },
+    "40965": {
+      "standard_magnitude": 9.34
+    },
+    "40972": {
+      "standard_magnitude": 8.6
+    },
+    "40982": {
+      "rcs_m2": 88.2146
+    },
+    "40984": {
+      "standard_magnitude": 2.2
+    },
+    "41019": {
+      "rcs_m2": 15.9174
+    },
+    "41021": {
+      "rcs_m2": 75.4609
+    },
+    "41026": {
+      "rcs_m2": 4.8055
+    },
+    "41028": {
+      "rcs_m2": 44.212
+    },
+    "41029": {
+      "rcs_m2": 78.9705
+    },
+    "41034": {
+      "rcs_m2": 56.7416
+    },
+    "41036": {
+      "rcs_m2": 29.9526
+    },
+    "41038": {
+      "rcs_m2": 5.0279
+    },
+    "41105": {
+      "rcs_m2": 0.003
+    },
+    "41121": {
+      "rcs_m2": 3.362
+    },
+    "41167": {
+      "rcs_m2": 0.1995
+    },
+    "41173": {
+      "rcs_m2": 1.582
+    },
+    "41174": {
+      "rcs_m2": 6.7254
+    },
+    "41175": {
+      "rcs_m2": 9.9514
+    },
+    "41179": {
+      "rcs_m2": 0.562
+    },
+    "41182": {
+      "rcs_m2": 0.5694
+    },
+    "41183": {
+      "rcs_m2": 0.505
+    },
+    "41184": {
+      "rcs_m2": 0.525
+    },
+    "41185": {
+      "rcs_m2": 0.468
+    },
+    "41187": {
+      "rcs_m2": 0.5329
+    },
+    "41188": {
+      "rcs_m2": 0.535
+    },
+    "41189": {
+      "rcs_m2": 0.55
+    },
+    "41191": {
+      "rcs_m2": 19.255
+    },
+    "41194": {
+      "rcs_m2": 22.1298
+    },
+    "41238": {
+      "rcs_m2": 35.8016
+    },
+    "41240": {
+      "rcs_m2": 2.7109
+    },
+    "41241": {
+      "rcs_m2": 9.9385
+    },
+    "41310": {
+      "rcs_m2": 39.9052
+    },
+    "41328": {
+      "rcs_m2": 26.1193
+    },
+    "41330": {
+      "rcs_m2": 11.2901
+    },
+    "41334": {
+      "standard_magnitude": 2.5
+    },
+    "41335": {
+      "rcs_m2": 3.9811
+    },
+    "41337": {
+      "rcs_m2": 6.1649
+    },
+    "41340": {
+      "rcs_m2": 0.1183
+    },
+    "41380": {
+      "rcs_m2": 20.5325
+    },
+    "41382": {
+      "rcs_m2": 47.7519
+    },
+    "41384": {
+      "standard_magnitude": 1.31,
+      "rcs_m2": 0.003
+    },
+    "41434": {
+      "rcs_m2": 26.1904
+    },
+    "41469": {
+      "rcs_m2": 8.5592
+    },
+    "41471": {
+      "rcs_m2": 9.8591
+    },
+    "41549": {
+      "rcs_m2": 6.5968
+    },
+    "41550": {
+      "rcs_m2": 15.8866
+    },
+    "41552": {
+      "rcs_m2": 8.0064
+    },
+    "41556": {
+      "rcs_m2": 4.613
+    },
+    "41581": {
+      "rcs_m2": 7.8945
+    },
+    "41586": {
+      "rcs_m2": 19.0112
+    },
+    "41588": {
+      "rcs_m2": 11.9244
+    },
+    "41589": {
+      "rcs_m2": 0.0794
+    },
+    "41591": {
+      "rcs_m2": 9.4719
+    },
+    "41592": {
+      "rcs_m2": 37.7081
+    },
+    "41599": {
+      "rcs_m2": 1.9953
+    },
+    "41601": {
+      "rcs_m2": 0.38
+    },
+    "41603": {
+      "rcs_m2": 0.2815
+    },
+    "41622": {
+      "standard_magnitude": 2,
+      "rcs_m2": 14.2529
+    },
+    "41725": {
+      "rcs_m2": 27.8959
+    },
+    "41727": {
+      "rcs_m2": 3.9379
+    },
+    "41729": {
+      "rcs_m2": 18.8988
+    },
+    "41747": {
+      "rcs_m2": 6.493
+    },
+    "41752": {
+      "rcs_m2": 8.2903
+    },
+    "41771": {
+      "rcs_m2": 0.387
+    },
+    "41772": {
+      "rcs_m2": 0.4255
+    },
+    "41773": {
+      "rcs_m2": 0.339
+    },
+    "41774": {
+      "rcs_m2": 0.3639
+    },
+    "41784": {
+      "rcs_m2": 0.145
+    },
+    "41785": {
+      "rcs_m2": 0.377
+    },
+    "41787": {
+      "rcs_m2": 0.375
+    },
+    "41790": {
+      "rcs_m2": 1.7214
+    },
+    "41793": {
+      "rcs_m2": 0.003
+    },
+    "41794": {
+      "rcs_m2": 0.003
+    },
+    "41836": {
+      "rcs_m2": 38.791
+    },
+    "41838": {
+      "rcs_m2": 19.83
+    },
+    "41847": {
+      "rcs_m2": 0.1175
+    },
+    "41849": {
+      "rcs_m2": 0.0429
+    },
+    "41850": {
+      "rcs_m2": 0.0132
+    },
+    "41851": {
+      "rcs_m2": 0.0671
+    },
+    "41852": {
+      "rcs_m2": 0.052
+    },
+    "41853": {
+      "rcs_m2": 0.051
+    },
+    "41857": {
+      "rcs_m2": 4.241
+    },
+    "41859": {
+      "rcs_m2": 18.3608
+    },
+    "41860": {
+      "rcs_m2": 2.7896
+    },
+    "41861": {
+      "rcs_m2": 14.1741
+    },
+    "41862": {
+      "rcs_m2": 8.5742
+    },
+    "41866": {
+      "rcs_m2": 13.1623
+    },
+    "41869": {
+      "rcs_m2": 21.9479
+    },
+    "41875": {
+      "rcs_m2": 3.1623
+    },
+    "41877": {
+      "rcs_m2": 4.155
+    },
+    "41879": {
+      "standard_magnitude": 1.48
+    },
+    "41882": {
+      "rcs_m2": 22.5893
+    },
+    "41884": {
+      "rcs_m2": 0.185
+    },
+    "41885": {
+      "rcs_m2": 0.1968
+    },
+    "41886": {
+      "rcs_m2": 0.2175
+    },
+    "41887": {
+      "rcs_m2": 0.234
+    },
+    "41888": {
+      "rcs_m2": 0.197
+    },
+    "41890": {
+      "rcs_m2": 0.3239
+    },
+    "41891": {
+      "rcs_m2": 0.192
+    },
+    "41893": {
+      "rcs_m2": 7.191
+    },
+    "41898": {
+      "rcs_m2": 1.4246
+    },
+    "41903": {
+      "rcs_m2": 71.039
+    },
+    "41904": {
+      "rcs_m2": 0.003
+    },
+    "41911": {
+      "rcs_m2": 43.7918
+    },
+    "41914": {
+      "rcs_m2": 0.4353
+    },
+    "41917": {
+      "rcs_m2": 2.8038
+    },
+    "41918": {
+      "rcs_m2": 2.392
+    },
+    "41919": {
+      "rcs_m2": 2.804
+    },
+    "41920": {
+      "rcs_m2": 2.6252
+    },
+    "41921": {
+      "rcs_m2": 2.2529
+    },
+    "41922": {
+      "rcs_m2": 2.894
+    },
+    "41923": {
+      "rcs_m2": 2.4372
+    },
+    "41924": {
+      "rcs_m2": 2.4103
+    },
+    "41925": {
+      "rcs_m2": 2.652
+    },
+    "41926": {
+      "rcs_m2": 2.6291
+    },
+    "41942": {
+      "rcs_m2": 3.1648
+    },
+    "41944": {
+      "rcs_m2": 10.8657
+    },
+    "41945": {
+      "rcs_m2": 14.7367
+    },
+    "41948": {
+      "rcs_m2": 2.2262
+    },
+    "42063": {
+      "rcs_m2": 2.5119
+    },
+    "42065": {
+      "standard_magnitude": 4.01
+    },
+    "42070": {
+      "rcs_m2": 13.1623
+    },
+    "42072": {
+      "standard_magnitude": 5.3
+    },
+    "42075": {
+      "standard_magnitude": 1.42
+    },
+    "42432": {
+      "rcs_m2": 6.493
+    },
+    "42662": {
+      "rcs_m2": 12.3708
+    },
+    "42698": {
+      "standard_magnitude": 0.94
+    },
+    "42747": {
+      "standard_magnitude": 1.7
+    },
+    "42749": {
+      "standard_magnitude": 1.7
+    },
+    "42758": {
+      "standard_magnitude": 4.51
+    },
+    "42767": {
+      "standard_magnitude": 6.84
+    },
+    "42803": {
+      "standard_magnitude": 5.96
+    },
+    "42804": {
+      "standard_magnitude": 5.83
+    },
+    "42805": {
+      "standard_magnitude": 6.02
+    },
+    "42806": {
+      "standard_magnitude": 5.84
+    },
+    "42807": {
+      "standard_magnitude": 5.96
+    },
+    "42808": {
+      "standard_magnitude": 5.84
+    },
+    "42809": {
+      "standard_magnitude": 5.9
+    },
+    "42810": {
+      "standard_magnitude": 5.96
+    },
+    "42811": {
+      "standard_magnitude": 5.95
+    },
+    "42812": {
+      "standard_magnitude": 5.93
+    },
+    "42814": {
+      "standard_magnitude": 1.36
+    },
+    "42828": {
+      "standard_magnitude": 8.3
+    },
+    "42829": {
+      "standard_magnitude": 8.29
+    },
+    "42831": {
+      "standard_magnitude": 8.08
+    },
+    "42835": {
+      "standard_magnitude": 8.66
+    },
+    "42837": {
+      "standard_magnitude": 9.15
+    },
+    "42839": {
+      "standard_magnitude": 7.81
+    },
+    "42840": {
+      "standard_magnitude": 8.38
+    },
+    "42841": {
+      "standard_magnitude": 6.27
+    },
+    "42842": {
+      "standard_magnitude": 6.81
+    },
+    "42900": {
+      "standard_magnitude": 7.68
+    },
+    "42920": {
+      "standard_magnitude": 6.48
+    },
+    "42934": {
+      "standard_magnitude": 3.27
+    },
+    "42941": {
+      "standard_magnitude": 3.92
+    },
+    "42954": {
+      "standard_magnitude": 7.12
+    },
+    "42955": {
+      "standard_magnitude": 6.03
+    },
+    "42956": {
+      "standard_magnitude": 5.84
+    },
+    "42957": {
+      "standard_magnitude": 5.96
+    },
+    "42958": {
+      "standard_magnitude": 5.83
+    },
+    "42959": {
+      "standard_magnitude": 5.82
+    },
+    "42960": {
+      "standard_magnitude": 5.87
+    },
+    "42961": {
+      "standard_magnitude": 5.92
+    },
+    "42962": {
+      "standard_magnitude": 5.88
+    },
+    "42963": {
+      "standard_magnitude": 5.91
+    },
+    "42964": {
+      "standard_magnitude": 5.87
+    },
+    "42969": {
+      "standard_magnitude": 6.11
+    },
+    "42987": {
+      "standard_magnitude": 8.74
+    },
+    "42988": {
+      "standard_magnitude": 9.25
+    },
+    "42989": {
+      "standard_magnitude": 8.44
+    },
+    "42990": {
+      "standard_magnitude": 8.26
+    },
+    "42991": {
+      "standard_magnitude": 8.62
+    },
+    "42992": {
+      "standard_magnitude": 8.79
+    },
+    "43001": {
+      "standard_magnitude": 1.1
+    },
+    "43002": {
+      "standard_magnitude": 2.39
+    },
+    "43005": {
+      "standard_magnitude": 6.73
+    },
+    "43013": {
+      "standard_magnitude": 4.88
+    },
+    "43022": {
+      "standard_magnitude": 8.7
+    },
+    "43023": {
+      "standard_magnitude": 8.02
+    },
+    "43024": {
+      "standard_magnitude": 7.95
+    },
+    "43055": {
+      "standard_magnitude": 3.6
+    },
+    "43056": {
+      "standard_magnitude": 3.42
+    },
+    "43057": {
+      "standard_magnitude": 3.64
+    },
+    "43058": {
+      "standard_magnitude": 3.09
+    },
+    "43070": {
+      "standard_magnitude": 5.94
+    },
+    "43071": {
+      "standard_magnitude": 5.8
+    },
+    "43072": {
+      "standard_magnitude": 5.83
+    },
+    "43073": {
+      "standard_magnitude": 5.97
+    },
+    "43074": {
+      "standard_magnitude": 5.92
+    },
+    "43075": {
+      "standard_magnitude": 5.85
+    },
+    "43076": {
+      "standard_magnitude": 5.76
+    },
+    "43077": {
+      "standard_magnitude": 5.96
+    },
+    "43078": {
+      "standard_magnitude": 5.92
+    },
+    "43079": {
+      "standard_magnitude": 5.93
+    },
+    "43080": {
+      "standard_magnitude": 6.96
+    },
+    "43099": {
+      "standard_magnitude": 6.89
+    },
+    "43107": {
+      "standard_magnitude": 3.16
+    },
+    "43108": {
+      "standard_magnitude": 3.62
+    },
+    "43111": {
+      "standard_magnitude": 6.71
+    },
+    "43113": {
+      "standard_magnitude": 7.89
+    },
+    "43145": {
+      "standard_magnitude": 2.5
+    },
+    "43146": {
+      "standard_magnitude": 6.73
+    },
+    "43152": {
+      "standard_magnitude": 5.93
+    },
+    "43159": {
+      "standard_magnitude": 7.84
+    },
+    "43160": {
+      "standard_magnitude": 7.67
+    },
+    "43178": {
+      "standard_magnitude": 1.1
+    },
+    "43194": {
+      "standard_magnitude": 6.53
+    },
+    "43207": {
+      "standard_magnitude": 2.22
+    },
+    "43215": {
+      "standard_magnitude": 4.44
+    },
+    "43223": {
+      "standard_magnitude": 4.48
+    },
+    "43232": {
+      "standard_magnitude": 3.79
+    },
+    "43233": {
+      "standard_magnitude": 4.44
+    },
+    "43234": {
+      "standard_magnitude": 3.84
+    },
+    "43236": {
+      "standard_magnitude": 6.57
+    },
+    "43245": {
+      "standard_magnitude": 3.34
+    },
+    "43246": {
+      "standard_magnitude": 3.38
+    },
+    "43249": {
+      "standard_magnitude": 6.03
+    },
+    "43250": {
+      "standard_magnitude": 5.97
+    },
+    "43251": {
+      "standard_magnitude": 5.81
+    },
+    "43252": {
+      "standard_magnitude": 6.01
+    },
+    "43253": {
+      "standard_magnitude": 6.02
+    },
+    "43254": {
+      "standard_magnitude": 5.89
+    },
+    "43255": {
+      "standard_magnitude": 5.99
+    },
+    "43256": {
+      "standard_magnitude": 5.89
+    },
+    "43257": {
+      "standard_magnitude": 5.93
+    },
+    "43258": {
+      "standard_magnitude": 5.87
+    },
+    "43259": {
+      "standard_magnitude": 7.09
+    },
+    "43260": {
+      "standard_magnitude": 6.93
+    },
+    "43262": {
+      "standard_magnitude": 6.94
+    },
+    "43437": {
+      "standard_magnitude": 5.62
+    },
+    "43440": {
+      "standard_magnitude": 9.87
+    },
+    "43441": {
+      "standard_magnitude": 10.09
+    },
+    "43461": {
+      "standard_magnitude": 4.89
+    },
+    "43478": {
+      "standard_magnitude": 5.93
+    },
+    "43479": {
+      "standard_magnitude": 5.9
+    },
+    "43480": {
+      "standard_magnitude": 5.95
+    },
+    "43481": {
+      "standard_magnitude": 5.98
+    },
+    "43482": {
+      "standard_magnitude": 5.97
+    },
+    "43484": {
+      "standard_magnitude": 6.87
+    },
+    "43485": {
+      "standard_magnitude": 8.82
+    },
+    "43495": {
+      "standard_magnitude": 3.73
+    },
+    "43529": {
+      "standard_magnitude": 8.14
+    },
+    "43530": {
+      "standard_magnitude": 7.06
+    },
+    "43562": {
+      "standard_magnitude": 4.89
+    },
+    "43564": {
+      "standard_magnitude": 3.63
+    },
+    "43565": {
+      "standard_magnitude": 3.56
+    },
+    "43566": {
+      "standard_magnitude": 2.94
+    },
+    "43567": {
+      "standard_magnitude": 3.13
+    },
+    "43569": {
+      "standard_magnitude": 5.89
+    },
+    "43570": {
+      "standard_magnitude": 5.85
+    },
+    "43571": {
+      "standard_magnitude": 6
+    },
+    "43572": {
+      "standard_magnitude": 6.02
+    },
+    "43573": {
+      "standard_magnitude": 5.74
+    },
+    "43574": {
+      "standard_magnitude": 5.83
+    },
+    "43575": {
+      "standard_magnitude": 5.89
+    },
+    "43576": {
+      "standard_magnitude": 5.87
+    },
+    "43577": {
+      "standard_magnitude": 5.88
+    },
+    "43578": {
+      "standard_magnitude": 5.88
+    },
+    "43581": {
+      "standard_magnitude": 2.65
+    },
+    "43582": {
+      "standard_magnitude": 3.47
+    },
+    "43585": {
+      "standard_magnitude": 5.71
+    },
+    "43602": {
+      "standard_magnitude": 3.53
+    },
+    "43603": {
+      "standard_magnitude": 3.48
+    },
+    "43609": {
+      "standard_magnitude": 7.13
+    },
+    "43613": {
+      "standard_magnitude": 5.39
+    },
+    "43618": {
+      "standard_magnitude": 7.59
+    },
+    "43622": {
+      "standard_magnitude": 3.44
+    },
+    "43623": {
+      "standard_magnitude": 3.62
+    },
+    "43641": {
+      "standard_magnitude": 1.58
+    },
+    "43647": {
+      "standard_magnitude": 3.53
+    },
+    "43648": {
+      "standard_magnitude": 3.54
+    },
+    "43677": {
+      "standard_magnitude": 8.2
+    },
+    "43678": {
+      "standard_magnitude": 8.92
+    },
+    "43682": {
+      "standard_magnitude": 4.38
+    },
+    "43689": {
+      "standard_magnitude": 4.22
+    },
+    "43698": {
+      "standard_magnitude": 1.76
+    },
+    "43700": {
+      "standard_magnitude": 1.99
+    },
+    "43706": {
+      "standard_magnitude": 3.33
+    },
+    "43707": {
+      "standard_magnitude": 3.26
+    },
+    "43717": {
+      "standard_magnitude": 6.57
+    },
+    "43719": {
+      "standard_magnitude": 7.07
+    },
+    "43758": {
+      "standard_magnitude": 9.29
+    },
+    "43759": {
+      "standard_magnitude": 9.5
+    },
+    "43765": {
+      "standard_magnitude": 8.7
+    },
+    "43783": {
+      "standard_magnitude": 9.59
+    },
+    "43790": {
+      "standard_magnitude": 8.04
+    },
+    "43794": {
+      "standard_magnitude": 8.91
+    },
+    "43797": {
+      "standard_magnitude": 9.16
+    },
+    "43799": {
+      "standard_magnitude": 8.75
+    },
+    "43812": {
+      "standard_magnitude": 8.65
+    },
+    "43831": {
+      "standard_magnitude": 6.52
+    },
+    "43833": {
+      "standard_magnitude": 7.03
+    },
+    "43864": {
+      "standard_magnitude": 1.35
+    },
+    "43866": {
+      "standard_magnitude": 4.01
+    },
+    "43873": {
+      "standard_magnitude": 3.28
+    },
+    "43922": {
+      "standard_magnitude": 5.99
+    },
+    "43923": {
+      "standard_magnitude": 5.83
+    },
+    "43924": {
+      "standard_magnitude": 5.93
+    },
+    "43925": {
+      "standard_magnitude": 5.92
+    },
+    "43926": {
+      "standard_magnitude": 5.85
+    },
+    "43927": {
+      "standard_magnitude": 5.84
+    },
+    "43928": {
+      "standard_magnitude": 5.75
+    },
+    "43929": {
+      "standard_magnitude": 5.93
+    },
+    "43930": {
+      "standard_magnitude": 5.88
+    },
+    "43931": {
+      "standard_magnitude": 6.01
+    },
+    "43941": {
+      "standard_magnitude": 4.34
+    },
+    "43943": {
+      "standard_magnitude": 7.03
+    },
+    "43946": {
+      "standard_magnitude": 8.33
+    },
+    "44057": {
+      "standard_magnitude": 7.05
+    },
+    "44058": {
+      "standard_magnitude": 7.05
+    },
+    "44059": {
+      "standard_magnitude": 7.05
+    },
+    "44060": {
+      "standard_magnitude": 7.05
+    },
+    "44061": {
+      "standard_magnitude": 7.05
+    },
+    "44062": {
+      "standard_magnitude": 7.05
+    },
+    "44071": {
+      "standard_magnitude": 1.58
+    },
+    "44078": {
+      "standard_magnitude": 6.71
+    },
+    "44113": {
+      "standard_magnitude": 3.66
+    },
+    "44114": {
+      "standard_magnitude": 4.16
+    },
+    "44115": {
+      "standard_magnitude": 4.75
+    },
+    "44186": {
+      "standard_magnitude": 1.29
+    },
+    "44312": {
+      "standard_magnitude": 8.8
+    },
+    "44475": {
+      "standard_magnitude": 1.82
+    },
+    "44476": {
+      "standard_magnitude": 0.91
+    },
+    "44479": {
+      "standard_magnitude": 0.46
+    },
+    "44481": {
+      "standard_magnitude": 1.11
+    },
+    "44499": {
+      "standard_magnitude": 9.19
+    },
+    "44528": {
+      "standard_magnitude": 5.4
+    },
+    "44538": {
+      "standard_magnitude": 9.31
+    },
+    "44542": {
+      "standard_magnitude": 3.35
+    },
+    "44543": {
+      "standard_magnitude": 3.13
+    },
+    "44622": {
+      "standard_magnitude": 5.11
+    },
+    "44703": {
+      "standard_magnitude": 4.94
+    },
+    "44777": {
+      "standard_magnitude": 6.65
+    },
+    "44779": {
+      "standard_magnitude": 8.03
+    },
+    "44783": {
+      "standard_magnitude": 8.23
+    },
+    "44785": {
+      "standard_magnitude": 8.01
+    },
+    "44793": {
+      "standard_magnitude": 3.17
+    },
+    "44794": {
+      "standard_magnitude": 3.21
+    },
+    "44800": {
+      "standard_magnitude": 1.76
+    },
+    "44804": {
+      "standard_magnitude": 5.84
+    },
+    "44819": {
+      "standard_magnitude": 4.03
+    },
+    "44836": {
+      "standard_magnitude": 6.89
+    },
+    "44864": {
+      "standard_magnitude": 3.38
+    },
+    "44865": {
+      "standard_magnitude": 2.77
+    },
+    "44873": {
+      "standard_magnitude": 4.06
+    },
+    "44879": {
+      "standard_magnitude": 7.62
+    },
+    "44880": {
+      "standard_magnitude": 7.88
+    },
+    "44881": {
+      "standard_magnitude": 8.51
+    },
+    "44882": {
+      "standard_magnitude": 5.94
+    },
+    "44883": {
+      "standard_magnitude": 6.28
+    },
+    "44884": {
+      "standard_magnitude": 8.44
+    },
+    "44886": {
+      "standard_magnitude": 8.42
+    },
+    "44910": {
+      "standard_magnitude": 1.15
+    },
+    "45016": {
+      "standard_magnitude": 5.8
+    },
+    "45027": {
+      "standard_magnitude": 2.02
+    },
+    "45131": {
+      "standard_magnitude": 7.05
+    },
+    "45132": {
+      "standard_magnitude": 7.05
+    },
+    "45133": {
+      "standard_magnitude": 7.05
+    },
+    "45134": {
+      "standard_magnitude": 7.05
+    },
+    "45136": {
+      "standard_magnitude": 7.05
+    },
+    "45137": {
+      "standard_magnitude": 7.05
+    },
+    "45138": {
+      "standard_magnitude": 7.05
+    },
+    "45139": {
+      "standard_magnitude": 7.05
+    },
+    "45140": {
+      "standard_magnitude": 7.05
+    },
+    "45141": {
+      "standard_magnitude": 7.05
+    },
+    "45142": {
+      "standard_magnitude": 7.05
+    },
+    "45143": {
+      "standard_magnitude": 7.05
+    },
+    "45144": {
+      "standard_magnitude": 7.05
+    },
+    "45145": {
+      "standard_magnitude": 7.05
+    },
+    "45146": {
+      "standard_magnitude": 7.05
+    },
+    "45147": {
+      "standard_magnitude": 7.05
+    },
+    "45149": {
+      "standard_magnitude": 7.05
+    },
+    "45150": {
+      "standard_magnitude": 7.05
+    },
+    "45151": {
+      "standard_magnitude": 7.05
+    },
+    "45152": {
+      "standard_magnitude": 7.05
+    },
+    "45153": {
+      "standard_magnitude": 7.05
+    },
+    "45154": {
+      "standard_magnitude": 7.05
+    },
+    "45155": {
+      "standard_magnitude": 7.05
+    },
+    "45156": {
+      "standard_magnitude": 7.05
+    },
+    "45157": {
+      "standard_magnitude": 7.05
+    },
+    "45158": {
+      "standard_magnitude": 7.05
+    },
+    "45159": {
+      "standard_magnitude": 7.05
+    },
+    "45160": {
+      "standard_magnitude": 7.05
+    },
+    "45161": {
+      "standard_magnitude": 7.05
+    },
+    "45162": {
+      "standard_magnitude": 7.05
+    },
+    "45163": {
+      "standard_magnitude": 7.05
+    },
+    "45164": {
+      "standard_magnitude": 7.05
+    },
+    "45165": {
+      "standard_magnitude": 5.63
+    },
+    "45424": {
+      "standard_magnitude": 7.05
+    },
+    "45425": {
+      "standard_magnitude": 7.05
+    },
+    "45426": {
+      "standard_magnitude": 7.05
+    },
+    "45427": {
+      "standard_magnitude": 7.05
+    },
+    "45428": {
+      "standard_magnitude": 7.05
+    },
+    "45429": {
+      "standard_magnitude": 7.05
+    },
+    "45430": {
+      "standard_magnitude": 7.05
+    },
+    "45431": {
+      "standard_magnitude": 7.05
+    },
+    "45432": {
+      "standard_magnitude": 7.05
+    },
+    "45433": {
+      "standard_magnitude": 7.05
+    },
+    "45434": {
+      "standard_magnitude": 7.05
+    },
+    "45435": {
+      "standard_magnitude": 7.05
+    },
+    "45436": {
+      "standard_magnitude": 7.05
+    },
+    "45437": {
+      "standard_magnitude": 7.05
+    },
+    "45438": {
+      "standard_magnitude": 7.05
+    },
+    "45439": {
+      "standard_magnitude": 7.05
+    },
+    "45440": {
+      "standard_magnitude": 7.05
+    },
+    "45441": {
+      "standard_magnitude": 7.05
+    },
+    "45442": {
+      "standard_magnitude": 7.05
+    },
+    "45443": {
+      "standard_magnitude": 7.05
+    },
+    "45444": {
+      "standard_magnitude": 7.05
+    },
+    "45445": {
+      "standard_magnitude": 7.05
+    },
+    "45446": {
+      "standard_magnitude": 7.05
+    },
+    "45447": {
+      "standard_magnitude": 7.05
+    },
+    "45448": {
+      "standard_magnitude": 7.05
+    },
+    "45449": {
+      "standard_magnitude": 7.05
+    },
+    "45450": {
+      "standard_magnitude": 7.05
+    },
+    "45451": {
+      "standard_magnitude": 7.05
+    },
+    "45452": {
+      "standard_magnitude": 7.05
+    },
+    "45453": {
+      "standard_magnitude": 7.05
+    },
+    "45454": {
+      "standard_magnitude": 7.05
+    },
+    "45455": {
+      "standard_magnitude": 7.05
+    },
+    "45456": {
+      "standard_magnitude": 7.05
+    },
+    "45457": {
+      "standard_magnitude": 7.05
+    },
+    "45602": {
+      "standard_magnitude": 8.28
+    },
+    "45603": {
+      "standard_magnitude": 7.9
+    },
+    "45721": {
+      "standard_magnitude": 7.77
+    },
+    "45854": {
+      "standard_magnitude": 3.63
+    },
+    "45856": {
+      "standard_magnitude": 6.09
+    },
+    "45939": {
+      "standard_magnitude": 5.26
+    },
+    "46265": {
+      "standard_magnitude": 1.43
+    },
+    "46277": {
+      "standard_magnitude": 10.17
+    },
+    "46457": {
+      "standard_magnitude": 8.42
+    },
+    "46458": {
+      "standard_magnitude": 9.32
+    },
+    "46459": {
+      "standard_magnitude": 8.62
+    },
+    "46460": {
+      "standard_magnitude": 9.3
+    },
+    "46478": {
+      "standard_magnitude": 5.73
+    },
+    "46479": {
+      "standard_magnitude": 5.93
+    },
+    "46497": {
+      "standard_magnitude": 7.96
+    },
+    "46918": {
+      "standard_magnitude": 4.47
+    },
+    "46984": {
+      "standard_magnitude": 5.03
+    },
+    "47237": {
+      "standard_magnitude": 1.04
+    },
+    "47258": {
+      "standard_magnitude": 7.66
+    },
+    "47259": {
+      "standard_magnitude": 7.52
+    },
+    "47260": {
+      "standard_magnitude": 7.46
+    },
+    "47261": {
+      "standard_magnitude": 7.56
+    },
+    "47262": {
+      "standard_magnitude": 7.55
+    },
+    "47263": {
+      "standard_magnitude": 7.61
+    },
+    "47264": {
+      "standard_magnitude": 7.63
+    },
+    "47265": {
+      "standard_magnitude": 7.64
+    },
+    "47266": {
+      "standard_magnitude": 7.75
+    },
+    "47267": {
+      "standard_magnitude": 7.64
+    },
+    "47268": {
+      "standard_magnitude": 7.59
+    },
+    "47269": {
+      "standard_magnitude": 7.58
+    },
+    "47270": {
+      "standard_magnitude": 7.6
+    },
+    "47271": {
+      "standard_magnitude": 7.59
+    },
+    "47272": {
+      "standard_magnitude": 7.12
+    },
+    "47273": {
+      "standard_magnitude": 7.67
+    },
+    "47274": {
+      "standard_magnitude": 7.55
+    },
+    "47275": {
+      "standard_magnitude": 7.65
+    },
+    "47276": {
+      "standard_magnitude": 7.59
+    },
+    "47277": {
+      "standard_magnitude": 7.68
+    },
+    "47278": {
+      "standard_magnitude": 7.59
+    },
+    "47279": {
+      "standard_magnitude": 7.56
+    },
+    "47280": {
+      "standard_magnitude": 7.51
+    },
+    "47281": {
+      "standard_magnitude": 7.59
+    },
+    "47282": {
+      "standard_magnitude": 7.64
+    },
+    "47283": {
+      "standard_magnitude": 7.65
+    },
+    "47284": {
+      "standard_magnitude": 7.65
+    },
+    "47285": {
+      "standard_magnitude": 7.59
+    },
+    "47286": {
+      "standard_magnitude": 7.63
+    },
+    "47287": {
+      "standard_magnitude": 7.44
+    },
+    "47288": {
+      "standard_magnitude": 7.24
+    },
+    "47289": {
+      "standard_magnitude": 7.71
+    },
+    "47290": {
+      "standard_magnitude": 7.56
+    },
+    "47291": {
+      "standard_magnitude": 7.62
+    },
+    "47292": {
+      "standard_magnitude": 7.5
+    },
+    "47293": {
+      "standard_magnitude": 7.63
+    },
+    "47305": {
+      "standard_magnitude": 4.44
+    },
+    "47306": {
+      "standard_magnitude": 1.97
+    },
+    "47321": {
+      "standard_magnitude": 2.04
+    },
+    "47502": {
+      "standard_magnitude": 9.2
+    },
+    "47505": {
+      "standard_magnitude": 8.68
+    },
+    "47508": {
+      "standard_magnitude": 9.26
+    },
+    "47883": {
+      "standard_magnitude": 7.37,
+      "rcs_m2": 22.68
+    },
+    "47932": {
+      "standard_magnitude": 8.83
+    },
+    "47934": {
+      "standard_magnitude": 7.81
+    },
+    "47971": {
+      "standard_magnitude": 9.12
+    },
+    "48042": {
+      "standard_magnitude": 7.57
+    },
+    "48043": {
+      "standard_magnitude": 7.57
+    },
+    "48044": {
+      "standard_magnitude": 7.56
+    },
+    "48045": {
+      "standard_magnitude": 7.57
+    },
+    "48046": {
+      "standard_magnitude": 7.67
+    },
+    "48047": {
+      "standard_magnitude": 7.55
+    },
+    "48048": {
+      "standard_magnitude": 7.63
+    },
+    "48049": {
+      "standard_magnitude": 7.64
+    },
+    "48050": {
+      "standard_magnitude": 7.47
+    },
+    "48051": {
+      "standard_magnitude": 7.61
+    },
+    "48052": {
+      "standard_magnitude": 7.53
+    },
+    "48053": {
+      "standard_magnitude": 7.61
+    },
+    "48054": {
+      "standard_magnitude": 7.7
+    },
+    "48055": {
+      "standard_magnitude": 7.56
+    },
+    "48056": {
+      "standard_magnitude": 7.51
+    },
+    "48057": {
+      "standard_magnitude": 7.72
+    },
+    "48058": {
+      "standard_magnitude": 7.63
+    },
+    "48059": {
+      "standard_magnitude": 7.64
+    },
+    "48060": {
+      "standard_magnitude": 7.68
+    },
+    "48061": {
+      "standard_magnitude": 7.6
+    },
+    "48062": {
+      "standard_magnitude": 7.46
+    },
+    "48063": {
+      "standard_magnitude": 7.42
+    },
+    "48064": {
+      "standard_magnitude": 7.48
+    },
+    "48065": {
+      "standard_magnitude": 7.68
+    },
+    "48066": {
+      "standard_magnitude": 7.62
+    },
+    "48067": {
+      "standard_magnitude": 7.67
+    },
+    "48068": {
+      "standard_magnitude": 7.59
+    },
+    "48069": {
+      "standard_magnitude": 7.62
+    },
+    "48070": {
+      "standard_magnitude": 7.46
+    },
+    "48071": {
+      "standard_magnitude": 7.48
+    },
+    "48072": {
+      "standard_magnitude": 7.68
+    },
+    "48073": {
+      "standard_magnitude": 7.67
+    },
+    "48074": {
+      "standard_magnitude": 7.51
+    },
+    "48075": {
+      "standard_magnitude": 7.49
+    },
+    "48076": {
+      "standard_magnitude": 7.7
+    },
+    "48077": {
+      "standard_magnitude": 7.68
+    },
+    "48079": {
+      "standard_magnitude": 4.68
+    },
+    "48210": {
+      "standard_magnitude": 7.42
+    },
+    "48211": {
+      "standard_magnitude": 7.49
+    },
+    "48212": {
+      "standard_magnitude": 7.69
+    },
+    "48213": {
+      "standard_magnitude": 7.43
+    },
+    "48214": {
+      "standard_magnitude": 7.53
+    },
+    "48215": {
+      "standard_magnitude": 7.55
+    },
+    "48216": {
+      "standard_magnitude": 7.48
+    },
+    "48217": {
+      "standard_magnitude": 7.44
+    },
+    "48218": {
+      "standard_magnitude": 7.44
+    },
+    "48219": {
+      "standard_magnitude": 7.53
+    },
+    "48220": {
+      "standard_magnitude": 7.29
+    },
+    "48221": {
+      "standard_magnitude": 7.32
+    },
+    "48222": {
+      "standard_magnitude": 7.57
+    },
+    "48223": {
+      "standard_magnitude": 7.49
+    },
+    "48224": {
+      "standard_magnitude": 7.47
+    },
+    "48225": {
+      "standard_magnitude": 7.16
+    },
+    "48226": {
+      "standard_magnitude": 7.3
+    },
+    "48227": {
+      "standard_magnitude": 7.5
+    },
+    "48228": {
+      "standard_magnitude": 7.29
+    },
+    "48229": {
+      "standard_magnitude": 7.51
+    },
+    "48230": {
+      "standard_magnitude": 7.48
+    },
+    "48231": {
+      "standard_magnitude": 7.31
+    },
+    "48232": {
+      "standard_magnitude": 7.45
+    },
+    "48233": {
+      "standard_magnitude": 7.41
+    },
+    "48234": {
+      "standard_magnitude": 7.38
+    },
+    "48235": {
+      "standard_magnitude": 7.4
+    },
+    "48236": {
+      "standard_magnitude": 7.37
+    },
+    "48237": {
+      "standard_magnitude": 7.49
+    },
+    "48238": {
+      "standard_magnitude": 7.41
+    },
+    "48239": {
+      "standard_magnitude": 7.24
+    },
+    "48240": {
+      "standard_magnitude": 7.12
+    },
+    "48241": {
+      "standard_magnitude": 7.11
+    },
+    "48242": {
+      "standard_magnitude": 7.03
+    },
+    "48243": {
+      "standard_magnitude": 7.37
+    },
+    "48244": {
+      "standard_magnitude": 7.54
+    },
+    "48245": {
+      "standard_magnitude": 7.48
+    },
+    "48247": {
+      "standard_magnitude": 5.38
+    },
+    "48268": {
+      "standard_magnitude": 5.19
+    },
+    "48270": {
+      "standard_magnitude": 8.64
+    },
+    "48271": {
+      "standard_magnitude": 8.23
+    },
+    "48273": {
+      "standard_magnitude": 9.79
+    },
+    "48274": {
+      "standard_magnitude": 1.87
+    },
+    "48606": {
+      "standard_magnitude": 9
+    },
+    "48767": {
+      "standard_magnitude": 7.6
+    },
+    "48768": {
+      "standard_magnitude": 7.54
+    },
+    "48769": {
+      "standard_magnitude": 7.76
+    },
+    "48770": {
+      "standard_magnitude": 7.65
+    },
+    "48771": {
+      "standard_magnitude": 7.62
+    },
+    "48772": {
+      "standard_magnitude": 7.73
+    },
+    "48773": {
+      "standard_magnitude": 7.55
+    },
+    "48774": {
+      "standard_magnitude": 7.74
+    },
+    "48775": {
+      "standard_magnitude": 7.38
+    },
+    "48776": {
+      "standard_magnitude": 7.56
+    },
+    "48777": {
+      "standard_magnitude": 7.42
+    },
+    "48778": {
+      "standard_magnitude": 7.62
+    },
+    "48779": {
+      "standard_magnitude": 7.66
+    },
+    "48780": {
+      "standard_magnitude": 7.51
+    },
+    "48781": {
+      "standard_magnitude": 7.59
+    },
+    "48782": {
+      "standard_magnitude": 7.72
+    },
+    "48783": {
+      "standard_magnitude": 7.39
+    },
+    "48784": {
+      "standard_magnitude": 7.39
+    },
+    "48785": {
+      "standard_magnitude": 7.46
+    },
+    "48786": {
+      "standard_magnitude": 7.65
+    },
+    "48787": {
+      "standard_magnitude": 7.56
+    },
+    "48788": {
+      "standard_magnitude": 7.69
+    },
+    "48789": {
+      "standard_magnitude": 7.62
+    },
+    "48790": {
+      "standard_magnitude": 7.73
+    },
+    "48791": {
+      "standard_magnitude": 7.49
+    },
+    "48792": {
+      "standard_magnitude": 7.65
+    },
+    "48793": {
+      "standard_magnitude": 7.66
+    },
+    "48794": {
+      "standard_magnitude": 7.71
+    },
+    "48795": {
+      "standard_magnitude": 7.43
+    },
+    "48796": {
+      "standard_magnitude": 7.74
+    },
+    "48797": {
+      "standard_magnitude": 7.68
+    },
+    "48798": {
+      "standard_magnitude": 7.47
+    },
+    "48799": {
+      "standard_magnitude": 7.63
+    },
+    "48800": {
+      "standard_magnitude": 7.63
+    },
+    "48801": {
+      "standard_magnitude": 7.45
+    },
+    "48802": {
+      "standard_magnitude": 7.67
+    },
+    "48859": {
+      "standard_magnitude": 3.73
+    },
+    "48908": {
+      "standard_magnitude": 8.44
+    },
+    "48915": {
+      "standard_magnitude": 8.86
+    },
+    "48924": {
+      "standard_magnitude": 9.36
+    },
+    "48931": {
+      "standard_magnitude": 8.77
+    },
+    "48951": {
+      "standard_magnitude": 8.73
+    },
+    "48957": {
+      "standard_magnitude": 8.69
+    },
+    "48967": {
+      "standard_magnitude": 7.5
+    },
+    "48968": {
+      "standard_magnitude": 7.53
+    },
+    "48970": {
+      "standard_magnitude": 7.42
+    },
+    "48971": {
+      "standard_magnitude": 7.57
+    },
+    "48972": {
+      "standard_magnitude": 7.41
+    },
+    "48973": {
+      "standard_magnitude": 7.76
+    },
+    "48974": {
+      "standard_magnitude": 7.53
+    },
+    "48975": {
+      "standard_magnitude": 7.48
+    },
+    "48976": {
+      "standard_magnitude": 7.54
+    },
+    "48977": {
+      "standard_magnitude": 7.62
+    },
+    "48978": {
+      "standard_magnitude": 7.62
+    },
+    "48979": {
+      "standard_magnitude": 7.77
+    },
+    "48980": {
+      "standard_magnitude": 7.6
+    },
+    "48981": {
+      "standard_magnitude": 7.53
+    },
+    "48982": {
+      "standard_magnitude": 7.37
+    },
+    "48984": {
+      "standard_magnitude": 7.56
+    },
+    "48985": {
+      "standard_magnitude": 7.61
+    },
+    "48986": {
+      "standard_magnitude": 7.38
+    },
+    "48987": {
+      "standard_magnitude": 7.68
+    },
+    "48988": {
+      "standard_magnitude": 7.62
+    },
+    "48989": {
+      "standard_magnitude": 7.69
+    },
+    "48990": {
+      "standard_magnitude": 7.58
+    },
+    "48991": {
+      "standard_magnitude": 7.67
+    },
+    "48992": {
+      "standard_magnitude": 7.52
+    },
+    "48993": {
+      "standard_magnitude": 7.43
+    },
+    "48994": {
+      "standard_magnitude": 7.48
+    },
+    "48995": {
+      "standard_magnitude": 7.65
+    },
+    "48996": {
+      "standard_magnitude": 7.56
+    },
+    "48997": {
+      "standard_magnitude": 7.64
+    },
+    "48998": {
+      "standard_magnitude": 7.52
+    },
+    "48999": {
+      "standard_magnitude": 7.59
+    },
+    "49000": {
+      "standard_magnitude": 7.8
+    },
+    "49001": {
+      "standard_magnitude": 7.54
+    },
+    "49002": {
+      "standard_magnitude": 7.51
+    },
+    "49011": {
+      "standard_magnitude": 1.26
+    },
+    "49070": {
+      "standard_magnitude": 5.37
+    },
+    "49075": {
+      "standard_magnitude": 7.61
+    },
+    "49076": {
+      "standard_magnitude": 7.53
+    },
+    "49077": {
+      "standard_magnitude": 7.6
+    },
+    "49078": {
+      "standard_magnitude": 7.68
+    },
+    "49079": {
+      "standard_magnitude": 7.62
+    },
+    "49080": {
+      "standard_magnitude": 7.62
+    },
+    "49081": {
+      "standard_magnitude": 7.55
+    },
+    "49082": {
+      "standard_magnitude": 7.5
+    },
+    "49083": {
+      "standard_magnitude": 7.73
+    },
+    "49084": {
+      "standard_magnitude": 7.47
+    },
+    "49085": {
+      "standard_magnitude": 7.53
+    },
+    "49086": {
+      "standard_magnitude": 7.63
+    },
+    "49087": {
+      "standard_magnitude": 7.5
+    },
+    "49088": {
+      "standard_magnitude": 7.49
+    },
+    "49089": {
+      "standard_magnitude": 7.53
+    },
+    "49090": {
+      "standard_magnitude": 7.67
+    },
+    "49091": {
+      "standard_magnitude": 7.76
+    },
+    "49092": {
+      "standard_magnitude": 7.56
+    },
+    "49093": {
+      "standard_magnitude": 7.55
+    },
+    "49094": {
+      "standard_magnitude": 7.52
+    },
+    "49095": {
+      "standard_magnitude": 7.57
+    },
+    "49096": {
+      "standard_magnitude": 7.64
+    },
+    "49097": {
+      "standard_magnitude": 7.53
+    },
+    "49098": {
+      "standard_magnitude": 7.48
+    },
+    "49099": {
+      "standard_magnitude": 7.64
+    },
+    "49100": {
+      "standard_magnitude": 7.57
+    },
+    "49101": {
+      "standard_magnitude": 7.54
+    },
+    "49102": {
+      "standard_magnitude": 7.53
+    },
+    "49103": {
+      "standard_magnitude": 7.53
+    },
+    "49104": {
+      "standard_magnitude": 7.4
+    },
+    "49105": {
+      "standard_magnitude": 7.56
+    },
+    "49106": {
+      "standard_magnitude": 7.59
+    },
+    "49107": {
+      "standard_magnitude": 7.43
+    },
+    "49108": {
+      "standard_magnitude": 7.48
+    },
+    "49144": {
+      "standard_magnitude": 6.98,
+      "rcs_m2": 22.68
+    },
+    "49186": {
+      "standard_magnitude": 7.33
+    },
+    "49187": {
+      "standard_magnitude": 7.5
+    },
+    "49188": {
+      "standard_magnitude": 7.61
+    },
+    "49189": {
+      "standard_magnitude": 7.25
+    },
+    "49190": {
+      "standard_magnitude": 7.6
+    },
+    "49191": {
+      "standard_magnitude": 7.58
+    },
+    "49192": {
+      "standard_magnitude": 7.51
+    },
+    "49193": {
+      "standard_magnitude": 7.73
+    },
+    "49194": {
+      "standard_magnitude": 7.67
+    },
+    "49195": {
+      "standard_magnitude": 7.63
+    },
+    "49196": {
+      "standard_magnitude": 7.49
+    },
+    "49197": {
+      "standard_magnitude": 7.74
+    },
+    "49198": {
+      "standard_magnitude": 7.5
+    },
+    "49199": {
+      "standard_magnitude": 7.49
+    },
+    "49200": {
+      "standard_magnitude": 7.24
+    },
+    "49201": {
+      "standard_magnitude": 7.48
+    },
+    "49202": {
+      "standard_magnitude": 7.48
+    },
+    "49203": {
+      "standard_magnitude": 7.41
+    },
+    "49204": {
+      "standard_magnitude": 7.22
+    },
+    "49205": {
+      "standard_magnitude": 7.75
+    },
+    "49206": {
+      "standard_magnitude": 7.54
+    },
+    "49207": {
+      "standard_magnitude": 7.57
+    },
+    "49208": {
+      "standard_magnitude": 7.52
+    },
+    "49209": {
+      "standard_magnitude": 7.58
+    },
+    "49210": {
+      "standard_magnitude": 7.53
+    },
+    "49211": {
+      "standard_magnitude": 7.58
+    },
+    "49212": {
+      "standard_magnitude": 7.51
+    },
+    "49213": {
+      "standard_magnitude": 7.43
+    },
+    "49214": {
+      "standard_magnitude": 7.51
+    },
+    "49215": {
+      "standard_magnitude": 7.38
+    },
+    "49216": {
+      "standard_magnitude": 7.36
+    },
+    "49217": {
+      "standard_magnitude": 7.5
+    },
+    "49218": {
+      "standard_magnitude": 7.45
+    },
+    "49219": {
+      "standard_magnitude": 7.57
+    },
+    "49260": {
+      "standard_magnitude": 4.05
+    },
+    "49279": {
+      "standard_magnitude": 7.54
+    },
+    "49280": {
+      "standard_magnitude": 7.33
+    },
+    "49281": {
+      "standard_magnitude": 7.49
+    },
+    "49282": {
+      "standard_magnitude": 7.37
+    },
+    "49283": {
+      "standard_magnitude": 7.61
+    },
+    "49284": {
+      "standard_magnitude": 7.8
+    },
+    "49285": {
+      "standard_magnitude": 7.69
+    },
+    "49286": {
+      "standard_magnitude": 7.69
+    },
+    "49287": {
+      "standard_magnitude": 7.69
+    },
+    "49288": {
+      "standard_magnitude": 7.53
+    },
+    "49289": {
+      "standard_magnitude": 7.47
+    },
+    "49290": {
+      "standard_magnitude": 7.54
+    },
+    "49291": {
+      "standard_magnitude": 7.56
+    },
+    "49292": {
+      "standard_magnitude": 7.46
+    },
+    "49293": {
+      "standard_magnitude": 7.35
+    },
+    "49294": {
+      "standard_magnitude": 7.31
+    },
+    "49295": {
+      "standard_magnitude": 7.36
+    },
+    "49296": {
+      "standard_magnitude": 7.68
+    },
+    "49297": {
+      "standard_magnitude": 7.64
+    },
+    "49298": {
+      "standard_magnitude": 7.33
+    },
+    "49299": {
+      "standard_magnitude": 7.35
+    },
+    "49300": {
+      "standard_magnitude": 7.6
+    },
+    "49301": {
+      "standard_magnitude": 7.84
+    },
+    "49302": {
+      "standard_magnitude": 7.64
+    },
+    "49303": {
+      "standard_magnitude": 7.44
+    },
+    "49304": {
+      "standard_magnitude": 7.41
+    },
+    "49305": {
+      "standard_magnitude": 7.35
+    },
+    "49306": {
+      "standard_magnitude": 7.64
+    },
+    "49307": {
+      "standard_magnitude": 7.4
+    },
+    "49308": {
+      "standard_magnitude": 7.46
+    },
+    "49309": {
+      "standard_magnitude": 7.42
+    },
+    "49310": {
+      "standard_magnitude": 7.39
+    },
+    "49311": {
+      "standard_magnitude": 7.35
+    },
+    "49312": {
+      "standard_magnitude": 7.65
+    },
+    "49313": {
+      "standard_magnitude": 7.53
+    },
+    "49314": {
+      "standard_magnitude": 7.52
+    },
+    "49330": {
+      "standard_magnitude": 2.04
+    },
+    "49332": {
+      "standard_magnitude": 3.09
+    },
+    "49333": {
+      "standard_magnitude": 0.74
+    },
+    "49387": {
+      "standard_magnitude": 5.56
+    },
+    "49396": {
+      "standard_magnitude": 9.86
+    },
+    "49399": {
+      "standard_magnitude": 7.37
+    },
+    "49400": {
+      "standard_magnitude": 7.45
+    },
+    "49464": {
+      "standard_magnitude": 6.44
+    },
+    "49465": {
+      "standard_magnitude": 6.29
+    },
+    "49466": {
+      "standard_magnitude": 6.3
+    },
+    "49469": {
+      "standard_magnitude": 9.84
+    },
+    "49495": {
+      "standard_magnitude": 5.31
+    },
+    "49809": {
+      "standard_magnitude": 3.85
+    },
+    "49810": {
+      "standard_magnitude": 3.45
+    },
+    "49950": {
+      "standard_magnitude": 7.82
+    },
+    "50212": {
+      "standard_magnitude": 3.18
+    },
+    "50322": {
+      "standard_magnitude": 2.03
+    },
+    "50466": {
+      "standard_magnitude": 6.89
+    },
+    "50469": {
+      "standard_magnitude": 7.6
+    },
+    "50470": {
+      "standard_magnitude": 7.59
+    },
+    "50471": {
+      "standard_magnitude": 7.55
+    },
+    "50472": {
+      "standard_magnitude": 7.55
+    },
+    "50473": {
+      "standard_magnitude": 7.49
+    },
+    "50474": {
+      "standard_magnitude": 7.61
+    },
+    "50475": {
+      "standard_magnitude": 7.47
+    },
+    "50476": {
+      "standard_magnitude": 7.7
+    },
+    "50477": {
+      "standard_magnitude": 7.58
+    },
+    "50478": {
+      "standard_magnitude": 7.59
+    },
+    "50479": {
+      "standard_magnitude": 7.53
+    },
+    "50480": {
+      "standard_magnitude": 7.32
+    },
+    "50481": {
+      "standard_magnitude": 7.3
+    },
+    "50482": {
+      "standard_magnitude": 7.49
+    },
+    "50483": {
+      "standard_magnitude": 7.51
+    },
+    "50484": {
+      "standard_magnitude": 7.5
+    },
+    "50485": {
+      "standard_magnitude": 7.37
+    },
+    "50486": {
+      "standard_magnitude": 7.71
+    },
+    "50487": {
+      "standard_magnitude": 7.51
+    },
+    "50488": {
+      "standard_magnitude": 7.6
+    },
+    "50489": {
+      "standard_magnitude": 7.47
+    },
+    "50490": {
+      "standard_magnitude": 7.5
+    },
+    "50491": {
+      "standard_magnitude": 7.63
+    },
+    "50492": {
+      "standard_magnitude": 7.58
+    },
+    "50493": {
+      "standard_magnitude": 7.54
+    },
+    "50494": {
+      "standard_magnitude": 7.49
+    },
+    "50495": {
+      "standard_magnitude": 7.46
+    },
+    "50496": {
+      "standard_magnitude": 7.57
+    },
+    "50497": {
+      "standard_magnitude": 7.54
+    },
+    "50498": {
+      "standard_magnitude": 7.51
+    },
+    "50499": {
+      "standard_magnitude": 7.51
+    },
+    "50500": {
+      "standard_magnitude": 7.62
+    },
+    "50501": {
+      "standard_magnitude": 7.63
+    },
+    "50502": {
+      "standard_magnitude": 7.45
+    },
+    "50503": {
+      "standard_magnitude": 7.54
+    },
+    "50504": {
+      "standard_magnitude": 7.39
+    },
+    "50993": {
+      "standard_magnitude": 7.67
+    },
+    "51060": {
+      "standard_magnitude": 9.38
+    },
+    "51061": {
+      "standard_magnitude": 9.09
+    },
+    "51284": {
+      "standard_magnitude": 4.94
+    },
+    "51444": {
+      "standard_magnitude": 4.2
+    },
+    "51445": {
+      "standard_magnitude": 3.97
+    },
+    "51622": {
+      "standard_magnitude": 7.6
+    },
+    "51623": {
+      "standard_magnitude": 7.59
+    },
+    "51624": {
+      "standard_magnitude": 7.6
+    },
+    "51625": {
+      "standard_magnitude": 7.69
+    },
+    "51626": {
+      "standard_magnitude": 7.43
+    },
+    "51627": {
+      "standard_magnitude": 7.46
+    },
+    "51628": {
+      "standard_magnitude": 7.57
+    },
+    "51629": {
+      "standard_magnitude": 7.53
+    },
+    "51630": {
+      "standard_magnitude": 7.55
+    },
+    "51631": {
+      "standard_magnitude": 7.66
+    },
+    "51632": {
+      "standard_magnitude": 7.45
+    },
+    "51633": {
+      "standard_magnitude": 7.62
+    },
+    "51634": {
+      "standard_magnitude": 7.55
+    },
+    "51635": {
+      "standard_magnitude": 7.6
+    },
+    "51636": {
+      "standard_magnitude": 7.41
+    },
+    "51637": {
+      "standard_magnitude": 7.58
+    },
+    "51638": {
+      "standard_magnitude": 7.64
+    },
+    "51639": {
+      "standard_magnitude": 7.41
+    },
+    "51640": {
+      "standard_magnitude": 7.7
+    },
+    "51641": {
+      "standard_magnitude": 7.73
+    },
+    "51642": {
+      "standard_magnitude": 7.58
+    },
+    "51643": {
+      "standard_magnitude": 7.62
+    },
+    "51644": {
+      "standard_magnitude": 7.66
+    },
+    "51646": {
+      "standard_magnitude": 7.55
+    },
+    "51647": {
+      "standard_magnitude": 7.63
+    },
+    "51648": {
+      "standard_magnitude": 7.59
+    },
+    "51649": {
+      "standard_magnitude": 7.54
+    },
+    "51650": {
+      "standard_magnitude": 7.68
+    },
+    "51651": {
+      "standard_magnitude": 7.6
+    },
+    "51652": {
+      "standard_magnitude": 7.43
+    },
+    "51653": {
+      "standard_magnitude": 7.6
+    },
+    "51654": {
+      "standard_magnitude": 7.68
+    },
+    "51655": {
+      "standard_magnitude": 7.51
+    },
+    "51822": {
+      "standard_magnitude": 5.13
+    },
+    "51951": {
+      "standard_magnitude": 6.33
+    },
+    "52157": {
+      "standard_magnitude": 9.56
+    },
+    "52159": {
+      "standard_magnitude": 5.68
+    },
+    "52196": {
+      "standard_magnitude": 7.04
+    },
+    "52200": {
+      "standard_magnitude": 5.2
+    },
+    "52257": {
+      "standard_magnitude": 4.59
+    },
+    "52259": {
+      "standard_magnitude": 3.74
+    },
+    "52422": {
+      "standard_magnitude": 9.07
+    },
+    "52754": {
+      "standard_magnitude": 9.53
+    },
+    "52756": {
+      "standard_magnitude": 9.51
+    },
+    "52757": {
+      "standard_magnitude": 9.3
+    },
+    "52760": {
+      "standard_magnitude": 8.47
+    },
+    "52761": {
+      "standard_magnitude": 7.27
+    },
+    "52763": {
+      "standard_magnitude": 8.41
+    },
+    "52771": {
+      "standard_magnitude": 9.5
+    },
+    "52887": {
+      "standard_magnitude": 3.31
+    },
+    "52888": {
+      "standard_magnitude": 6.28
+    },
+    "52889": {
+      "standard_magnitude": 7.35
+    },
+    "52890": {
+      "standard_magnitude": 7.15
+    },
+    "52891": {
+      "standard_magnitude": 6.13
+    },
+    "52892": {
+      "standard_magnitude": 7.3
+    },
+    "52912": {
+      "standard_magnitude": 5.15
+    },
+    "53043": {
+      "standard_magnitude": 6.43,
+      "rcs_m2": 22.68
+    },
+    "53100": {
+      "standard_magnitude": 1.98
+    },
+    "53204": {
+      "standard_magnitude": 7.13,
+      "rcs_m2": 22.68
+    },
+    "53346": {
+      "standard_magnitude": 4.88
+    },
+    "53468": {
+      "standard_magnitude": 7.14,
+      "rcs_m2": 22.68
+    },
+    "53676": {
+      "standard_magnitude": 6.3,
+      "rcs_m2": 22.68
+    },
+    "53754": {
+      "standard_magnitude": 7.51
+    },
+    "53757": {
+      "standard_magnitude": 7.89
+    },
+    "53758": {
+      "standard_magnitude": 7.53
+    },
+    "53807": {
+      "standard_magnitude": 5.43
+    },
+    "54020": {
+      "standard_magnitude": 7.54
+    },
+    "54021": {
+      "standard_magnitude": 7.57
+    },
+    "54023": {
+      "standard_magnitude": 7.89
+    },
+    "54029": {
+      "standard_magnitude": 5.82
+    },
+    "54035": {
+      "standard_magnitude": 4.03
+    },
+    "54039": {
+      "standard_magnitude": 2.91
+    },
+    "54048": {
+      "standard_magnitude": 2.46
+    },
+    "54113": {
+      "standard_magnitude": 7.53
+    },
+    "54114": {
+      "standard_magnitude": 7.44
+    },
+    "54115": {
+      "standard_magnitude": 7.53
+    },
+    "54116": {
+      "standard_magnitude": 7.48
+    },
+    "54117": {
+      "standard_magnitude": 7.65
+    },
+    "54118": {
+      "standard_magnitude": 7.6
+    },
+    "54119": {
+      "standard_magnitude": 7.79
+    },
+    "54120": {
+      "standard_magnitude": 7.37
+    },
+    "54121": {
+      "standard_magnitude": 7.59
+    },
+    "54122": {
+      "standard_magnitude": 7.4
+    },
+    "54123": {
+      "standard_magnitude": 7.39
+    },
+    "54124": {
+      "standard_magnitude": 7.54
+    },
+    "54125": {
+      "standard_magnitude": 7.43
+    },
+    "54126": {
+      "standard_magnitude": 7.59
+    },
+    "54127": {
+      "standard_magnitude": 7.55
+    },
+    "54128": {
+      "standard_magnitude": 7.63
+    },
+    "54129": {
+      "standard_magnitude": 7.53
+    },
+    "54130": {
+      "standard_magnitude": 7.66
+    },
+    "54131": {
+      "standard_magnitude": 7.4
+    },
+    "54132": {
+      "standard_magnitude": 7.24
+    },
+    "54133": {
+      "standard_magnitude": 7.51
+    },
+    "54134": {
+      "standard_magnitude": 7.55
+    },
+    "54135": {
+      "standard_magnitude": 7.59
+    },
+    "54136": {
+      "standard_magnitude": 7.51
+    },
+    "54137": {
+      "standard_magnitude": 7.53
+    },
+    "54138": {
+      "standard_magnitude": 7.44
+    },
+    "54139": {
+      "standard_magnitude": 7.63
+    },
+    "54140": {
+      "standard_magnitude": 7.6
+    },
+    "54141": {
+      "standard_magnitude": 7.68
+    },
+    "54142": {
+      "standard_magnitude": 7.63
+    },
+    "54143": {
+      "standard_magnitude": 7.7
+    },
+    "54144": {
+      "standard_magnitude": 7.5
+    },
+    "54145": {
+      "standard_magnitude": 7.57
+    },
+    "54146": {
+      "standard_magnitude": 7.44
+    },
+    "54147": {
+      "standard_magnitude": 7.47
+    },
+    "54148": {
+      "standard_magnitude": 7.59
+    },
+    "54149": {
+      "standard_magnitude": 4
+    },
+    "54234": {
+      "standard_magnitude": 4.43
+    },
+    "54259": {
+      "standard_magnitude": 3.15
+    },
+    "54642": {
+      "standard_magnitude": 7.46
+    },
+    "54643": {
+      "standard_magnitude": 7.58
+    },
+    "54644": {
+      "standard_magnitude": 7.64
+    },
+    "54645": {
+      "standard_magnitude": 7.37
+    },
+    "54646": {
+      "standard_magnitude": 7.74
+    },
+    "54647": {
+      "standard_magnitude": 7.81
+    },
+    "54648": {
+      "standard_magnitude": 7.41
+    },
+    "54649": {
+      "standard_magnitude": 7.77
+    },
+    "54650": {
+      "standard_magnitude": 7.63
+    },
+    "54651": {
+      "standard_magnitude": 7.64
+    },
+    "54652": {
+      "standard_magnitude": 7.75
+    },
+    "54653": {
+      "standard_magnitude": 7.92
+    },
+    "54654": {
+      "standard_magnitude": 7.64
+    },
+    "54655": {
+      "standard_magnitude": 7.93
+    },
+    "54656": {
+      "standard_magnitude": 7.65
+    },
+    "54657": {
+      "standard_magnitude": 7.61
+    },
+    "54658": {
+      "standard_magnitude": 7.51
+    },
+    "54659": {
+      "standard_magnitude": 7.73
+    },
+    "54660": {
+      "standard_magnitude": 7.78
+    },
+    "54661": {
+      "standard_magnitude": 7.6
+    },
+    "54662": {
+      "standard_magnitude": 7.56
+    },
+    "54663": {
+      "standard_magnitude": 7.57
+    },
+    "54664": {
+      "standard_magnitude": 7.8
+    },
+    "54665": {
+      "standard_magnitude": 7.56
+    },
+    "54666": {
+      "standard_magnitude": 7.53
+    },
+    "54667": {
+      "standard_magnitude": 7.69
+    },
+    "54668": {
+      "standard_magnitude": 7.6
+    },
+    "54669": {
+      "standard_magnitude": 7.67
+    },
+    "54670": {
+      "standard_magnitude": 7.63
+    },
+    "54671": {
+      "standard_magnitude": 7.8
+    },
+    "54672": {
+      "standard_magnitude": 7.8
+    },
+    "54673": {
+      "standard_magnitude": 7.74
+    },
+    "54674": {
+      "standard_magnitude": 7.67
+    },
+    "54675": {
+      "standard_magnitude": 7.77
+    },
+    "54676": {
+      "standard_magnitude": 7.66
+    },
+    "54677": {
+      "standard_magnitude": 7.6
+    },
+    "54678": {
+      "standard_magnitude": 7.45
+    },
+    "54679": {
+      "standard_magnitude": 7.51
+    },
+    "54680": {
+      "standard_magnitude": 7.33
+    },
+    "54681": {
+      "standard_magnitude": 7.68
+    },
+    "54687": {
+      "standard_magnitude": 8.8
+    },
+    "54743": {
+      "standard_magnitude": 0.05
+    },
+    "54754": {
+      "standard_magnitude": 4.09
+    },
+    "54755": {
+      "standard_magnitude": 3.16
+    },
+    "54756": {
+      "standard_magnitude": 3.91
+    },
+    "55015": {
+      "standard_magnitude": 8.88
+    },
+    "55051": {
+      "standard_magnitude": 7.9
+    },
+    "55060": {
+      "standard_magnitude": 7.96
+    },
+    "55093": {
+      "standard_magnitude": 8.66
+    },
+    "55140": {
+      "standard_magnitude": 7.3
+    },
+    "55141": {
+      "standard_magnitude": 7.61
+    },
+    "55142": {
+      "standard_magnitude": 7.38
+    },
+    "55143": {
+      "standard_magnitude": 7.34
+    },
+    "55144": {
+      "standard_magnitude": 7.63
+    },
+    "55145": {
+      "standard_magnitude": 7.68
+    },
+    "55146": {
+      "standard_magnitude": 7.69
+    },
+    "55147": {
+      "standard_magnitude": 7.88
+    },
+    "55148": {
+      "standard_magnitude": 7.91
+    },
+    "55149": {
+      "standard_magnitude": 7.67
+    },
+    "55150": {
+      "standard_magnitude": 7.55
+    },
+    "55151": {
+      "standard_magnitude": 7.69
+    },
+    "55152": {
+      "standard_magnitude": 7.63
+    },
+    "55153": {
+      "standard_magnitude": 7.51
+    },
+    "55154": {
+      "standard_magnitude": 7.52
+    },
+    "55155": {
+      "standard_magnitude": 7.65
+    },
+    "55156": {
+      "standard_magnitude": 7.28
+    },
+    "55157": {
+      "standard_magnitude": 7.42
+    },
+    "55158": {
+      "standard_magnitude": 7.55
+    },
+    "55159": {
+      "standard_magnitude": 7.04
+    },
+    "55160": {
+      "standard_magnitude": 7.7
+    },
+    "55161": {
+      "standard_magnitude": 7.42
+    },
+    "55162": {
+      "standard_magnitude": 7.35
+    },
+    "55163": {
+      "standard_magnitude": 7.28
+    },
+    "55164": {
+      "standard_magnitude": 7.08
+    },
+    "55165": {
+      "standard_magnitude": 7.54
+    },
+    "55166": {
+      "standard_magnitude": 7.37
+    },
+    "55167": {
+      "standard_magnitude": 7.66
+    },
+    "55168": {
+      "standard_magnitude": 7.66
+    },
+    "55169": {
+      "standard_magnitude": 7.57
+    },
+    "55170": {
+      "standard_magnitude": 7.43
+    },
+    "55171": {
+      "standard_magnitude": 7.48
+    },
+    "55172": {
+      "standard_magnitude": 7.68
+    },
+    "55173": {
+      "standard_magnitude": 7.6
+    },
+    "55174": {
+      "standard_magnitude": 7.54
+    },
+    "55175": {
+      "standard_magnitude": 7.46
+    },
+    "55176": {
+      "standard_magnitude": 7.57
+    },
+    "55177": {
+      "standard_magnitude": 7.51
+    },
+    "55178": {
+      "standard_magnitude": 7.59
+    },
+    "55179": {
+      "standard_magnitude": 7.53
+    },
+    "55239": {
+      "standard_magnitude": 2.46
+    },
+    "55326": {
+      "standard_magnitude": 9.31
+    },
+    "55327": {
+      "standard_magnitude": 9.63
+    },
+    "55329": {
+      "standard_magnitude": 5.07
+    },
+    "55690": {
+      "standard_magnitude": 6.85
+    },
+    "55796": {
+      "standard_magnitude": 7.6
+    },
+    "55797": {
+      "standard_magnitude": 7.5
+    },
+    "55798": {
+      "standard_magnitude": 7.14
+    },
+    "55799": {
+      "standard_magnitude": 7.4
+    },
+    "55800": {
+      "standard_magnitude": 7.36
+    },
+    "55801": {
+      "standard_magnitude": 7.11
+    },
+    "55802": {
+      "standard_magnitude": 7.39
+    },
+    "55803": {
+      "standard_magnitude": 7.58
+    },
+    "55804": {
+      "standard_magnitude": 7.5
+    },
+    "55805": {
+      "standard_magnitude": 7.59
+    },
+    "55806": {
+      "standard_magnitude": 7.32
+    },
+    "55807": {
+      "standard_magnitude": 7.42
+    },
+    "55808": {
+      "standard_magnitude": 7.71
+    },
+    "55809": {
+      "standard_magnitude": 7.36
+    },
+    "55810": {
+      "standard_magnitude": 7.42
+    },
+    "55811": {
+      "standard_magnitude": 7.26
+    },
+    "55812": {
+      "standard_magnitude": 7.46
+    },
+    "55813": {
+      "standard_magnitude": 7.38
+    },
+    "55814": {
+      "standard_magnitude": 7.52
+    },
+    "55815": {
+      "standard_magnitude": 7.4
+    },
+    "55816": {
+      "standard_magnitude": 7.56
+    },
+    "55817": {
+      "standard_magnitude": 7.68
+    },
+    "55818": {
+      "standard_magnitude": 7.54
+    },
+    "55819": {
+      "standard_magnitude": 7.58
+    },
+    "55820": {
+      "standard_magnitude": 7.32
+    },
+    "55821": {
+      "standard_magnitude": 7.58
+    },
+    "55822": {
+      "standard_magnitude": 7.64
+    },
+    "55823": {
+      "standard_magnitude": 7.62
+    },
+    "55824": {
+      "standard_magnitude": 7.61
+    },
+    "55825": {
+      "standard_magnitude": 7.34
+    },
+    "55826": {
+      "standard_magnitude": 7.65
+    },
+    "55827": {
+      "standard_magnitude": 7.48
+    },
+    "55828": {
+      "standard_magnitude": 7.64
+    },
+    "55829": {
+      "standard_magnitude": 7.5
+    },
+    "55830": {
+      "standard_magnitude": 7.47
+    },
+    "55831": {
+      "standard_magnitude": 7.56
+    },
+    "55832": {
+      "standard_magnitude": 7.59
+    },
+    "55833": {
+      "standard_magnitude": 7.37
+    },
+    "55834": {
+      "standard_magnitude": 7.71
+    },
+    "55835": {
+      "standard_magnitude": 7.46
+    },
+    "55844": {
+      "standard_magnitude": 6.5
+    },
+    "55970": {
+      "standard_magnitude": 7
+    },
+    "55971": {
+      "standard_magnitude": 6.24
+    },
+    "55973": {
+      "standard_magnitude": 8.36
+    },
+    "55974": {
+      "standard_magnitude": 8.12
+    },
+    "55975": {
+      "standard_magnitude": 8.34
+    },
+    "55976": {
+      "standard_magnitude": 8.31
+    },
+    "56046": {
+      "standard_magnitude": 7.57
+    },
+    "56047": {
+      "standard_magnitude": 7.41
+    },
+    "56048": {
+      "standard_magnitude": 7.79
+    },
+    "56049": {
+      "standard_magnitude": 7.35
+    },
+    "56050": {
+      "standard_magnitude": 7.67
+    },
+    "56051": {
+      "standard_magnitude": 7.23
+    },
+    "56052": {
+      "standard_magnitude": 7.36
+    },
+    "56053": {
+      "standard_magnitude": 7.56
+    },
+    "56054": {
+      "standard_magnitude": 7.52
+    },
+    "56055": {
+      "standard_magnitude": 7.82
+    },
+    "56056": {
+      "standard_magnitude": 7.69
+    },
+    "56057": {
+      "standard_magnitude": 7.65
+    },
+    "56058": {
+      "standard_magnitude": 7.7
+    },
+    "56059": {
+      "standard_magnitude": 7.43
+    },
+    "56060": {
+      "standard_magnitude": 7.83
+    },
+    "56061": {
+      "standard_magnitude": 7.71
+    },
+    "56062": {
+      "standard_magnitude": 7.71
+    },
+    "56063": {
+      "standard_magnitude": 7.76
+    },
+    "56064": {
+      "standard_magnitude": 7.61
+    },
+    "56065": {
+      "standard_magnitude": 7.82
+    },
+    "56066": {
+      "standard_magnitude": 7.57
+    },
+    "56067": {
+      "standard_magnitude": 7.59
+    },
+    "56068": {
+      "standard_magnitude": 7.12
+    },
+    "56069": {
+      "standard_magnitude": 7.65
+    },
+    "56070": {
+      "standard_magnitude": 7.57
+    },
+    "56071": {
+      "standard_magnitude": 7.46
+    },
+    "56072": {
+      "standard_magnitude": 7.58
+    },
+    "56073": {
+      "standard_magnitude": 7.6
+    },
+    "56074": {
+      "standard_magnitude": 7.75
+    },
+    "56075": {
+      "standard_magnitude": 7.59
+    },
+    "56076": {
+      "standard_magnitude": 7.46
+    },
+    "56077": {
+      "standard_magnitude": 7.59
+    },
+    "56078": {
+      "standard_magnitude": 7.71
+    },
+    "56079": {
+      "standard_magnitude": 7.78
+    },
+    "56080": {
+      "standard_magnitude": 7.48
+    },
+    "56081": {
+      "standard_magnitude": 7.47
+    },
+    "56191": {
+      "standard_magnitude": 8.34
+    },
+    "56192": {
+      "standard_magnitude": 7.95
+    },
+    "56193": {
+      "standard_magnitude": 8.66
+    },
+    "56200": {
+      "standard_magnitude": 7.79
+    },
+    "56232": {
+      "standard_magnitude": 4.45
+    },
+    "56710": {
+      "standard_magnitude": 7.41
+    },
+    "56711": {
+      "standard_magnitude": 7.33
+    },
+    "56712": {
+      "standard_magnitude": 7.61
+    },
+    "56713": {
+      "standard_magnitude": 7.26
+    },
+    "56714": {
+      "standard_magnitude": 7.87
+    },
+    "56715": {
+      "standard_magnitude": 7.65
+    },
+    "56716": {
+      "standard_magnitude": 7.59
+    },
+    "56717": {
+      "standard_magnitude": 7.09
+    },
+    "56718": {
+      "standard_magnitude": 7.37
+    },
+    "56719": {
+      "standard_magnitude": 7.49
+    },
+    "56720": {
+      "standard_magnitude": 7.54
+    },
+    "56721": {
+      "standard_magnitude": 7.35
+    },
+    "56722": {
+      "standard_magnitude": 7.56
+    },
+    "56723": {
+      "standard_magnitude": 7.69
+    },
+    "56724": {
+      "standard_magnitude": 7.57
+    },
+    "56725": {
+      "standard_magnitude": 7.4
+    },
+    "56726": {
+      "standard_magnitude": 5.34
+    },
+    "56727": {
+      "standard_magnitude": 5.96
+    },
+    "56728": {
+      "standard_magnitude": 5.82
+    },
+    "56729": {
+      "standard_magnitude": 5.81
+    },
+    "56730": {
+      "standard_magnitude": 5.61
+    },
+    "56744": {
+      "standard_magnitude": 9.33
+    },
+    "56745": {
+      "standard_magnitude": 7.61
+    },
+    "56757": {
+      "standard_magnitude": 1.57
+    },
+    "56934": {
+      "standard_magnitude": 9.81
+    },
+    "56950": {
+      "standard_magnitude": 8.27
+    },
+    "56955": {
+      "standard_magnitude": 7.37
+    },
+    "56956": {
+      "standard_magnitude": 7.32
+    },
+    "56957": {
+      "standard_magnitude": 7.53
+    },
+    "56958": {
+      "standard_magnitude": 8.4
+    },
+    "56962": {
+      "standard_magnitude": 8.34
+    },
+    "56970": {
+      "standard_magnitude": 8.91
+    },
+    "57177": {
+      "standard_magnitude": 8.6
+    },
+    "57213": {
+      "standard_magnitude": 0.2
+    },
+    "57399": {
+      "standard_magnitude": 8.71
+    },
+    "57400": {
+      "standard_magnitude": 8.41
+    },
+    "57401": {
+      "standard_magnitude": 8.25
+    },
+    "57402": {
+      "standard_magnitude": 8.71
+    },
+    "57519": {
+      "standard_magnitude": 3.57
+    },
+    "57654": {
+      "standard_magnitude": 4.5
+    },
+    "58296": {
+      "standard_magnitude": 8.62
+    },
+    "58347": {
+      "standard_magnitude": 4.45
+    },
+    "58643": {
+      "standard_magnitude": 6.98
+    },
+    "58644": {
+      "standard_magnitude": 5.7
+    },
+    "58645": {
+      "standard_magnitude": 9.49
+    },
+    "58646": {
+      "standard_magnitude": 9.01
+    },
+    "58647": {
+      "standard_magnitude": 8.77
+    },
+    "58648": {
+      "standard_magnitude": 9.01
+    },
+    "58654": {
+      "standard_magnitude": 3.8
+    },
+    "58655": {
+      "standard_magnitude": 3.69
+    },
+    "58661": {
+      "standard_magnitude": 8.27
+    },
+    "58663": {
+      "standard_magnitude": 8.31
+    },
+    "58698": {
+      "standard_magnitude": 0.73
+    },
+    "58700": {
+      "standard_magnitude": 8.27
+    },
+    "58701": {
+      "standard_magnitude": 8.3
+    },
+    "58702": {
+      "standard_magnitude": 8.42
+    },
+    "58703": {
+      "standard_magnitude": 7.89
+    },
+    "58899": {
+      "standard_magnitude": 8.31
+    },
+    "58900": {
+      "standard_magnitude": 8.64
+    },
+    "58903": {
+      "standard_magnitude": 9.25
+    },
+    "59065": {
+      "standard_magnitude": 7.65
+    },
+    "59069": {
+      "standard_magnitude": 1.27
+    },
+    "59146": {
+      "standard_magnitude": 8.31
+    },
+    "59346": {
+      "standard_magnitude": 2
+    },
+    "59588": {
+      "standard_magnitude": 8.97
+    },
+    "59600": {
+      "standard_magnitude": 2.93
+    },
+    "59625": {
+      "standard_magnitude": 7.03
+    },
+    "59814": {
+      "standard_magnitude": 5.93
+    },
+    "59815": {
+      "standard_magnitude": 6.82
+    },
+    "59816": {
+      "standard_magnitude": 6.15
+    },
+    "59817": {
+      "standard_magnitude": 5.95
+    },
+    "59818": {
+      "standard_magnitude": 6.84
+    },
+    "59820": {
+      "standard_magnitude": 6.03
+    },
+    "59821": {
+      "standard_magnitude": 6.45
+    },
+    "59823": {
+      "standard_magnitude": 6.55
+    },
+    "59824": {
+      "standard_magnitude": 6.55
+    },
+    "59825": {
+      "standard_magnitude": 7.36
+    },
+    "59826": {
+      "standard_magnitude": 6.13
+    },
+    "59827": {
+      "standard_magnitude": 6.91
+    },
+    "59829": {
+      "standard_magnitude": 6.28
+    },
+    "59830": {
+      "standard_magnitude": 6.82
+    },
+    "59831": {
+      "standard_magnitude": 6.48
+    },
+    "59832": {
+      "standard_magnitude": 6.5
+    },
+    "59833": {
+      "standard_magnitude": 6.1
+    },
+    "59834": {
+      "standard_magnitude": 6.87
+    },
+    "60079": {
+      "standard_magnitude": 8.7
+    },
+    "60083": {
+      "standard_magnitude": 7.99
+    },
+    "60084": {
+      "standard_magnitude": 9.26
+    },
+    "60086": {
+      "standard_magnitude": 1.1
+    },
+    "60163": {
+      "standard_magnitude": 6.33
+    },
+    "60165": {
+      "standard_magnitude": 6.82
+    },
+    "60166": {
+      "standard_magnitude": 6.31
+    },
+    "60167": {
+      "standard_magnitude": 6.37
+    },
+    "60168": {
+      "standard_magnitude": 6.88
+    },
+    "60171": {
+      "standard_magnitude": 7.5
+    },
+    "60173": {
+      "standard_magnitude": 6.81
+    },
+    "60175": {
+      "standard_magnitude": 6.88
+    },
+    "60176": {
+      "standard_magnitude": 6.78
+    },
+    "60182": {
+      "standard_magnitude": 1.88
+    },
+    "60240": {
+      "standard_magnitude": 9.02
+    },
+    "60379": {
+      "standard_magnitude": 5.24
+    },
+    "60380": {
+      "standard_magnitude": 5.31
+    },
+    "60381": {
+      "standard_magnitude": 5.16
+    },
+    "60382": {
+      "standard_magnitude": 4.74
+    },
+    "60383": {
+      "standard_magnitude": 5.06
+    },
+    "60384": {
+      "standard_magnitude": 5.09
+    },
+    "60385": {
+      "standard_magnitude": 6.28
+    },
+    "60386": {
+      "standard_magnitude": 5.01
+    },
+    "60387": {
+      "standard_magnitude": 5.14
+    },
+    "60388": {
+      "standard_magnitude": 5.24
+    },
+    "60389": {
+      "standard_magnitude": 5.04
+    },
+    "60390": {
+      "standard_magnitude": 5.06
+    },
+    "60391": {
+      "standard_magnitude": 5.71
+    },
+    "60392": {
+      "standard_magnitude": 5.05
+    },
+    "60393": {
+      "standard_magnitude": 5.18
+    },
+    "60394": {
+      "standard_magnitude": 5.21
+    },
+    "60395": {
+      "standard_magnitude": 5.29
+    },
+    "60396": {
+      "standard_magnitude": 5.37
+    },
+    "60452": {
+      "standard_magnitude": 7.52
+    },
+    "60453": {
+      "standard_magnitude": 6.69
+    },
+    "60471": {
+      "standard_magnitude": 7.39
+    },
+    "60496": {
+      "standard_magnitude": 8.61
+    },
+    "60504": {
+      "standard_magnitude": 6.11
+    },
+    "60532": {
+      "standard_magnitude": 9.33
+    },
+    "60537": {
+      "standard_magnitude": 8.06
+    },
+    "60539": {
+      "standard_magnitude": 6.44
+    },
+    "60540": {
+      "standard_magnitude": 9.28
+    },
+    "60541": {
+      "standard_magnitude": 4.67
+    },
+    "60542": {
+      "standard_magnitude": 5.32
+    },
+    "60543": {
+      "standard_magnitude": 7.21
+    },
+    "60544": {
+      "standard_magnitude": 5.59
+    },
+    "60546": {
+      "standard_magnitude": 8.87
+    },
+    "60549": {
+      "standard_magnitude": 8.67
+    },
+    "60550": {
+      "standard_magnitude": 8.66
+    },
+    "60552": {
+      "standard_magnitude": 9.43
+    },
+    "60989": {
+      "standard_magnitude": 6.62
+    },
+    "61186": {
+      "standard_magnitude": 1.97
+    },
+    "61594": {
+      "standard_magnitude": 7.33
+    },
+    "61595": {
+      "standard_magnitude": 7.64
+    },
+    "61596": {
+      "standard_magnitude": 7.36
+    },
+    "61597": {
+      "standard_magnitude": 7.48
+    },
+    "61598": {
+      "standard_magnitude": 8.03
+    },
+    "61599": {
+      "standard_magnitude": 7.43
+    },
+    "61600": {
+      "standard_magnitude": 7.74
+    },
+    "61601": {
+      "standard_magnitude": 7.89
+    },
+    "61602": {
+      "standard_magnitude": 7.81
+    },
+    "61603": {
+      "standard_magnitude": 7.68
+    },
+    "61604": {
+      "standard_magnitude": 7.56
+    },
+    "61605": {
+      "standard_magnitude": 8
+    },
+    "61606": {
+      "standard_magnitude": 7.94
+    },
+    "61607": {
+      "standard_magnitude": 7.61
+    },
+    "61608": {
+      "standard_magnitude": 7.54
+    },
+    "61609": {
+      "standard_magnitude": 7.71
+    },
+    "61610": {
+      "standard_magnitude": 6.96
+    },
+    "61611": {
+      "standard_magnitude": 7.3
+    },
+    "61612": {
+      "standard_magnitude": 7.87
+    },
+    "61613": {
+      "standard_magnitude": 7.63
+    },
+    "62339": {
+      "standard_magnitude": 3.81
+    },
+    "64878": {
+      "standard_magnitude": 8.07
+    },
+    "66004": {
+      "standard_magnitude": 3.24
+    },
+    "66515": {
+      "standard_magnitude": 5.1
+    },
+    "69123": {
+      "standard_magnitude": 6.04
+    },
+    "69182": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69183": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69184": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69185": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69186": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69187": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69188": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69189": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69190": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69191": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69192": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69193": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69194": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69195": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69196": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69197": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69198": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69199": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69200": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69201": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69202": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69203": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69204": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69205": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69206": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69207": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69208": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69209": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69210": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69211": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69212": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69213": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69214": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69215": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69216": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69217": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69218": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69219": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69220": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69221": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69222": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69223": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69224": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69225": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69226": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69227": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69228": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69229": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69230": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69231": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69232": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69233": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69234": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69238": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69239": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69240": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69241": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69242": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69243": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69244": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69245": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69246": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69247": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69248": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69249": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69250": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69251": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69252": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69253": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69254": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69255": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69256": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69257": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69258": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69259": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69260": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69261": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69262": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69263": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69264": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69265": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69266": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69296": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69297": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69298": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69299": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69300": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69301": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69302": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69303": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69304": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69305": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69306": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69307": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69308": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69309": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69310": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69311": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69312": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69313": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69314": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69315": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69316": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69317": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69318": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69319": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69329": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69330": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69331": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69332": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69333": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69334": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69335": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69336": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69337": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69338": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69339": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69340": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69341": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69342": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69343": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69344": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69345": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69346": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69347": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69348": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69349": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69350": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69351": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69352": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69353": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69354": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69355": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69356": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69357": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69358": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69359": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69360": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69361": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69362": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69363": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69364": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69365": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69366": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69367": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69368": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69369": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69370": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69371": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69372": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69373": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69374": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69375": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69376": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69377": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69378": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69379": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69380": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69381": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69420": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69421": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69422": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69423": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69424": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69425": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69426": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69427": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69428": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69429": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69430": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69431": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69432": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69433": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69434": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69435": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69436": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69437": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69438": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69439": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69440": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69443": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69444": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69445": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69446": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69447": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69448": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69449": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69450": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69451": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69452": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69453": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69454": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69455": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69456": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69457": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69458": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69459": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69460": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69461": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69462": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69463": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69464": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69465": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69466": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69467": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69468": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69469": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69470": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69471": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69478": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69479": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69480": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69481": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69482": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69483": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69484": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69485": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69486": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69487": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69488": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69489": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69490": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69491": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69492": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69493": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69494": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69495": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69496": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69497": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69498": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69499": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69500": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69501": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69508": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69509": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69510": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69511": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69512": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69513": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69514": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69515": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69516": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69517": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69518": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69519": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69520": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69521": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69522": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69523": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69524": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69525": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69526": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69527": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69528": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69529": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69530": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69531": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69532": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69533": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69534": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69535": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "69536": {
+      "standard_magnitude": 5.89,
+      "rcs_m2": 22.68
+    },
+    "81111": {
+      "standard_magnitude": 8.02
+    },
+    "81134": {
+      "standard_magnitude": 7.43
+    },
+    "81605": {
+      "standard_magnitude": 8.24
+    },
+    "81683": {
+      "standard_magnitude": 9.65
+    },
+    "82783": {
+      "standard_magnitude": 8.07
+    },
+    "85210": {
+      "standard_magnitude": 9.27
+    },
+    "90007": {
+      "standard_magnitude": 3.5
+    },
+    "90087": {
+      "standard_magnitude": 2.5
+    },
+    "90103": {
+      "standard_magnitude": 3.68
+    },
+    "96058": {
+      "standard_magnitude": 2
+    }
+  }
+}

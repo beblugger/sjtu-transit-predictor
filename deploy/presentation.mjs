@@ -23,6 +23,12 @@ export function weatherCondition(snapshot, instant) {
 export function visibleDetailEntries(entries) {
   return entries.filter(([,value])=>value!==null&&value!==undefined&&String(value).trim()!==''&&!/未知|不可用|未设置|缺少|无法判断|尚未量化|^unknown$/i.test(String(value)));
 }
+export function brightnessLabel(event) {
+  if(event.satellite_sunlit===false)return '在地影中';
+  if(event.satellite_sunlit===true&&typeof event.satellite_magnitude==='number'&&Number.isFinite(event.satellite_magnitude))return `约 ${event.satellite_magnitude.toFixed(1)} 等`;
+  if(event.satellite_sunlit===true)return '受阳光照射，暂无星等估计';
+  return '受光状态待数据更新';
+}
 export function dataNotices({manifest,selected,backend,loadError='',now=Date.now()}) {
   const notices=[];
   const add=(level,text)=>notices.push({level,text});

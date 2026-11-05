@@ -90,7 +90,7 @@ class CelestrakProvider:
         self.update_url = update_url
         self.known_update_at: datetime | None = None
 
-    async def fetch_active(self, *, max_targets: int = 0) -> list[TLEEntry]:
+    async def fetch_active(self, *, max_targets: int = 0, allow_download: bool = True) -> list[TLEEntry]:
         headers = {
             "User-Agent": "sjtu-transit-predictor/0.1 (+https://github.com/beblugger/sjtu-transit-predictor)",
             "Accept": "application/json, text/plain",
@@ -112,6 +112,8 @@ class CelestrakProvider:
                 update_at = datetime.strptime(match[1], "%Y %b %d %H:%M:%S").replace(tzinfo=timezone.utc)
                 if self.known_update_at is not None and update_at <= self.known_update_at:
                     raise CatalogUnchanged(f"GP publication timestamp unchanged: {update_at.isoformat()}")
+                if not allow_download:
+                    raise CatalogUnchanged("CelesTrak daily download limit reached; retaining cached catalog")
             response = await client.get(self.url, headers=headers)
             if response.status_code == 403 and "has not updated" in response.text.lower():
                 raise CatalogUnchanged(response.text.strip())
