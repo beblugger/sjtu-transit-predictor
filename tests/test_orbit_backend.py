@@ -197,10 +197,12 @@ def test_old_epoch_is_not_excluded_from_geometry(tmp_path, monkeypatch):
     runtime.satellites._restore_cached_catalog()
     now = EPOCH + timedelta(days=3)
     visited = []
-    def candidates(record, target, observer, times, *args):
+    def candidates(record, target, observer, times, *args, **kwargs):
         visited.append(record.entry.norad_id)
         return []
     monkeypatch.setattr(runtime.satellites, "_candidate_windows", candidates)
+    monkeypatch.setattr(runtime.astronomy, "targets_at", lambda target, observer, times:
+                        tuple(np.full(len(times), value) for value in (180., 45., 1e11, 900.)))
     runtime.satellites._compute_events(now, now + timedelta(minutes=1), now, runtime.satellites.records)
     assert visited == [25544, 25544]
     runtime.store.close()

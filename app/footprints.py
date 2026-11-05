@@ -132,8 +132,9 @@ class FootprintSolver:
                 break
         area = cell.intersection(Polygon(vertices)) if len(vertices) >= 3 else Polygon()
         extent = math.hypot(xmax - xmin, ymax - ymin) * 3 + 1
+        buffered_cell = cell.buffer(.01)
         checks = [(np.array([x, y]), False) for x in (xmin, p[0], xmax) for y in (ymin, p[1], ymax)
-                  if cell.buffer(.01).covers(Point(x, y))]
+                  if buffered_cell.covers(Point(x, y))]
         seed = np.array(self.xy(self.event.observer.longitude, self.event.observer.latitude))
         seed_in_cell = cell.buffer(1e-6).covers(Point(seed))
         if seed_in_cell:
@@ -146,7 +147,7 @@ class FootprintSolver:
             for left, right in zip(vertices, vertices[1:]):
                 checks.append((np.array(left), False))
                 middle = (np.array(left) + np.array(right)) / 2
-                if cell.buffer(.01).covers(Point(middle)):
+                if buffered_cell.covers(Point(middle)):
                     checks.append((middle, False))
         contacts = []
         for level in (-radius, radius):
@@ -156,8 +157,15 @@ class FootprintSolver:
                     point = segment.interpolate(fraction, normalized=True)
                     contacts.append(np.array(point.coords[0]))
         checks.extend((q, True) for q in contacts)
-        errors, time_errors, accepted_contacts, fail = [], [], [], bool(area.is_empty and seed_in_cell)
+        # Corners and edge midpoints also occur in the rectangular sampling
+        # grid. Evaluate each physical point once, retaining contact checks.
+        unique_checks = {}
         for q, contact in checks:
+            key = tuple(q)
+            unique_checks[key] = unique_checks.get(key, False) or contact
+        errors, time_errors, accepted_contacts, fail = [], [], [], bool(area.is_empty and seed_in_cell)
+        for coordinates, contact in unique_checks.items():
+            q = np.asarray(coordinates)
             exact_t, (exact_g, exact_radius, exact_alt) = self.closest(q, predicted(q))
             margin = float(np.linalg.norm(exact_g)) - exact_radius
             linear_margin = abs(float(a @ (q - p)) + c) - radius

@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import math
+import sys
+import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
+from functools import lru_cache
 from threading import Lock
 
 import numpy as np
@@ -55,13 +58,17 @@ class CandidateWindow:
 
 
 @dataclass(frozen=True)
-class RefinedConjunction:
+class ClosestApproach:
     observer: ObserverPoint
     minimum_time: datetime
     minimum_separation_arcsec: float
     satellite: SatellitePosition
     target_position: TargetPosition
     threshold_arcsec: float
+
+
+@dataclass(frozen=True)
+class RefinedConjunction(ClosestApproach):
     start_time: datetime
     end_time: datetime
 
@@ -283,12 +290,24 @@ class SatelliteService:
             self.campus.center.altitude_m,
         )
         result: list[TransitEvent] = []
+        target_samples = []
         for target in (Target.SUN, Target.MOON):
             target_az, target_alt, _, target_radius = self.astronomy.targets_at(
                 target.value, center, coarse_times
             )
             target_vectors = unit_vector_rows(target_az, target_alt)
-            for record in records:
+            # This is the same visibility test as the candidate filter. If no
+            # segment can pass it, there is no need to propagate any objects.
+            if np.any(np.minimum(target_alt[:-1], target_alt[1:]) > -0.5):
+                target_samples.append((target, target_vectors, target_alt, target_radius))
+        started = last_progress = time.monotonic()
+        candidate_count = 0
+        for index, record in enumerate(records if target_samples else (), 1):
+            try:
+                satellite_samples = self.astronomy.satellite_vectors(record.satrec, center, coarse_times)
+            except RuntimeError:
+                continue
+            for target, target_vectors, target_alt, target_radius in target_samples:
                 try:
                     windows = self._candidate_windows(
                         record,
@@ -298,22 +317,38 @@ class SatelliteService:
                         target_vectors,
                         target_alt,
                         target_radius,
+                        satellite_samples=satellite_samples,
                     )
                 except RuntimeError:
                     continue
                 for window in windows:
+                    candidate_count += 1
                     event = self._select_and_refine(record, target, window, now)
                     if event is not None:
                         result.append(event)
+            if time.monotonic() - last_progress >= 30:
+                print(f"Search {start.isoformat()}: {index}/{len(records)} objects, "
+                      f"{candidate_count} candidates, {len(result)} events, "
+                      f"{time.monotonic() - started:.1f}s", file=sys.stderr, flush=True)
+                last_progress = time.monotonic()
         result.sort(key=lambda item: item.minimum_time)
         result = [event for event in result if start <= event.minimum_time < end]
         result = _deduplicate_events(result)
+        print(f"Search {start.isoformat()} complete: {len(records)} objects, "
+              f"{candidate_count} candidates, {len(result)} events in "
+              f"{time.monotonic() - started:.1f}s; computing visibility regions",
+              file=sys.stderr, flush=True)
         from app.footprints import FootprintSolver
         records_by_id = {record.entry.norad_id: record for record in records}
-        for event in result:
+        last_progress = time.monotonic()
+        for index, event in enumerate(result, 1):
             event.visibility = FootprintSolver(
                 self.astronomy, self.campus, records_by_id[int(event.identifier)], event,
             ).solve()
+            if time.monotonic() - last_progress >= 30:
+                print(f"Visibility {start.isoformat()}: {index}/{len(result)} regions",
+                      file=sys.stderr, flush=True)
+                last_progress = time.monotonic()
         with self._lock:
             self._event_cache = [event.model_copy(deep=True) for event in result]
             self._event_cache_key = (start, end)
@@ -328,10 +363,11 @@ class SatelliteService:
         target_vectors: np.ndarray,
         target_alt_deg: np.ndarray,
         target_radius_arcsec: np.ndarray,
+        *,
+        satellite_samples: tuple[np.ndarray, np.ndarray] | None = None,
     ) -> list[CandidateWindow]:
-        satellite_vectors, ranges = self.astronomy.satellite_vectors(
-            record.satrec, observer, times
-        )
+        satellite_vectors, ranges = (satellite_samples if satellite_samples is not None else
+                                     self.astronomy.satellite_vectors(record.satrec, observer, times))
         sat_alt_deg = np.degrees(np.arcsin(np.clip(satellite_vectors[:, 2], -1.0, 1.0)))
         finite_ranges = ranges[np.isfinite(ranges) & (ranges > 0)]
         if finite_ranges.size == 0:
@@ -387,7 +423,6 @@ class SatelliteService:
         )
         if candidate_indices.size == 0:
             return []
-        step = self.settings.satellite_coarse_step_seconds
         windows: list[CandidateWindow] = []
         for index in candidate_indices:
             left = times[int(index)]
@@ -443,11 +478,12 @@ class SatelliteService:
         if not ranked:
             return None
         candidates = ranked[: min(20, len(ranked))]
-        refined: list[RefinedConjunction] = []
+        refined: list[ClosestApproach] = []
         for _, point in candidates:
             try:
                 conjunction = self._refine_at_observer(
-                    record, target, point, window.center_time, target_at=target_at
+                    record, target, point, window.center_time, target_at=target_at,
+                    compute_contacts=False,
                 )
             except (RuntimeError, ValueError):
                 continue
@@ -457,7 +493,8 @@ class SatelliteService:
             return None
         best = min(refined, key=lambda item: item.minimum_separation_arcsec)
         for point in self.campus.refine(best.observer, self.settings.campus_refine_meters):
-            conjunction = self._refine_at_observer(record, target, point, best.minimum_time, target_at=target_at)
+            conjunction = self._refine_at_observer(record, target, point, best.minimum_time,
+                                                  target_at=target_at, compute_contacts=False)
             if conjunction and conjunction.minimum_separation_arcsec < best.minimum_separation_arcsec:
                 best = conjunction
         # Final event/contact times always use exact apparent places, independently
@@ -499,10 +536,12 @@ class SatelliteService:
         center_time: datetime,
         *,
         target_at=None,
-    ) -> RefinedConjunction | None:
+        compute_contacts: bool = True,
+    ) -> ClosestApproach | RefinedConjunction | None:
         observer = geodetic_for_observer(point)
         half_window = max(5.0, self.settings.satellite_coarse_step_seconds)
 
+        @lru_cache(maxsize=256)
         def evaluate(offset_seconds: float) -> tuple[datetime, SatellitePosition, TargetPosition, float]:
             value = center_time + timedelta(seconds=float(offset_seconds))
             target_position = (target_at(observer, value) if target_at else
@@ -533,6 +572,12 @@ class SatelliteService:
         threshold = target_pos.angular_radius_arcsec + sat_radius
         if min_sep > threshold:
             return None
+
+        # Ranking needs only the minimum. Solving both contacts at every grid
+        # point is especially costly for slow crossings that leave the local
+        # interpolation window. Only the selected observer needs contact times.
+        if not compute_contacts:
+            return ClosestApproach(point, minimum_time, min_sep, sat_pos, target_pos, threshold)
 
         start_s = _crossing_offset(
             evaluate,

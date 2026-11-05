@@ -97,3 +97,20 @@ def test_exterior_region_and_true_contact_boundaries_are_retained():
     assert shape(result['geometry']).bounds[2] > 500/original.east_scale
     assert not shape(result['boundaries']).is_empty
     assert not shape(result['centerline']).is_empty
+
+
+def test_duplicate_tile_checks_are_evaluated_once(monkeypatch):
+    solver = make_case()
+    closest = solver.closest
+    points = []
+
+    def counted(point, guess):
+        points.append(tuple(point))
+        return closest(point, guess)
+
+    monkeypatch.setattr(solver, 'closest', counted)
+    result = solver.solve()
+    assert len(result['models']) == 1
+    # The first call fits the tile model; subsequent calls validate its points.
+    assert len(points[1:]) == len(set(points[1:]))
+    assert result['contact_validation_count'] >= 6
