@@ -49,13 +49,16 @@ export function distanceMeters(a, b) {
   // Surface-height-zero ECEF chord, adequate for campus distances; not walking distance.
   return Math.hypot(...p.map((v, i) => v - q[i]));
 }
-export function filterEvents(events, filters, location = null, weather = null) {
+export function filterEvents(events, filters, location = null, weather = null, now = Date.now()) {
   const needle = filters.search.trim().toLowerCase();
+  // Silently exclude events whose minimum has already occurred. Callers may pass a
+  // fixed instant in tests; the UI passes the current time on every render.
+  const futureOnly = Number.isFinite(now);
   const result = events.filter(event => {
     const t = Date.parse(event.minimum_time), diameter = event.object_angular_diameter_arcsec;
     const distance = location && present(filters.maxDistance) ? visibilityAt(event, location)?.distance_m : null;
     return (!location || !present(filters.maxDistance) || (present(distance) && distance <= filters.maxDistance)) &&
-      t >= filters.from && t < filters.to &&
+      t >= filters.from && t < filters.to && (!futureOnly || t > now) &&
       (filters.target === 'all' || filters.target === event.target) &&
       (!needle || `${event.name} ${event.identifier}`.toLowerCase().includes(needle)) &&
       event.altitude_deg >= filters.minAltitude &&

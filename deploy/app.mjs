@@ -88,7 +88,7 @@ async function loadSnapshot() {
     Object.assign(state, {manifest: snapshot.manifest, events: snapshot.payload.events, campus: snapshot.campus});
     state.selected=state.events.find(e=>eventKey(e)===oldKey)||null;
     $('application').hidden = false; $('filter-controls').disabled = false;
-    // Default to the full snapshot coverage so past and future events are all inspectable.
+    // Keep the original full-coverage window; filterEvents silently hides past events.
     if(initial)setWindow(0, true);
     renderMetadata(); render();
     const hashKey = initial && new URLSearchParams(location.hash.slice(1)).get('event');
@@ -123,7 +123,7 @@ function setWindow(hours, all = false) {
   const m = state.manifest;
   const start = all ? Date.parse(m.from_time) : Math.max(Date.now(), Date.parse(m.from_time));
   const end = all ? Date.parse(m.to_time) : Math.min(start + hours * 3600000, Date.parse(m.to_time));
-  // Keep expired coverage inspectable; never quietly present it as upcoming.
+  // The window can still include past coverage; filterEvents silently hides those events.
   $('from').value = inputTime(start, state.zone);
   $('to').value = inputTime(Math.max(start, end), state.zone);
 }
@@ -142,6 +142,7 @@ function readFilters() {
 }
 function render() {
   if (!state.manifest) return;
+  const nowMs = Date.now();
   for(const field of ['weather','target'])for(const tab of document.querySelectorAll(`[data-${field}]`)){const active=tab.dataset[field]===$(field).value;tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;}
   const f = readFilters();
   const error = !Number.isFinite(f.from) || !Number.isFinite(f.to) ? '请输入完整的起止时间。' :
@@ -149,7 +150,7 @@ function render() {
     f.maxDistance !== null && (!Number.isFinite(f.maxDistance) || f.maxDistance < 0) ? '距可见区最大距离须为非负数，留空表示不限。' :
     !present(f.minAltitude) || f.minAltitude < 0 || f.minAltitude > 90 || !present(f.minDiameter) || f.minDiameter < 0 ? '高度角须为 0–90°，最小角直径须为非负数。' : '';
   $('filter-error').textContent = error;
-  state.filtered = error ? [] : filterEvents(state.events, f, state.location,state.weather);
+  state.filtered = error ? [] : filterEvents(state.events, f, state.location, state.weather, nowMs);
   const pages = Math.max(1, Math.ceil(state.filtered.length / PAGE_SIZE));
   state.page = Math.min(state.page, pages - 1);
   if (state.selected && state.sharedKey!==eventKey(state.selected) && !state.filtered.some(e => eventKey(e) === eventKey(state.selected))) state.selected = null;
@@ -489,6 +490,14 @@ document.addEventListener('pointerout',e=>{const anchor=e.target.closest('[data-
 window.addEventListener('scroll',hideWeatherHint,{passive:true,capture:true});
 window.addEventListener('blur',hideWeatherHint);
 setInterval(()=>{if(state.manifest)renderNotices();},60000);
+// Events cross their minimum while the page stays open; drop them without waiting
+// for the next five-minute data refresh.
+setInterval(()=>{
+  if(!state.manifest)return;
+  const now=Date.now();
+  const selectedExpired=state.selected && Date.parse(state.selected.minimum_time)<=now && state.sharedKey!==eventKey(state.selected);
+  if(state.filtered.some(e=>Date.parse(e.minimum_time)<=now) || selectedExpired) render();
+},30000);
 $('reload').addEventListener('click', loadSnapshot);
 window.addEventListener('hashchange', selectSharedEvent);
 for(const field of ['weather','target']){

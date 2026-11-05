@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {weatherCondition,visibleDetailEntries,dataNotices,brightnessLabel} from '../deploy/presentation.mjs';
 import {filterEvents} from '../deploy/core.mjs';
+const filterNow = Date.parse('2026-11-04T23:59:59Z');
 const weather={deterministic:{hourly:{times:['2026-11-05T00:00:00Z','2026-11-05T01:00:00Z','2026-11-05T02:00:00Z'],cloud_cover_pct:[5,95,60],weather_code:[0,3,2],precipitation_mm:[0,0,0]}}};
 test('sky conditions are independent of composite scores and do not extrapolate unavailable weather',()=>{
   assert.equal(weatherCondition(weather,'2026-11-05T00:00:00Z').kind,'clear');
@@ -12,8 +13,8 @@ test('sky conditions are independent of composite scores and do not extrapolate 
   const events=[{name:'a',identifier:'1',minimum_time:'2026-11-05T00:00:00Z',altitude_deg:30,object_angular_diameter_arcsec:null,weather:{decision:'suppressed'}},
     {name:'b',identifier:'2',minimum_time:'2026-11-05T01:00:00Z',altitude_deg:30,object_angular_diameter_arcsec:null,weather:{decision:'announced'}}];
   const f={search:'',from:Date.parse('2026-11-05T00:00:00Z'),to:Date.parse('2026-11-05T03:00:00Z'),target:'all',minAltitude:15,minDiameter:0,keepUnknown:true,weather:'clear',sort:'time'};
-  assert.deepEqual(filterEvents(events,f,null,weather),[events[0]]);
-  assert.deepEqual(filterEvents(events,{...f,weather:'overcast'},null,weather),[events[1]]);
+  assert.deepEqual(filterEvents(events,f,null,weather,filterNow),[events[0]]);
+  assert.deepEqual(filterEvents(events,{...f,weather:'overcast'},null,weather,filterNow),[events[1]]);
 });
 test('unknown detail values disappear while real zero measurements remain',()=>{
   assert.deepEqual(visibleDetailEntries([['a','未知'],['b','未知 — 5 m'],['c',null],['d','0.00 m'],['e','未设置位置'],['f','unknown']]),[['d','0.00 m']]);

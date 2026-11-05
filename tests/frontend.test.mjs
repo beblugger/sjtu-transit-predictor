@@ -9,6 +9,9 @@ const event = (id, time, diameter = null, altitude = 30) => ({identifier: String
   orbit_age_at_event_hours: 24, weather: {decision: 'unavailable', score: 0}, reason_codes: []});
 const filters = {from: start, to: start + 86400000, target: 'all', search: '', minAltitude: 15,
   minDiameter: 0, keepUnknown: true, weather: 'all', sort: 'time'};
+const filterNow = Date.parse('2026-11-03T00:00:00Z');
+const applyFilters = (events, f, location = null, weather = null, now = filterNow) =>
+  filterEvents(events, f, location, weather, now);
 
 test('UTC and Beijing conversion retains the same instant, including day rollover', () => {
   const time = '2026-11-04T20:12:33.123Z';
@@ -18,18 +21,25 @@ test('UTC and Beijing conversion retains the same instant, including day rollove
 });
 test('time range is half open and old orbital epochs are retained', () => {
   const events = [event(1, '2026-11-04T00:00:00Z'), event(2, '2026-11-05T00:00:00Z')];
-  assert.deepEqual(filterEvents(events, filters).map(e => e.identifier), ['1']);
+  assert.deepEqual(applyFilters(events, filters).map(e => e.identifier), ['1']);
+});
+
+test('future-only filtering excludes events whose minimum has already occurred', () => {
+  const now = Date.parse('2026-11-04T00:30:00Z');
+  const events = [event(1, '2026-11-04T00:29:59Z'), event(2, '2026-11-04T00:30:00Z'), event(3, '2026-11-04T00:30:01Z')];
+  assert.deepEqual(applyFilters(events, filters, null, null, now).map(e => e.identifier), ['3']);
+  assert.deepEqual(applyFilters(events, filters).map(e => e.identifier), ['1', '2', '3']);
 });
 test('unknown size is distinct from zero and does not disappear unless requested', () => {
   const events = [event(1, '2026-11-04T01:00:00Z'), event(2, '2026-11-04T02:00:00Z', 0), event(3, '2026-11-04T03:00:00Z', 5)];
   assert.equal(number(null), '未知'); assert.equal(number(0), '0.00');
-  assert.deepEqual(filterEvents(events, {...filters, minDiameter: 1}).map(e => e.identifier), ['1', '3']);
-  assert.deepEqual(filterEvents(events, {...filters, minDiameter: 1, keepUnknown: false}).map(e => e.identifier), ['3']);
+  assert.deepEqual(applyFilters(events, {...filters, minDiameter: 1}).map(e => e.identifier), ['1', '3']);
+  assert.deepEqual(applyFilters(events, {...filters, minDiameter: 1, keepUnknown: false}).map(e => e.identifier), ['3']);
 });
 test('altitude and weather filters are explicit', () => {
   const events = [event(1, '2026-11-04T00:00:00Z', 5, 10), event(2, '2026-11-04T01:00:00Z', 5, 20)];
-  assert.deepEqual(filterEvents(events, filters).map(e => e.identifier), ['2']);
-  assert.equal(filterEvents(events, {...filters, weather: 'announced'}).length, 0);
+  assert.deepEqual(applyFilters(events, filters).map(e => e.identifier), ['2']);
+  assert.equal(applyFilters(events, {...filters, weather: 'announced'}).length, 0);
 });
 test('WGS84 distance has physical metre units and no GCJ shift', () => {
   assert.equal(distanceMeters({latitude: 0, longitude: 0}, {latitude: 0, longitude: 0}), 0);
@@ -76,15 +86,15 @@ test('inverse region membership, distance and local time use geometry instead of
   const outside=visibilityAt(e,{longitude:.005,latitude:.003});
   assert.equal(outside.inside,false);assert.ok(Math.abs(outside.distance_m-100)<.001);
   assert.equal(outside.minimum_time,null);
-  assert.equal(filterEvents([e],{...filters,insideOnly:true},{longitude:.005,latitude:.003}).length,0);
+  assert.equal(applyFilters([e],{...filters,insideOnly:true},{longitude:.005,latitude:.003}).length,0);
   const location={longitude:.005,latitude:.003};
-  assert.equal(filterEvents([e],{...filters,maxDistance:99},location).length,0);
-  assert.equal(filterEvents([e],{...filters,maxDistance:101},location).length,1);
-  assert.equal(filterEvents([e],{...filters,maxDistance:0},{longitude:.009,latitude:.001}).length,1);
-  assert.equal(filterEvents([e],{...filters,maxDistance:0}).length,1);
-  assert.equal(filterEvents([e],{...filters,maxDistance:null},location).length,1);
-  assert.equal(filterEvents([e],{...filters,maxDistance:10000},{longitude:1,latitude:1}).length,0);
-  assert.equal(filterEvents([event(2,'2026-11-04T00:00:00Z')],{...filters,maxDistance:1000},location).length,0);
+  assert.equal(applyFilters([e],{...filters,maxDistance:99},location).length,0);
+  assert.equal(applyFilters([e],{...filters,maxDistance:101},location).length,1);
+  assert.equal(applyFilters([e],{...filters,maxDistance:0},{longitude:.009,latitude:.001}).length,1);
+  assert.equal(applyFilters([e],{...filters,maxDistance:0}).length,1);
+  assert.equal(applyFilters([e],{...filters,maxDistance:null},location).length,1);
+  assert.equal(applyFilters([e],{...filters,maxDistance:10000},{longitude:1,latitude:1}).length,0);
+  assert.equal(applyFilters([event(2,'2026-11-04T00:00:00Z')],{...filters,maxDistance:1000},location).length,0);
 });
 
 test('overlay window uses two chronological neighbors on each side without backfill', async () => {
