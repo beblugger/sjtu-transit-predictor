@@ -23,6 +23,14 @@ function stamp(value, detailed = false) {
   return value ? `${formatTime(value, state.zone, detailed)} ${zoneName(state.zone)}` : '未知 / 尚未记录';
 }
 function quantity(value, unit, digits = 2) { return present(value) ? `${number(value, digits)} ${unit}` : '未知'; }
+function distanceLabel(event) {
+  if (!state.location) return '未设置位置';
+  const local = visibilityAt(event, state.location);
+  if (!local) return '无法判断';
+  if (local.outside_chart) return '超出计算范围';
+  if (!present(local.distance_m)) return '无法判断';
+  return local.distance_m === 0 ? '区域内' : `${number(local.distance_m, 0)} m`;
+}
 function reason(value) { return REASONS[value] || value; }
 async function getBytes(url) {
   const response = await fetch(url, {cache: 'no-store',signal:AbortSignal.timeout(20000)});
@@ -151,13 +159,12 @@ function render() {
   }
   const overlays = currentOverlays();
   $('result-count').textContent = `${state.filtered.length} / ${state.events.length} 条符合条件。${f.sort === 'distance' && !state.location ? '尚未设置位置，暂按时间排序。' : ''}`;
-  $('selected-event').textContent=state.selected ? `已选：${state.selected.name} / ${state.selected.identifier} · ${formatTime(state.selected.minimum_time,state.zone)}${state.sharedKey&&!state.filtered.includes(state.selected)?'（链接事件不符合当前筛选）':''}` : '尚无选中事件';
   const rows=state.filtered.map(event => {
     const row = node('tr'); row.dataset.eventKey = eventKey(event);
     row.dataset.overlay = String(overlays.includes(event)); row.setAttribute('aria-selected', String(!!state.selected && eventKey(state.selected) === eventKey(event)));
     const values = [`${event.name} / ${event.identifier}`, TARGETS[event.target], formatTime(event.minimum_time, state.zone),
       number(event.altitude_deg, 1), number(event.duration_ms / 1000, 3), number(event.object_angular_diameter_arcsec, 2),
-      number(event.range_km, 1), weatherCondition(state.weather,event.minimum_time).label, state.location ? number(visibilityAt(event, state.location)?.distance_m, 0) : '未设置'];
+      number(event.range_km, 1), weatherCondition(state.weather,event.minimum_time).label, distanceLabel(event)];
     values.forEach((value, index) => row.append(node('td', value, [3, 4, 5, 6, 8].includes(index) ? {class: 'number'} : {})));
     row.tabIndex = 0;
     row.setAttribute('aria-label', `查看 ${event.name} ${TARGETS[event.target]} ${formatTime(event.minimum_time, state.zone)} 的详情`);
@@ -177,7 +184,7 @@ function render() {
   drawMap(); renderDetail();renderNotices();
 }
 function renderEventPages(rows,pages,error){
-  const headers=['卫星 / NORAD','目标',`最近时刻 (${zoneName(state.zone)})`,'高度 (°)','持续 (s)','角直径 (″)','距离 (km)','天气','距可见区 (m)'];
+  const headers=['卫星 / NORAD','目标',`最近时刻 (${zoneName(state.zone)})`,'高度 (°)','持续 (s)','角直径 (″)','距离 (km)','天气','距可见区'];
   const groups=[];
   for(let i=0;i<pages;i++){
     const group=node('div',undefined,{class:'event-page','data-page':i,role:'group','aria-label':`第 ${i+1} 页`});
@@ -272,10 +279,8 @@ function renderDetail() {
     ['雷达截面积（RCS）',quantity(e.satellite_rcs_m2,'m²',3)],
     ['尺寸可信度', ({high:'高',medium:'中',low:'低'})[e.angular_size_confidence||e.physical_size_confidence] || '未知'], ['轨道历元', stamp(e.orbit_epoch, true)],
     ['距轨道历元的外推时长', quantity(e.orbit_age_at_event_hours, 'h', 2)],
-    ['距可见区', state.location ? quantity(visibilityAt(e, state.location)?.distance_m, 'm', 0) : '未设置位置'],
-    ['位置的区域判断', !state.location ? '未设置位置' : !local || local.outside_chart ? '超出计算范围或缺少区域数据，无法判断' : local.inside ? '在反解区域内' : '不在反解区域内'],
+    ['距可见区', distanceLabel(e)],
     ['位置的边界提示', visibilityAt(e, state.location)?.outside_chart ? '位置不在本次计算范围内' : visibilityAt(e, state.location)?.near_boundary ? '距边界不足 5 m，区域判断对展开误差敏感，应完整复算' : '轨道真实误差尚未量化'],
-    ['位置的最近时刻（约）', stamp(visibilityAt(e, state.location)?.minimum_time)],
     ['校内可见区域面积', quantity((e.visibility?.campus_area_m2 ?? e.visibility?.area_m2) / 1e6, 'km²', 3)],
     ['接触边界最大采样回算偏差', e.visibility?.contact_validation_count ? quantity(e.visibility.maximum_sampled_boundary_error_m, 'm', 3) : '本区域未采到日月接触边界'],
     ['局部时刻最大采样回算偏差', quantity(e.visibility?.maximum_sampled_time_error_s, 's', 3)],

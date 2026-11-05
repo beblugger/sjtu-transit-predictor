@@ -68,7 +68,6 @@ input[type=checkbox] { width: 1.1rem; height: 1.1rem; min-height: 0; accent-colo
 #result-count { font-size: .9rem; font-weight: 600; margin: .8rem 0; }
 #page-status { color: var(--muted); font-size: .8rem; }
 #page-jump { width: 4rem; }
-#selected-event { padding: .65rem .85rem; background: #edf4fa; border-radius: 7px; color: #24547c; margin: .85rem 0; }
 .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 9px; }
 table { border-collapse: collapse; width: 100%; } caption { text-align: left; padding: .5rem; }
 th, td { padding: .7rem .8rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
