@@ -89,8 +89,7 @@ jobs:
         run: python scripts/validate_export.py --data dist/data
       - name: Prepare static data site
         run: |
-          cp deploy/*.html deploy/*.css deploy/*.mjs deploy/*.js deploy/*.webmanifest dist/
-          cp -R deploy/assets dist/assets
+          python scripts/build_frontend.py --source deploy --data dist/data --output dist
           cp DESIGN.md dist/design.md
           cp THIRD_PARTY_NOTICES.md dist/third-party.md
           cp -R licenses dist/licenses

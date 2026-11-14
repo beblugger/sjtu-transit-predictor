@@ -1,3 +1,5 @@
+import {getBytes, checkedJSON, checkedEvents} from './data.mjs';
+import {loadFirstScreen} from './first-screen.mjs';
 import {weatherCondition,visibleDetailEntries,dataNotices,brightnessLabel} from './presentation.mjs';
 import {UPDATE_INTERVAL,REMINDER_INTERVAL,SETTINGS_KEY,SENT_KEY,readSettings,nearbyEvents,reminderKey,alreadyReminded,notificationURL} from './reminders.mjs';
 import {mapView,exteriorTiles,campusTiles,overlayEvents,nearestEvent,SELECTED_COLOR,NEIGHBOR_COLOR,asLines} from './map.mjs';
@@ -5,8 +7,12 @@ import {PAGE_SIZE, TARGETS, WEATHER, REASONS, present, number, formatTime, zoneN
   inputTime, inputInstant, eventKey, filterEvents, timeOpacity, validateSnapshot, visibilityAt} from './core.mjs';
 
 const $ = id => document.getElementById(id);
+let initialRequests = window.__initialSnapshotRequests;
+delete window.__initialSnapshotRequests;
+let finishFirstSnapshot;
+const firstSnapshotReady = new Promise(resolve => { finishFirstSnapshot = resolve; });
 const state = {manifest: null, events: [], campus: null, filtered: [], page: 0, selected: null, sharedKey:null,
-  weather: null,buildings:null,backend:null,loadError:'',assetWarnings:[],location: null, zone: 'Asia/Shanghai', loading: false};
+  weather: null,buildings:null,backend:null,loadError:'',assetWarnings:[],location: null, zone: 'Asia/Shanghai', loading: false, partial:null};
 let settings;
 try {settings=readSettings(localStorage);}catch{settings=readSettings(null);}
 let lastRead=0;
@@ -32,37 +38,79 @@ function distanceLabel(event) {
   return local.distance_m === 0 ? '区域内' : `${number(local.distance_m, 0)} m`;
 }
 function reason(value) { return REASONS[value] || value; }
-async function getBytes(url) {
-  const response = await fetch(url, {cache: 'no-store',signal:AbortSignal.timeout(20000)});
-  if (!response.ok) throw new Error(`${url.pathname.split('/').at(-1)}：HTTP ${response.status}`);
-  return new Uint8Array(await response.arrayBuffer());
+let fullSnapshotRequest = null;
+let firstScreenRequest = null;
+function ensureFullSnapshot() {
+  if (!state.partial) return Promise.resolve();
+  return fullSnapshotRequest ||= (async()=>{
+    if(firstScreenRequest)await firstScreenRequest;
+    if(state.partial)await loadSnapshot();
+  })().finally(() => { fullSnapshotRequest = null; });
 }
-async function checkedJSON(filename, manifest) {
-  const digest = manifest.files?.[filename];
-  if (!/^[a-f0-9]{64}$/.test(digest || '')) throw new Error(`${filename} 缺少有效 SHA256`);
-  const url = new URL(`data/${filename}`, location.href); url.searchParams.set('v', digest);
-  const bytes = await getBytes(url);
-  if (!crypto.subtle) throw new Error('当前环境不能校验数据，请使用 HTTPS 或 localhost 打开');
-  const actual = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), b => b.toString(16).padStart(2, '0')).join('');
-  if (actual !== digest) throw new Error(`${filename} 校验不一致，可能正在更新`);
-  return JSON.parse(new TextDecoder().decode(bytes));
+function startSnapshot(refresh = false) {
+  return firstScreenRequest ||= loadFirstSnapshot(refresh).finally(()=>{firstScreenRequest=null;});
+}
+async function loadFirstSnapshot(refresh = false) {
+  if (state.loading) return;
+  const initial = !state.manifest;
+  state.loading = true;
+  try {
+    const first = await loadFirstScreen({refresh});
+    if (!first) { state.loading = false; return await loadSnapshot(); }
+    const oldKey = state.selected && eventKey(state.selected);
+    Object.assign(state, {manifest:first.manifest, events:first.payload.events, campus:first.campus,
+      weather:first.weather, partial:first, loadError:''});
+    state.selected = state.events.find(e=>eventKey(e)===oldKey)||null;
+    state.page = 0; lastRead = Date.now();
+    $('application').hidden = false; $('filter-controls').disabled = false;
+    $('application').dataset.snapshot = 'bootstrap';
+    for (const child of $('application').children) child.hidden = false;
+    if(initial)setWindow(0, true);
+    renderMetadata(); render();
+    $('load-status').textContent = '首屏数据校验通过；筛选及翻页时按需读取其余事件。';
+    $('load-status').dataset.error = 'false'; $('reload').disabled = false;
+    if (!performance.getEntriesByName('transit:firstscreen').length) performance.mark('transit:firstscreen');
+    // Keep optional map decoration and offline installation out of the first paint.
+    setTimeout(finishFirstSnapshot, 1500);
+  } catch {
+    state.loading = false;
+    return await loadSnapshot();
+  } finally { state.loading = false; }
 }
 async function loadSnapshot() {
   if (state.loading) return;
   const initial=!state.manifest;
+  const early = initialRequests; initialRequests = null;
   lastRead=Date.now();
-  state.loadError='';state.assetWarnings=state.assetWarnings.filter(w=>!w.startsWith('天气文件'));
+  state.loadError='';state.assetWarnings=state.assetWarnings.filter(w=>!w.startsWith('天气文件')&&!w.startsWith('校区地图数据'));
   state.loading = true; $('reload').disabled = true;
   $('load-status').textContent = '正在读取并校验数据……'; $('load-status').dataset.error = 'false';
+  let previewMap = initial;
   try {
-    let snapshot, lastError, offline=false;
+    let snapshot, lastError, offline=false, currentAttempt=0, campusPromise, campusReady=null, weatherPromise;
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
+        currentAttempt = attempt + 1; campusReady = null;
         const url = new URL('data/manifest.json', location.href); url.searchParams.set('read', String(Date.now()));
-        const manifest = JSON.parse(new TextDecoder().decode(await getBytes(url)));
-        const [payload, campus] = await Promise.all([checkedJSON('events.json', manifest), checkedJSON('campus.geojson', manifest)]);
-        validateSnapshot(manifest, payload, campus);
-        snapshot = {manifest, payload, campus}; break;
+        const manifestBytes = (attempt === 0 && early ? await early.manifest : null) || await getBytes(url);
+        const manifest = JSON.parse(new TextDecoder().decode(manifestBytes));
+        if (!manifest.files?.['events.columns.json.gz']) early?.controller.abort();
+        weatherPromise = checkedJSON('weather.json',manifest).catch(()=>null);
+        campusPromise = checkedJSON('campus.geojson', manifest).then(campus => {
+          if (campus.type !== 'FeatureCollection' || !campus.features?.length) throw new Error('校区 GeoJSON 无效');
+          if (currentAttempt !== attempt + 1) return campus;
+          campusReady = campus;
+          if (previewMap && !state.manifest) {
+            state.campus = campus;
+            for (const child of $('application').children) if (!child.classList.contains('map-card')) child.hidden = true;
+            $('application').hidden = false; drawMap();
+            $('map-status').textContent = '地图已加载，正在读取事件……';
+          }
+          return campus;
+        }).catch(error => ({error}));
+        const payload = await checkedEvents(manifest, attempt === 0 ? early?.events : null);
+        validateSnapshot(manifest, payload, null);
+        snapshot = {manifest, payload, campus:null}; break;
       } catch (error) { lastError = error; }
     }
     if (!snapshot) {
@@ -74,20 +122,20 @@ async function loadSnapshot() {
         offline=true;
       } catch {throw lastError;}
     }
-    let weather=null;
-    if(offline)weather=snapshot.weather;
-    else try{weather=await checkedJSON('weather.json',snapshot.manifest);}catch{state.assetWarnings.push('天气文件读取或校验失败，阴晴预报暂不可用。');}
-    if(!offline) {
-      try {
-        const cache=await caches.open('transit-snapshot-v1');
-        await cache.put(new URL('data/verified-snapshot',location.href),new Response(JSON.stringify({...snapshot,weather}),{headers:{'Content-Type':'application/json'}}));
-      } catch {/* Online data remain usable if storage is unavailable. */}
-    }
-    state.weather=weather;
+    if (offline) campusPromise = Promise.resolve(snapshot.campus);
+    // Apply the verified weather before the default clear-sky filter is rendered.
+    // A ready event list must not briefly claim that no events match while weather loads.
+    state.weather = offline ? snapshot.weather : await weatherPromise;
+    previewMap = false;
+    if (!offline) snapshot.campus = campusReady;
+    if (!offline && !state.weather) state.assetWarnings.push('天气文件读取或校验失败，阴晴预报暂不可用。');
     const oldKey = state.selected && eventKey(state.selected);
-    Object.assign(state, {manifest: snapshot.manifest, events: snapshot.payload.events, campus: snapshot.campus});
+    Object.assign(state, {manifest: snapshot.manifest, events: snapshot.payload.events, campus: snapshot.campus, partial:null});
+    $('application').dataset.snapshot = 'full';
     state.selected=state.events.find(e=>eventKey(e)===oldKey)||null;
+    for (const child of $('application').children) child.hidden = false;
     $('application').hidden = false; $('filter-controls').disabled = false;
+    if (!state.campus) { $('map').replaceChildren(); currentView = null; $('map-status').textContent = '正在读取校区地图……'; }
     // Keep the original full-coverage window; filterEvents silently hides past events.
     if(initial)setWindow(0, true);
     renderMetadata(); render();
@@ -100,11 +148,31 @@ async function loadSnapshot() {
     if(offline)state.loadError='无法连接网络，正在显示本机保存的数据，时效以数据生成时间为准。';
     $('load-status').textContent = offline?state.loadError:`已加载 ${state.events.length} 条事件，数据校验通过；检查于 ${formatTime(Date.now(),state.zone)}。`;
     $('load-status').dataset.error=String(offline);
+    if (!offline) {
+      performance.mark('transit:fullready');
+      if (!performance.getEntriesByName('transit:firstscreen').length) performance.mark('transit:firstscreen');
+    }
+    finishFirstSnapshot();
+    const campusResult = await campusPromise;
+    if (campusResult?.error) {
+      state.campus = null; currentView = null; $('map').replaceChildren();
+      $('map-status').textContent = '校区地图数据读取失败，事件列表仍可使用。';
+      state.assetWarnings.push('校区地图数据读取或校验失败。');
+    } else {
+      snapshot.campus = campusResult; state.campus = campusResult; drawMap();
+    }
+    renderNotices();
+    if(!offline && snapshot.campus) {
+      try {
+        const cache=await caches.open('transit-snapshot-v1');
+        await cache.put(new URL('data/verified-snapshot',location.href),new Response(JSON.stringify({...snapshot,weather:state.weather}),{headers:{'Content-Type':'application/json'}}));
+      } catch {/* Online data remain usable if storage is unavailable. */}
+    }
   } catch (error) {
     $('load-status').dataset.error = 'true';
     state.loadError=`读取失败：${error.message}。${state.manifest ? '仍显示上一次读取的数据。' : '请重试。'}`;
     $('load-status').textContent=state.loadError;
-  } finally { state.loading = false; $('reload').disabled = false; renderNotices();checkBackend();checkNearby(); }
+  } finally { previewMap = false; early?.controller.abort(); finishFirstSnapshot(); state.loading = false; $('reload').disabled = false; renderNotices();checkBackend();checkNearby(); }
 }
 function renderMetadata() {
   const m = state.manifest;
@@ -151,7 +219,8 @@ function render() {
     !present(f.minAltitude) || f.minAltitude < 0 || f.minAltitude > 90 || !present(f.minDiameter) || f.minDiameter < 0 ? '高度角须为 0–90°，最小角直径须为非负数。' : '';
   $('filter-error').textContent = error;
   state.filtered = error ? [] : filterEvents(state.events, f, state.location, state.weather, nowMs);
-  const pages = Math.max(1, Math.ceil(state.filtered.length / PAGE_SIZE));
+  const resultTotal = state.partial ? state.partial.default_event_count : state.filtered.length;
+  const pages = Math.max(1, Math.ceil(resultTotal / PAGE_SIZE));
   state.page = Math.min(state.page, pages - 1);
   if (state.selected && state.sharedKey!==eventKey(state.selected) && !state.filtered.some(e => eventKey(e) === eventKey(state.selected))) state.selected = null;
   if (!state.selected) {
@@ -159,7 +228,7 @@ function render() {
     if (state.selected) state.page = Math.floor(state.filtered.indexOf(state.selected) / PAGE_SIZE);
   }
   const overlays = currentOverlays();
-  $('result-count').textContent = `${state.filtered.length} / ${state.events.length} 条符合条件。${f.sort === 'distance' && !state.location ? '尚未设置位置，暂按时间排序。' : ''}`;
+  $('result-count').textContent = `${resultTotal} / ${state.manifest.event_count} 条符合条件。${f.sort === 'distance' && !state.location ? '尚未设置位置，暂按时间排序。' : ''}`;
   const rows=state.filtered.map(event => {
     const row = node('tr'); row.dataset.eventKey = eventKey(event);
     row.dataset.overlay = String(overlays.includes(event)); row.setAttribute('aria-selected', String(!!state.selected && eventKey(state.selected) === eventKey(event)));
@@ -180,7 +249,7 @@ function render() {
     });
     return row;
   });
-  renderEventPages(rows,pages,error);
+  renderEventPages(rows,state.partial ? 1 : pages,error);
   $('weather-tooltip').hidden=true;
   drawMap(); renderDetail();renderNotices();
 }
@@ -212,7 +281,7 @@ function renderEventPages(rows,pages,error){
   const scroller=$('events');scroller.replaceChildren(...groups);scroller.scrollTop=state.page*scroller.clientHeight;updatePageControls();
 }
 function updatePageControls(){
-  const pages=Math.max(1,Math.ceil(state.filtered.length/PAGE_SIZE));
+  const pages=Math.max(1,Math.ceil((state.partial ? state.partial.default_event_count : state.filtered.length)/PAGE_SIZE));
   $('page-status').textContent=`第 ${state.page+1} / ${pages} 页`;
   $('previous').disabled=state.page===0;$('next').disabled=state.page+1>=pages;
   $('page-jump').max=String(pages);$('page-jump').value=String(state.page+1);
@@ -243,6 +312,7 @@ function selectEvent(event, focus, shared=false) {
   if (focus) $('detail').focus();
 }
 function selectSharedEvent() {
+  if (state.partial) { ensureFullSnapshot().then(()=>{if(!state.partial)selectSharedEvent();}); return; }
   if (!state.manifest || state.loading) return;
   const key = new URLSearchParams(location.hash.slice(1)).get('event');
   if (!key) return;
@@ -254,6 +324,7 @@ function renderDetail() {
   const e = state.selected;
   $('detail-empty').hidden = !!e; $('detail-content').hidden = !e;
   if (!e) return;
+  $('detail-content').dataset.eventKey = eventKey(e);
   drawTransit(e);
   const local = visibilityAt(e, state.location);
   const radius=present(e.object_angular_radius_arcsec)?e.object_angular_radius_arcsec:present(e.object_angular_diameter_arcsec)?e.object_angular_diameter_arcsec/2:null;
@@ -312,6 +383,7 @@ function currentOverlays(){
   return overlayEvents(events,state.selected);
 }
 function drawMap() {
+  if (!state.campus) return;
   const map=$('map'),overlays=currentOverlays();
   const view=mapView(state.campus,state.selected?.visibility,mapZoom,mapFocus),project=view.project;
   currentView=view;
@@ -378,7 +450,7 @@ function drawMap() {
   if(center){const a=project(center),b=project([center[0]+500/(111320*Math.cos(center[1]*Math.PI/180)),center[1]]),pixelsPerMeter=Math.abs(b[0]-a[0])/500;
     const meters=[1,2,5,10,20,50,100,200,500,1000].filter(m=>m*pixelsPerMeter<=140).at(-1)??1,length=meters*pixelsPerMeter;
     map.append(svg('path',{d:`M24 530v6h${length}v-6`,stroke:'#161616',fill:'none','stroke-width':2}),svg('text',{x:24,y:519,'paint-order':'stroke',stroke:'#fff','stroke-width':3},`${meters} m`));}
-  $('map-status').textContent=state.selected ? `已选 ${state.selected.name} · ${formatTime(state.selected.minimum_time,state.zone)}；同时显示前后各最多 2 条，共 ${overlays.length} 条事件。` : '没有符合条件的事件。';
+  $('map-status').textContent=state.selected ? `已选 ${state.selected.name} · ${formatTime(state.selected.minimum_time,state.zone)}；同时显示前后各最多 2 条，共 ${overlays.length} 条事件。` : state.manifest ? '没有符合条件的事件。' : '地图已加载，正在读取事件……';
 }
 function zoomMap(factor, point=[480,280]) {
   if(!currentView)return;
@@ -429,7 +501,8 @@ function finishMapGesture(e){commitMapPreview();pointers.delete(e.pointerId);beg
 for(const name of ['pointerup','pointercancel','lostpointercapture'])$('map').addEventListener(name,finishMapGesture);
 if('ResizeObserver' in window)new ResizeObserver(()=>{if(state.campus)drawMap();}).observe($('map'));
 function mapAssetError(text){if(!state.assetWarnings.includes(text)){state.assetWarnings.push(text);renderNotices();}}
-fetch('assets/buildings.geojson').then(r=>{if(!r.ok)throw new Error();return r.json();}).then(data=>{
+// Decorative outlines and offline precaching yield bandwidth to the first snapshot.
+firstSnapshotReady.then(()=>fetch('assets/buildings.geojson')).then(r=>{if(!r.ok)throw new Error();return r.json();}).then(data=>{
   if(data.type!=='FeatureCollection'||!Array.isArray(data.features))throw new Error();
   state.buildings=data;if(state.campus)drawMap();
 }).catch(()=>{state.assetWarnings.push('校园建筑底图暂不可用；事件和预测区域仍可查看。');renderNotices();});
@@ -495,10 +568,36 @@ setInterval(()=>{if(state.manifest)renderNotices();},60000);
 setInterval(()=>{
   if(!state.manifest)return;
   const now=Date.now();
+  if(state.partial){if(now>=Date.parse(state.partial.valid_until))startSnapshot();return;}
   const selectedExpired=state.selected && Date.parse(state.selected.minimum_time)<=now && state.sharedKey!==eventKey(state.selected);
   if(state.filtered.some(e=>Date.parse(e.minimum_time)<=now) || selectedExpired) render();
 },30000);
-$('reload').addEventListener('click', loadSnapshot);
+// The first page and map work from the small snapshot. Acquire the full
+// catalog only when a global filter, later page or location feature needs it.
+for(const type of ['click','input','change','keydown','submit'])$('application').addEventListener(type,event=>{
+  if(!state.partial)return;
+  const target=event.target;
+  const globalClick=type==='click'&&target.closest('#filters button,#previous,#next,#go-page,#locate,#clear-location');
+  const globalInput=['input','change'].includes(type)&&target.closest('#filters');
+  const globalSetting=type==='change'&&target.matches('#nearby-notifications,#follow-device');
+  const globalKey=type==='keydown'&&((target.id==='events'&&['PageDown','PageUp','Home','End'].includes(event.key))||(target.id==='page-jump'&&event.key==='Enter'));
+  const globalSubmit=type==='submit'&&target.id==='location-form';
+  const row=(type==='click'||(type==='keydown'&&['Enter',' '].includes(event.key)))&&target.closest('tr[data-event-key]');
+  const edgeSelection=row&&state.partial.default_event_count>state.events.length&&state.events.findIndex(e=>eventKey(e)===row.dataset.eventKey)>=state.events.length-2;
+  if(!globalClick&&!globalInput&&!globalSetting&&!globalKey&&!globalSubmit&&!edgeSelection)return;
+  event.preventDefault();event.stopImmediatePropagation();
+  const key=event.key,rowKey=row?.dataset.eventKey,jumpPageValue=$('page-jump').value;
+  ensureFullSnapshot().then(()=>{
+    if(state.partial)return;
+    if(target.id==='go-page'||target.id==='page-jump')$('page-jump').value=jumpPageValue;
+    if(rowKey){const selected=state.events.find(e=>eventKey(e)===rowKey);if(selected)selectEvent(selected,false);}
+    else if(type==='click')target.click();
+    else if(type==='submit')target.requestSubmit();
+    else if(type==='keydown')target.dispatchEvent(new KeyboardEvent(type,{key,bubbles:true,cancelable:true}));
+    else if(globalSetting)target.dispatchEvent(new Event(type,{bubbles:true}));
+  });
+},true);
+$('reload').addEventListener('click',()=>state.partial?startSnapshot(true):loadSnapshot());
 window.addEventListener('hashchange', selectSharedEvent);
 for(const field of ['weather','target']){
   const tabs=[...document.querySelectorAll(`[data-${field}]`)];
@@ -577,7 +676,7 @@ function startTracking(){
 }
 let registrationPromise=null;
 if('serviceWorker' in navigator){
-  registrationPromise=navigator.serviceWorker.register('tiles-sw.js',{updateViaCache:'none'}).then(async registration=>{
+  registrationPromise=firstSnapshotReady.then(()=>navigator.serviceWorker.register('tiles-sw.js',{updateViaCache:'none'})).then(async registration=>{
     await Promise.race([navigator.serviceWorker.ready,new Promise((_,reject)=>setTimeout(()=>reject(new Error('启动超时')),10000))]);
     return registration;
   });
@@ -588,6 +687,7 @@ try{sent=JSON.parse(localStorage.getItem(SENT_KEY))||{};}catch{}
 let checkingNearby=false;
 async function checkNearby(){
   if(!settings.nearbyNotifications)return;
+  if(state.partial){await ensureFullSnapshot();if(state.partial)return;}
   if(!('Notification' in window)||Notification.permission!=='granted'){
     $('notification-status').textContent='未获得系统通知权限，请重新开启通知并在系统中允许。';return;
   }
@@ -632,7 +732,7 @@ async function checkNearby(){
 $('auto-update').checked=settings.autoUpdate;
 $('auto-update').addEventListener('change',()=>{
   settings.autoUpdate=$('auto-update').checked;saveSettings();
-  if(settings.autoUpdate)loadSnapshot();
+  if(settings.autoUpdate)(state.partial?startSnapshot(true):loadSnapshot());
 });
 $('nearby-notifications').checked=settings.nearbyNotifications;
 $('nearby-notifications').addEventListener('change',async()=>{
@@ -676,16 +776,16 @@ $('install-app').addEventListener('click',async()=>{
 window.addEventListener('appinstalled',()=>{$('install-app').hidden=true;$('app-status').textContent='已安装，可从主屏幕打开。';});
 function resumeApp(){
   if(document.visibilityState==='hidden')return;
-  if(settings.autoUpdate&&!state.loading)loadSnapshot();
+  if(settings.autoUpdate&&!state.loading)(state.partial?startSnapshot(true):loadSnapshot());
   else checkNearby();
   registrationPromise?.then(registration=>registration.update()).catch(()=>{});
 }
 document.addEventListener('visibilitychange',resumeApp);
 window.addEventListener('online',resumeApp);
 window.addEventListener('pageshow',event=>{if(event.persisted)resumeApp();});
-setInterval(()=>{if(settings.autoUpdate&&Date.now()-lastRead>=UPDATE_INTERVAL&&document.visibilityState!=='hidden')loadSnapshot();},30000);
+setInterval(()=>{if(settings.autoUpdate&&Date.now()-lastRead>=UPDATE_INTERVAL&&document.visibilityState!=='hidden')(state.partial?startSnapshot(true):loadSnapshot());},30000);
 setInterval(checkNearby,REMINDER_INTERVAL);
-loadSnapshot();
+startSnapshot();
 
 function drawTransit(e) {
   const chart = $('transit-diagram'), d = e.transit_diagram;

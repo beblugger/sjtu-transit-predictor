@@ -210,6 +210,7 @@ def test_old_epoch_is_not_excluded_from_geometry(tmp_path, monkeypatch):
 
 def test_export_96_hours_keeps_weather_unavailable_events_and_reuses_geometry(tmp_path, monkeypatch):
     import hashlib
+    import gzip
     now = EPOCH.replace(hour=0, minute=0, second=0)
     settings = Settings(database_path=tmp_path / "cache.db", ephemeris_path=tmp_path / "missing.bsp")
     store = DatabaseStore(settings.database_path)
@@ -233,7 +234,11 @@ def test_export_96_hours_keeps_weather_unavailable_events_and_reuses_geometry(tm
     output = tmp_path / "output"
     first = asyncio.run(export_snapshot(settings, output, offline=True, now=now))
     assert len(calls) == 16
+    assert gzip.decompress((output / "events.json.gz").read_bytes()) == (output / "events.json").read_bytes()
     payload = json.loads((output / "events.json").read_text())
+    from app.event_columns import decode_snapshot
+    from app.compact_events import compact_snapshot
+    assert decode_snapshot((output / "events.columns.json.gz").read_bytes()) == compact_snapshot(payload)
     assert payload["hours"] == 96
     assert payload["announced_only"] is False
     assert len(payload["events"]) == 16
@@ -243,6 +248,17 @@ def test_export_96_hours_keeps_weather_unavailable_events_and_reuses_geometry(tm
     assert manifest["catalog_count"] == 2
     assert manifest["tle_count"] == 1
     assert manifest["tle_omitted_count"] == 1
+    first_screen = json.loads((output / "first-screen.json").read_bytes())
+    assert first_screen["source_sha256"] == manifest["files"]["events.json"]
+    # Missing deterministic weather has no default clear-sky candidates, while
+    # the complete snapshot still retains every geometric event.
+    assert len(first_screen["packets"]) == 1
+    packet_entry = first_screen["packets"][0]
+    assert packet_entry["count"] == 0
+    assert packet_entry["filename"] not in manifest["files"]
+    packet_bytes = (output / packet_entry["filename"]).read_bytes()
+    assert hashlib.sha256(packet_bytes).hexdigest() == packet_entry["sha256"]
+    assert json.loads(packet_bytes)["payload"]["events"] == []
     assert [row["NORAD_CAT_ID"] for row in json.loads((output / "orbits.json").read_text())] == [25544, 100001]
     assert len((output / "orbits.tle").read_text().splitlines()) == 3
     for name, digest in manifest["files"].items():

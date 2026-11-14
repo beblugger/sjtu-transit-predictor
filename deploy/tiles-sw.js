@@ -1,7 +1,7 @@
 // Cache only native-resolution tiles requested by the current viewport.
 const CACHE='transit-exterior-v2',MAX_TILES=64,MAX_BYTES=12*1024*1024;
-const APP_CACHE='transit-app-v1';
-const APP_FILES=['./','index.html','reading.html','styles.css','app.mjs','core.mjs','map.mjs','presentation.mjs','reminders.mjs','manifest.webmanifest','assets/icon-192.png','assets/icon-512.png'];
+const APP_CACHE='transit-app-v2';
+const APP_FILES=['./','index.html','reading.html','styles.css','app.mjs','data.mjs','bands.mjs','first-screen.mjs','core.mjs','map.mjs','presentation.mjs','reminders.mjs','manifest.webmanifest','assets/icon-192.png','assets/icon-512.png'];
 let writes=Promise.resolve();
 self.addEventListener('install',event=>event.waitUntil((async()=>{
   const cache=await caches.open(APP_CACHE);

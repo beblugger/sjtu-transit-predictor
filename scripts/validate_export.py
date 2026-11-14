@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime
+import gzip
 import hashlib
 import json
 import math
@@ -50,12 +51,30 @@ def validate(root: Path, ephemeris: Path) -> dict:
             raise ValueError("Manifest filenames must be local basenames")
         if hashlib.sha256((root / filename).read_bytes()).hexdigest() != digest:
             raise ValueError(f"Snapshot digest mismatch: {filename}")
+    event_bytes = (root / "events.json").read_bytes()
+    payload = json.loads(event_bytes)
+    if ("events.json.gz" in manifest["files"] and
+            gzip.decompress((root / "events.json.gz").read_bytes()) != event_bytes):
+        raise ValueError("Compressed event data differs from the full event JSON")
+    if "events.columns.json.gz" in manifest["files"]:
+        from app.event_columns import decode_snapshot
+        from app.compact_events import compact_snapshot
+        if decode_snapshot((root / "events.columns.json.gz").read_bytes()) != compact_snapshot(payload):
+            raise ValueError("Column event data differs from the compact event representation")
+    if "first-screen.json" in manifest["files"]:
+        from app.first_screen import build_first_screen_files
+        first_screen = build_first_screen_files(
+            payload, json.loads((root / "weather.json").read_bytes()),
+            json.loads((root / "campus.geojson").read_bytes()), manifest)
+        for filename, expected in first_screen.items():
+            if (root / filename).read_bytes() != expected:
+                raise ValueError(f"First-screen data differs from the full snapshot: {filename}")
     catalog = parse_omm_elements(json.loads((root / "orbits.json").read_text()))
     ts = load.timescale()
     satellites = {entry.norad_id: EarthSatellite.from_satrec(entry.to_satrec(), ts) for entry in catalog}
     eph = load_file(str(ephemeris))
     campus = load_campus(root / "campus.geojson")
-    events = json.loads((root / "events.json").read_text())["events"]
+    events = payload["events"]
     minimum_errors = []
     contact_errors = []
     violations = []

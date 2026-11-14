@@ -71,6 +71,7 @@ test('mixed publications and malformed events cannot be silently presented', () 
   assert.throws(() => validateSnapshot(m, {...p, events: [{...e, observer: null}]}, campus));
   assert.throws(() => validateSnapshot(m, {...p, events: [{...e, range_km: 0}]}, campus));
   assert.throws(() => validateSnapshot(m, {...p, events: [{...e, minimum_time: '2026-11-05T00:00:00Z'}]}, campus));
+  assert.throws(() => validateSnapshot(m, {...p, events: [{...e, start_time: undefined, end_time: undefined}]}, campus));
 });
 
 test('inverse region membership, distance and local time use geometry instead of a radius around the preferred point', async () => {
@@ -95,6 +96,28 @@ test('inverse region membership, distance and local time use geometry instead of
   assert.equal(applyFilters([e],{...filters,maxDistance:null},location).length,1);
   assert.equal(applyFilters([e],{...filters,maxDistance:10000},{longitude:1,latitude:1}).length,0);
   assert.equal(applyFilters([event(2,'2026-11-04T00:00:00Z')],{...filters,maxDistance:1000},location).length,0);
+});
+
+test('visibility band seams do not become observation boundaries', async () => {
+  const {visibilityAt} = await import('../deploy/core.mjs');
+  const rectangle = (left, bottom, right, top) => [[[left,bottom],[right,bottom],[right,top],[left,top],[left,bottom]]];
+  const e = {...event(1, '2026-11-04T00:00:00Z'), visibility: {
+    chart: {longitude:0, latitude:0, east_m_per_degree:1000, north_m_per_degree:1000},
+    geometry: {type:'MultiPolygon', coordinates:[rectangle(-.2,-.1,0,.1), rectangle(0,-.1,.2,.1)]},
+    calculation_domain: {type:'Polygon', coordinates:rectangle(-1,-1,1,1)},
+    reference_time:'2026-11-04T00:00:00Z', sampled_boundary_tolerance_m:5,
+    bands: [], models: [{bounds_m:[-200,-100,200,100], origin_m:[0,0], time_offset_s:0, time_gradient_s_per_m:[.01,0]}],
+  }};
+  for (const longitude of [-.001, 0, .001]) {
+    const local = visibilityAt(e, {longitude, latitude:0});
+    assert.equal(local.inside, true);
+    assert.equal(local.distance_m, 0);
+    assert.ok(Math.abs(local.boundary_distance_m - 100) < 1e-6);
+    assert.equal(local.near_boundary, false);
+  }
+  const outside = visibilityAt(e, {longitude:0, latitude:.15});
+  assert.equal(outside.inside, false);
+  assert.ok(Math.abs(outside.distance_m - 50) < 1e-6);
 });
 
 test('overlay window uses two chronological neighbors on each side without backfill', async () => {

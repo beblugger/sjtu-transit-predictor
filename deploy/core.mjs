@@ -85,7 +85,7 @@ export function validateSnapshot(manifest, payload, campus) {
   if (!Number.isFinite(from) || !Number.isFinite(to) || from >= to || !Number.isFinite(Date.parse(manifest.generated_at))) throw new Error('数据覆盖或生成时间无效');
   if (payload.catalog_sha256 !== manifest.catalog_sha256 || payload.generated_at !== manifest.generated_at) throw new Error('数据版本不一致');
   if (!Array.isArray(payload.events) || payload.events.length !== manifest.event_count) throw new Error('事件数量与版本清单不一致');
-  if (campus.type !== 'FeatureCollection' || !campus.features?.length) throw new Error('校区 GeoJSON 无效');
+  if (campus !== null && (campus.type !== 'FeatureCollection' || !campus.features?.length)) throw new Error('校区 GeoJSON 无效');
   for (const event of payload.events) {
     const start = Date.parse(event.start_time), minimum = Date.parse(event.minimum_time), end = Date.parse(event.end_time);
     if (!TARGETS[event.target] || !event.observer || !present(event.observer.latitude) || !present(event.observer.longitude) ||
@@ -137,6 +137,34 @@ export function regionContains(geometry, point) {
     return !polygon.slice(1).some(hole => { const p = ringPosition(point, hole); return p.inside && !p.boundary; });
   });
 }
+const bandEdges = new WeakMap();
+function unionBoundarySegments(visibility, project) {
+  if (bandEdges.has(visibility)) return bandEdges.get(visibility);
+  const polygons = visibility.geometry.coordinates;
+  const vertices = polygons.flatMap(polygon => polygon.flatMap(ring => ring.map(project)));
+  const result = [];
+  const {longitude, latitude, east_m_per_degree:sx, north_m_per_degree:sy} = visibility.chart;
+  const contains = p => regionContains(visibility.geometry, [longitude+p[0]/sx, latitude+p[1]/sy]);
+  for (const polygon of polygons) for (const ring of polygon) for (let i=1; i<ring.length; i++) {
+    const a=project(ring[i-1]), b=project(ring[i]), dx=b[0]-a[0], dy=b[1]-a[1], length=Math.hypot(dx,dy);
+    if (length < 1e-7) continue;
+    const cuts=[0,1];
+    for (const v of vertices) {
+      const t=((v[0]-a[0])*dx+(v[1]-a[1])*dy)/(length*length);
+      if (t>1e-8 && t<1-1e-8 && Math.abs((v[0]-a[0])*dy-(v[1]-a[1])*dx)/length<1e-4) cuts.push(t);
+    }
+    cuts.sort((x,y)=>x-y);
+    for(let j=1;j<cuts.length;j++) {
+      const lo=cuts[j-1], hi=cuts[j]; if (hi-lo<1e-9) continue;
+      const t=(lo+hi)/2, x=a[0]+t*dx, y=a[1]+t*dy, epsilon=0.001;
+      const left=contains([x-dy/length*epsilon,y+dx/length*epsilon]);
+      const right=contains([x+dy/length*epsilon,y-dx/length*epsilon]);
+      if(left!==right) result.push([[a[0]+lo*dx,a[1]+lo*dy],[a[0]+hi*dx,a[1]+hi*dy]]);
+    }
+  }
+  bandEdges.set(visibility,result);
+  return result;
+}
 export function visibilityAt(event, location) {
   const v = event.visibility;
   if (!v || !location) return null;
@@ -147,8 +175,10 @@ export function visibilityAt(event, location) {
   const inside = regionContains(v.geometry, [location.longitude, location.latitude]);
   let boundaryDistance = Infinity;
   const polygons = v.geometry.type === 'Polygon' ? [v.geometry.coordinates] : v.geometry.coordinates;
-  for (const polygon of polygons) for (const ring of polygon) for (let i = 1; i < ring.length; i++) {
-    const a = project(ring[i - 1]), b = project(ring[i]), dx = b[0] - a[0], dy = b[1] - a[1];
+  const segments = v.bands ? unionBoundarySegments(v,project) : polygons.flatMap(polygon => polygon.flatMap(ring =>
+    ring.slice(1).map((point,i) => [project(ring[i]),project(point)])));
+  for (const [a,b] of segments) {
+    const dx = b[0] - a[0], dy = b[1] - a[1];
     const fraction = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / (dx * dx + dy * dy || 1)));
     boundaryDistance = Math.min(boundaryDistance, Math.hypot(p[0] - a[0] - fraction * dx, p[1] - a[1] - fraction * dy));
   }

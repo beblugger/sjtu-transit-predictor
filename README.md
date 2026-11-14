@@ -34,10 +34,14 @@ python -m pytest -q
 | 文件 | 内容 |
 | --- | --- |
 | `manifest.json` | 生成时间、96 小时覆盖范围、上游时间、来源、数量、警告和文件 SHA256 |
+| `events.columns.json.gz` | 浏览器优先读取的列式事件快照；复用重复值，用局部模型重建可见区域，保留事件时间和数值精度 |
+| `events.json.gz` | 完整事件 JSON 的 gzip 版本，作为兼容读取路径 |
 | `events.json` | 凌星事件、观测位置、入凌/出凌时间、角距、卫星尺寸、轨道历元和天气评分 |
 | `orbits.json` | 完整 OMM 轨道目录，支持六位及以上卫星编号 |
 | `orbits.tle` | 编号不超过 99999 的兼容子集；遗漏数量记录在 manifest 中 |
 | `weather.json` | 含原始获取时间和位置的确定性、ECMWF/GFS 集合天气缓存 |
+| `first-screen.json` | 首屏批次索引；构建时内联，按事件过期时刻选择一个已校验的小批次 |
+| `first-screen-*.json` | 每批最多 10 条默认筛选事件及首屏所需天气、校区和可见区模型 |
 | `campus.geojson` | 闵行校区观测范围 |
 
 客户端默认使用整份数据的完整覆盖时段；`filterEvents` 静默排除已发生事件，因此列表、筛选结果和默认地图叠加只出现未来事件，“全部数据覆盖时段”仍保留原时间窗。也可收窄到未来 6 / 24 / 96 小时（受数据结束时间限制），并按天气等条件进一步筛选。导出数据保留覆盖内全部几何事件，不按天气、地影或轨道历元超过六小时排除。已发生事件不进入列表和筛选结果；若仍存在于当前或离线缓存的数据快照中，可通过事件链接查看详情。数据覆盖结束、天气过期时会给出警告；天气缺失、过期或窗口不足时标为不可用。
@@ -80,13 +84,14 @@ SGP4 传播轨道，DE421 计算日月位置。搜索采用 60 秒有限轨迹�
 
 ## 基础前端
 
-`deploy/` 为无框架、无外部运行依赖的 HTML/CSS/ES modules。界面读取并核对 manifest 中的事件、校区和天气文件 SHA256；发布切换导致不一致时重试一次，仍失败则明确报错。数据缺失、覆盖结束、天气不可用及未知尺寸均单独标注。
+`deploy/` 为无框架、无外部运行依赖的 HTML/CSS/ES modules。发布前由 `scripts/build_frontend.py` 把样式、应用脚本、首屏索引和生成时刻的 10 条事件内联进 `index.html`；正常首次打开只请求这个 HTML，不读取完整事件快照。校区几何、默认筛选后的列表、地图选中区域和选中项详情先完成渲染，建筑轮廓与 Service Worker 安装延后。当前时间越过内联批次有效期时，HTML 解析阶段只预取一个经 SHA256 校验的小批次，不下载全部事件。
 
-本地预览（先生成或下载 `dist/data`）：
+筛选、翻页、定位、通知或外部事件链接需要完整目录时才读取完整快照；优先使用列式 gzip，旧版 manifest 回退到完整 gzip，不支持浏览器解压时读取原始 JSON。列式快照保留事件时间、位置和筛选数值的原精度；可见区域由原有局部条带模型重建，导出时与完整几何比对，无法等价表达时保留完整几何。完整 JSON 继续用于独立审计，审计同时验证两种压缩文件与原始数据一致。旧快照没有首屏文件时构建会回退到完整快照加载。发布切换导致校验不一致时重试一次，仍失败则明确报错。地图或天气失败单独提示，事件列表仍可使用。数据缺失、覆盖结束、天气不可用及未知尺寸均单独标注。受控首屏测量、测量边界及复现步骤见 [首屏性能基准](benchmarks/first-load-2026-11-14.md)。
+
+本地预览（先生成或下载 `dist/data`，其中应包含 `first-screen.json` 和对应小批次）：
 
 ```bash
-cp deploy/*.html deploy/*.css deploy/*.mjs deploy/*.js deploy/*.webmanifest dist/
-cp -R deploy/assets dist/assets
+python scripts/build_frontend.py --source deploy --data dist/data --output dist
 cp THIRD_PARTY_NOTICES.md dist/third-party.md
 cp -R licenses dist/licenses
 python -m http.server 8765 --directory dist --bind 127.0.0.1

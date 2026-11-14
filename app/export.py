@@ -5,6 +5,7 @@ import argparse
 import asyncio
 from datetime import datetime, timedelta, timezone
 import hashlib
+import gzip
 from importlib.metadata import version
 import json
 from pathlib import Path
@@ -15,6 +16,8 @@ import sys
 from sgp4.exporter import export_tle
 
 from app.config import Settings
+from app.event_columns import encode_snapshot
+from app.first_screen import build_first_screen_files
 from app.models import TransitEvent
 from app.photometry import PHOTOMETRY_PATH
 from app.runtime import build_runtime
@@ -132,16 +135,26 @@ async def export_snapshot(settings: Settings, output: Path, *, offline: bool = F
             "weather_status": runtime.weather.status(now).model_dump(mode="json"),
             "warnings": warnings,
         }
+        payload = {**metadata, "announced_only": False,
+                   "events": [event.model_dump(mode="json") for event in events]}
+        weather_payload = runtime.weather.snapshot()
         files = {
-            "events.json": _json({**metadata, "announced_only": False,
-                                   "events": [event.model_dump(mode="json") for event in events]}),
+            "events.json": _json(payload),
             "orbits.json": _json(omm_rows),
             "orbits.tle": "\n".join(tles) + "\n",
-            "weather.json": _json(runtime.weather.snapshot()),
+            "weather.json": _json(weather_payload),
             "campus.geojson": settings.campus_geojson_path.read_text(),
         }
-        metadata["files"] = {name: hashlib.sha256(data.encode()).hexdigest() for name, data in files.items()}
-        files["manifest.json"] = _json(metadata)
+        files = {name: data.encode("utf-8") for name, data in files.items()}
+        files["events.json.gz"] = gzip.compress(files["events.json"], mtime=0)
+        files["events.columns.json.gz"] = encode_snapshot(payload)
+        metadata["files"] = {name: hashlib.sha256(data).hexdigest() for name, data in files.items()}
+        first_screen = build_first_screen_files(payload, weather_payload,
+                                               json.loads(files["campus.geojson"]), metadata)
+        files.update(first_screen)
+        # Packet hashes live in the index, avoiding a second copy in the manifest.
+        metadata["files"]["first-screen.json"] = hashlib.sha256(first_screen["first-screen.json"]).hexdigest()
+        files["manifest.json"] = _json(metadata).encode("utf-8")
         # Stage the complete generation before touching any existing export.
         output = output.resolve()
         if output == settings.database_path.resolve().parent or output in settings.database_path.resolve().parents:
@@ -150,7 +163,7 @@ async def export_snapshot(settings: Settings, output: Path, *, offline: bool = F
         with tempfile.TemporaryDirectory(prefix=".transit-export-", dir=output.parent) as staging:
             stage = Path(staging)
             for name, content in files.items():
-                (stage / name).write_text(content, encoding="utf-8")
+                (stage / name).write_bytes(content)
             output.mkdir(parents=True, exist_ok=True)
             # Commit manifest last; readers can check each file's digest.
             for name in files:
