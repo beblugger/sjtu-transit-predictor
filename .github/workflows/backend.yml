@@ -39,7 +39,7 @@ jobs:
           cache: pip
           cache-dependency-path: pyproject.toml
       - name: Install backend
-        run: python -m pip install -e '.[dev]'
+        run: python -m pip install -e '.[dev,chart]'
       - name: Restore calculation cache
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
@@ -70,39 +70,6 @@ jobs:
         run: python -m pytest -q
       - name: Test frontend data handling
         run: node --test tests/*.test.mjs
-      - name: Cache CJK fonts
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: ${{ runner.temp }}/fonts
-          key: noto-sans-sc-${{ env.FONT_SHA }}
-      - name: Fetch CJK fonts
-        shell: bash
-        run: |
-          font_dir="$RUNNER_TEMP/fonts"
-          mkdir -p "$font_dir"
-          base="https://raw.githubusercontent.com/notofonts/noto-cjk/${FONT_SHA}/Sans/SubsetOTF/SC"
-          for weight in Light Regular Bold; do
-            target="$font_dir/NotoSansSC-$weight.otf"
-            if [[ -s "$target" ]]; then continue; fi
-            curl --fail --location --retry 3 --max-time 180 \
-              "$base/NotoSansSC-$weight.otf" --output "$target"
-            test -s "$target"
-          done
-          echo "FONT_DIR=$font_dir" >> "$GITHUB_ENV"
-      - name: Render Geminids cloud chart
-        shell: bash
-        run: |
-          today="$(TZ=Asia/Shanghai date +%F)"
-          for date in ${CHART_DATES//,/ }; do
-            [[ -z "$date" ]] && continue
-            if [[ "$date" < "$today" ]]; then
-              echo "skip $date: night already past"
-              continue
-            fi
-            # 只是一步，不新增构建；只访问 Open-Meteo，不碰 CelesTrak
-            python -m app.geminids_cloud --date "$date" \
-              --font-dir "$FONT_DIR" --out "charts/$date"
-          done
       - name: Compute next 96 hours
         run: python -m app.export --database .state/transit.db --output dist/data --hours 96
       - name: Save durable inputs (including failed request attempts)
@@ -128,6 +95,40 @@ jobs:
           git push --force-with-lease="refs/heads/state:$previous_sha" origin "$state_sha:refs/heads/state"
       - name: Independently validate published geometry
         run: python scripts/validate_export.py --data dist/data
+      - name: Cache CJK fonts
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ runner.temp }}/fonts
+          key: noto-sans-sc-${{ env.FONT_SHA }}
+      - name: Fetch CJK fonts
+        shell: bash
+        run: |
+          font_dir="$RUNNER_TEMP/fonts"
+          mkdir -p "$font_dir"
+          base="https://raw.githubusercontent.com/notofonts/noto-cjk/${FONT_SHA}/Sans/SubsetOTF/SC"
+          for weight in Light Regular Bold; do
+            target="$font_dir/NotoSansSC-$weight.otf"
+            if [[ -s "$target" ]]; then continue; fi
+            curl --fail --location --retry 3 --max-time 180 \
+              "$base/NotoSansSC-$weight.otf" --output "$target"
+            test -s "$target"
+          done
+          echo "FONT_DIR=$font_dir" >> "$GITHUB_ENV"
+      - name: Render Geminids cloud chart
+        continue-on-error: true
+        shell: bash
+        run: |
+          today="$(TZ=Asia/Shanghai date +%F)"
+          for date in ${CHART_DATES//,/ }; do
+            [[ -z "$date" ]] && continue
+            if [[ "$date" < "$today" ]]; then
+              echo "skip $date: night already past"
+              continue
+            fi
+            # 只是一步，不新增构建；只访问 Open-Meteo，不碰 CelesTrak
+            python -m app.geminids_cloud --date "$date" \
+              --font-dir "$FONT_DIR" --out "charts/$date"
+          done
       - name: Prepare static data site
         run: |
           python scripts/build_frontend.py --source deploy --data dist/data --output dist
