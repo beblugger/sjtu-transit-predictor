@@ -23,9 +23,13 @@ dependencies = [
 dev = [
   "pytest>=8,<10",
 ]
+chart = [
+  "matplotlib>=3.8,<4",
+]
 
 [project.scripts]
 transit-export = "app.export:main"
+gemini-cloud = "app.geminids_cloud:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["app"]
