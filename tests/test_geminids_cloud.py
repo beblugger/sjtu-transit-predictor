@@ -155,9 +155,20 @@ def test_meta_records_endpoints_and_errors():
         return httpx.Response(500, text="boom")
 
     with httpx.Client(transport=httpx.MockTransport(handler)) as client:
-        series, meta = fetch_site(client, SITES[1], SLOTS)
+        series, meta = fetch_site(client, SITES[1], SLOTS, retries=1)
     assert len(meta["errors"]) == 2
     assert all(not item.active for item in series)
+    assert all(item.error for item in series)
+
+
+def test_transport_failure_is_visible_on_every_row():
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectTimeout("handshake timed out")
+
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        series, meta = fetch_site(client, SITES[0], SLOTS, retries=1)
+    assert "deterministic" in meta["errors"][0]
+    assert all(item.reason.startswith("请求失败") for item in series)
 
 
 def test_partial_coverage_refuses_whole_night_verdict(tmp_path):

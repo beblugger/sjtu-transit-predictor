@@ -20,6 +20,7 @@ import argparse
 import datetime as dt
 import json
 import math
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -138,12 +139,26 @@ def night_slots(date: str) -> list[str]:
     return slots
 
 
+def _get_json(client: httpx.Client, url: str, params: dict, retries: int = 3):
+    """GET with retries: the runner occasionally loses the TLS handshake to Open-Meteo."""
+    detail = None
+    for attempt in range(max(1, retries)):
+        try:
+            return client.get(url, params=params).raise_for_status().json(), None
+        except (httpx.HTTPError, ValueError) as exc:
+            detail = f"{type(exc).__name__}: {exc}"
+            if attempt + 1 < max(1, retries):
+                time.sleep(1.5 * (attempt + 1))
+    return None, detail
+
+
 def _belongs(column: str, key: str) -> bool:
     """Open-Meteo suffixes ensemble columns with _ensemble / _eps when several are requested."""
     return any(column.endswith(suffix) for suffix in (f"_{key}", f"_{key}_ensemble", f"_{key}_eps"))
 
 
-def fetch_site(client: httpx.Client, site: Site, slots: list[str]) -> tuple[list[Series], dict]:
+def fetch_site(client: httpx.Client, site: Site, slots: list[str],
+               retries: int = 3) -> tuple[list[Series], dict]:
     det = [Series(spec, "det") for spec in DET_MODELS]
     ens = [Series(spec, "ens") for spec in ENS_MODELS]
     meta: dict = {"endpoints": {}, "errors": []}
@@ -157,10 +172,11 @@ def fetch_site(client: httpx.Client, site: Site, slots: list[str]) -> tuple[list
         "timezone": "Asia/Shanghai",
     }
     meta["endpoints"]["det"] = str(client.build_request("GET", FORECAST_URL, params=params).url)
-    try:
-        payload = client.get(FORECAST_URL, params=params).raise_for_status().json()
-    except (httpx.HTTPError, ValueError) as exc:
-        meta["errors"].append(f"deterministic: {type(exc).__name__}: {exc}")
+    payload, detail = _get_json(client, FORECAST_URL, params, retries)
+    if payload is None:
+        meta["errors"].append(f"deterministic: {detail}")
+        for series in det:
+            series.error = "请求失败（网络/超时）"
     else:
         hourly = payload["hourly"]
         index = {stamp: position for position, stamp in enumerate(hourly["time"])}
@@ -184,7 +200,8 @@ def fetch_site(client: httpx.Client, site: Site, slots: list[str]) -> tuple[list
                      if value is not None]
             series.last_valid = valid[-1] if valid else None
             if not series.total:
-                series.error = "目标夜已超出时效"
+                series.error = ("目标夜已超出时效" if series.last_valid
+                                else "接口返回空序列")
 
     params = {
         "latitude": site.latitude,
@@ -195,10 +212,11 @@ def fetch_site(client: httpx.Client, site: Site, slots: list[str]) -> tuple[list
         "timezone": "Asia/Shanghai",
     }
     meta["endpoints"]["ens"] = str(client.build_request("GET", ENSEMBLE_URL, params=params).url)
-    try:
-        payload = client.get(ENSEMBLE_URL, params=params).raise_for_status().json()
-    except (httpx.HTTPError, ValueError) as exc:
-        meta["errors"].append(f"ensemble: {type(exc).__name__}: {exc}")
+    payload, detail = _get_json(client, ENSEMBLE_URL, params, retries)
+    if payload is None:
+        meta["errors"].append(f"ensemble: {detail}")
+        for series in ens:
+            series.error = "请求失败（网络/超时）"
     else:
         hourly = payload["hourly"]
         index = {stamp: position for position, stamp in enumerate(hourly["time"])}
@@ -222,7 +240,8 @@ def fetch_site(client: httpx.Client, site: Site, slots: list[str]) -> tuple[list
                      if value is not None]
             series.last_valid = valid[-1] if valid else None
             if not series.members:
-                series.error = "目标夜已超出时效"
+                series.error = ("目标夜已超出时效" if series.last_valid
+                                else "接口返回空序列")
 
     return det + ens, meta
 
