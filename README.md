@@ -66,6 +66,18 @@ Actions cache 保存几何计算和星历；独立 `state` 分支持久保存压
 
 GitHub 定时任务可能延迟或丢弃，公共仓库无活动达 60 天可能被停用。实际数据更新会写入 state 分支，但平台不保证永久运行；可查看构建记录和 `manifest.generated_at`，必要时手动运行工作流。
 
+## 云量图（双子座流星雨）
+
+`app/geminids_cloud.py` 复用同一套 Open-Meteo 取数口径，为东滩、千岛湖、野鹿荡三个候选点画一张观测夜云量图：8 个确定性模式加权共识、4 个集合给概率、逐小时总云量，超出时效的源灰掉并标注它自己的最远时次（空白表示“还没报到”，不是“无云”）。
+
+```bash
+python -m pip install -e '.[chart]'
+python -m app.geminids_cloud --date 2026-12-12 --out charts --font-dir ~/.fonts
+python -m pytest -q tests/test_geminids_cloud.py
+```
+
+`.github/workflows/gemini-cloud.yml` 可手动触发（可指定日期与角标），在 Actions 里装图表依赖、下载 Noto Sans SC 字体、渲染并上传 `charts/<日期>/` 产物，不影响 `backend.yml` 的定时构建。matplotlib 只在 `chart` 可选依赖里，主构建不安装。
+
 ## 计算与验证
 
 SGP4 传播轨道，DE421 计算日月位置。搜索采用 60 秒有限轨迹弧、100 米校区网格和 25 米局部细化。筛选使用日月位置插值，最终最小角距及接触时间使用完整星历重新求解。出入凌是在选定观测位置上求时间根，接触搜索允许向两侧各扩展一小时。
