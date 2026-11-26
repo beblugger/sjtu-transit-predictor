@@ -36,6 +36,8 @@ CLEAR_THRESHOLD_PCT = 30.0
 GOOD_WINDOW_SCORE = 70.0
 # 少于这个小时数就不给"整夜"结论：3 小时的共识拿去排三地优劣是误导
 MIN_CONSENSUS_HOURS = 6
+# 中国无夏令时，固定 +08:00 就够；CI 机器是 UTC，不能直接 datetime.now()
+CST = dt.timezone(dt.timedelta(hours=8))
 
 
 @dataclass(frozen=True)
@@ -601,9 +603,9 @@ def render(verdicts: list[tuple[Site, dict]], slots: list[str], date: str, out_p
 def build(date: str, sites: tuple[Site, ...], out_dir: Path, label: str = "",
           font_dir: Path | None = None, today: dt.date | None = None,
           transport: httpx.BaseTransport | None = None) -> tuple[Path, list[tuple[Site, dict]]]:
-    today = today or dt.date.today()
+    rendered_at = dt.datetime.now(CST)
+    today = today or rendered_at.date()
     slots = night_slots(date)
-    rendered_at = dt.datetime.now()
     days_ahead = lead_days(date, today)
     verdicts: list[tuple[Site, dict]] = []
     meta_out: dict = {"date": date, "fetched_at": rendered_at.isoformat(timespec="seconds"),
