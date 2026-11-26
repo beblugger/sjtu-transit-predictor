@@ -353,8 +353,10 @@ def _draw_panel(ax, site: Site, verdict: dict, slots: list[str]) -> None:
                           f"{abs(site.longitude):.3f}°E",
             fontsize=8.8, color=C_TXT_FAINT, va="top", ha="left")
 
+    ens_hours = verdict.get("ens_hours", NIGHT_HOURS)
+    p_label = "P(云 < 30%)" if ens_hours >= NIGHT_HOURS else f"P(云 < 30%) · 集合 {ens_hours}h"
     for x, value, label, color in ((0.958, verdict["median_cloud"], "中位云量", C_TXT),
-                                   (0.792, verdict["p_clear"], "P(云 < 30%)", C_ACCENT)):
+                                   (0.792, verdict["p_clear"], p_label, C_ACCENT)):
         if value is None:
             ax.text(x, 0.958, "—", fontsize=15, color=C_TXT_FAINT, ha="right", va="center")
         else:
@@ -629,6 +631,7 @@ def build(date: str, sites: tuple[Site, ...], out_dir: Path, label: str = "",
             det_n, ens_n = len([item for item in det if item.total]), len(usable)
             coverage = (max(coverage[0], det_n), max(coverage[1], ens_n))
             hours = len(consensus)
+            ens_hours = max((len(item.members) for item in usable), default=0)
             if hours < MIN_CONSENSUS_HOURS:
                 median = None
 
@@ -657,7 +660,8 @@ def build(date: str, sites: tuple[Site, ...], out_dir: Path, label: str = "",
 
             verdicts.append((site, dict(rows=rows, scores=scores, median_cloud=median,
                                         p_clear=p_clear, headline=headline, detail=detail,
-                                        note=note, coverage=(det_n, ens_n), hours=hours)))
+                                        note=note, coverage=(det_n, ens_n), hours=hours,
+                                        ens_hours=ens_hours)))
             meta_out["sites"][site.key] = {
                 "meta": meta,
                 "sources": [dict(key=item.spec.key, label=item.spec.label, kind=item.kind,
