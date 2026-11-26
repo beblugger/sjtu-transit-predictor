@@ -160,6 +160,19 @@ def test_meta_records_endpoints_and_errors():
     assert all(not item.active for item in series)
 
 
+def test_partial_coverage_refuses_whole_night_verdict(tmp_path):
+    pytest.importorskip("matplotlib")
+    # Only 18:00-20:00 exist: three hours must not become a "night median".
+    values = {f"2026-12-12T{h:02d}:00": 100.0 for h in range(18, 21)}
+    _, verdicts = build("2026-12-12", SITES[:1], tmp_path, font_dir=None,
+                        today=dt.date(2026, 12, 10), transport=_mock_transport(values))
+    _, verdict = verdicts[0]
+    assert verdict["hours"] == 3
+    assert verdict["median_cloud"] is None
+    assert "3/12" in verdict["headline"]
+    assert verdict["note"]
+
+
 def test_build_writes_chart_and_metadata(tmp_path):
     pytest.importorskip("matplotlib")
     values = {f"2026-12-12T{h:02d}:00": 40.0 for h in range(18, 24)}

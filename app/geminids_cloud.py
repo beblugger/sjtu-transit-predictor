@@ -34,6 +34,8 @@ NIGHT_HOURS = 12
 DECAY_DAYS = 6.0
 CLEAR_THRESHOLD_PCT = 30.0
 GOOD_WINDOW_SCORE = 70.0
+# 少于这个小时数就不给"整夜"结论：3 小时的共识拿去排三地优劣是误导
+MIN_CONSENSUS_HOURS = 6
 
 
 @dataclass(frozen=True)
@@ -463,11 +465,12 @@ def _draw_panel(ax, site: Site, verdict: dict, slots: list[str]) -> None:
     ax.text(0.042, rule_y - 0.062, verdict["detail"], fontsize=8.5, color=C_TXT_DIM,
             va="top", ha="left", linespacing=1.65)
     if verdict.get("note"):
-        ax.text(0.042, max(rule_y - 0.132, 0.088), verdict["note"], fontsize=8.2,
-                color=C_WARN, va="top", ha="left")
-    ax.plot([0.042, 0.958], [0.056, 0.056], color=C_RULE, linewidth=0.8)
-    ax.text(0.042, 0.032, f"当晚实况复核：{site.metar} 逐 30 分钟 METAR　·　卫星看云团移动",
-            fontsize=7.8, color=C_TXT_FAINT, va="center", ha="left")
+        ax.text(0.042, rule_y - 0.112, verdict["note"], fontsize=8.2, color=C_WARN,
+                va="top", ha="left")
+    else:
+        ax.plot([0.042, 0.958], [0.056, 0.056], color=C_RULE, linewidth=0.8)
+        ax.text(0.042, 0.032, f"当晚实况复核：{site.metar} 逐 30 分钟 METAR　·　卫星看云团移动",
+                fontsize=7.8, color=C_TXT_FAINT, va="center", ha="left")
 
 
 def render(verdicts: list[tuple[Site, dict]], slots: list[str], date: str, out_png: Path,
@@ -520,7 +523,12 @@ def render(verdicts: list[tuple[Site, dict]], slots: list[str], date: str, out_p
                if verdict["median_cloud"] is not None]
     peaks = [(site, max(verdict["scores"].values())) for site, verdict in verdicts
              if verdict["scores"]]
-    if not peaks:
+    hours = [verdict.get("hours", 0) for _, verdict in verdicts]
+    if peaks and min(hours) < MIN_CONSENSUS_HOURS:
+        summary = (f"确定性模式只覆盖了 {max(hours)}/{NIGHT_HOURS} 小时，暂不排三地优劣"
+                   f" · 等 T-10 之后再判断")
+        summary_color = C_WARN
+    elif not peaks:
         if ens_count:
             summary = (f"目前只有 {ens_count} 个集合覆盖这一夜，还谈不到多源共识"
                        f" · 等 T-10 之后确定性模式到位再跑")
@@ -620,26 +628,36 @@ def build(date: str, sites: tuple[Site, ...], out_dir: Path, label: str = "",
 
             det_n, ens_n = len([item for item in det if item.total]), len(usable)
             coverage = (max(coverage[0], det_n), max(coverage[1], ens_n))
+            hours = len(consensus)
+            if hours < MIN_CONSENSUS_HOURS:
+                median = None
 
-            if window:
+            if window and hours >= MIN_CONSENSUS_HOURS:
                 headline = (f"最佳窗口 {window[0][11:16]} – {window[1][11:16]}"
                             f"　适宜度 {window_score:.0f}")
             elif not det_n and not ens_n:
                 headline = "时效未到，这一夜还没有任何模式"
             elif not det_n:
                 headline = "仅有集合覆盖，暂不给共识"
+            elif hours < MIN_CONSENSUS_HOURS:
+                headline = f"仅 {hours}/{NIGHT_HOURS} 小时有模式覆盖，不给整夜结论"
             else:
                 headline = "覆盖不完整，暂不给窗口"
 
-            detail = (f"{det_n}/8 确定性模式 + {ens_n}/4 集合参与；"
-                      f"{'样本充足' if det_n >= 5 else '样本偏少'}，"
-                      f"{'结论可作行程依据' if det_n >= 5 and days_ahead <= 5 else '仅作趋势参考'}。")
-            note = ("→ T-10 后再跑，届时 ECMWF / ICON / JMA 才覆盖到这一夜。"
-                    if det_n == 0 else None)
+            detail = (f"{det_n}/8 确定性模式 + {ens_n}/4 集合参与，共识覆盖 "
+                      f"{hours}/{NIGHT_HOURS} 小时；"
+                      f"{'样本充足' if det_n >= 5 and hours >= NIGHT_HOURS - 1 else '样本偏少'}，"
+                      f"{'结论可作行程依据' if det_n >= 5 and hours >= NIGHT_HOURS - 1 and days_ahead <= 5 else '仅作趋势参考'}。")
+            if det_n == 0:
+                note = "→ T-10 后再跑，届时 ECMWF / ICON / JMA 才覆盖到这一夜。"
+            elif hours < MIN_CONSENSUS_HOURS:
+                note = f"→ 现在只有前 {hours} 小时落在模式时效内，越靠近这一夜覆盖越完整。"
+            else:
+                note = None
 
             verdicts.append((site, dict(rows=rows, scores=scores, median_cloud=median,
                                         p_clear=p_clear, headline=headline, detail=detail,
-                                        note=note, coverage=(det_n, ens_n))))
+                                        note=note, coverage=(det_n, ens_n), hours=hours)))
             meta_out["sites"][site.key] = {
                 "meta": meta,
                 "sources": [dict(key=item.spec.key, label=item.spec.label, kind=item.kind,
