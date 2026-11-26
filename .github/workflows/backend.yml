@@ -6,6 +6,11 @@ on:
   schedule:
     - cron: '23 */2 * * *'
   workflow_dispatch:
+    inputs:
+      chart_dates:
+        description: '云量图观测夜（逗号分隔，Asia/Shanghai 日期）'
+        type: string
+        default: '2026-12-12,2026-12-13'
 
 concurrency:
   group: satellite-backend
@@ -23,6 +28,9 @@ jobs:
     env:
       TRANSIT_EPHEMERIS_PATH: /home/runner/.cache/sjtu-transit/de421.bsp
       GH_TOKEN: ${{ github.token }}
+      # 云量图：跟着卫星构建一起跑，但只出产物，不写进 Pages
+      CHART_DATES: ${{ inputs.chart_dates || '2026-12-12,2026-12-13' }}
+      FONT_SHA: f8d157532fbfaeda587e826d4cd5b21a49186f7c
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
@@ -62,6 +70,39 @@ jobs:
         run: python -m pytest -q
       - name: Test frontend data handling
         run: node --test tests/*.test.mjs
+      - name: Cache CJK fonts
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ runner.temp }}/fonts
+          key: noto-sans-sc-${{ env.FONT_SHA }}
+      - name: Fetch CJK fonts
+        shell: bash
+        run: |
+          font_dir="$RUNNER_TEMP/fonts"
+          mkdir -p "$font_dir"
+          base="https://raw.githubusercontent.com/notofonts/noto-cjk/${FONT_SHA}/Sans/SubsetOTF/SC"
+          for weight in Light Regular Bold; do
+            target="$font_dir/NotoSansSC-$weight.otf"
+            if [[ -s "$target" ]]; then continue; fi
+            curl --fail --location --retry 3 --max-time 180 \
+              "$base/NotoSansSC-$weight.otf" --output "$target"
+            test -s "$target"
+          done
+          echo "FONT_DIR=$font_dir" >> "$GITHUB_ENV"
+      - name: Render Geminids cloud chart
+        shell: bash
+        run: |
+          today="$(TZ=Asia/Shanghai date +%F)"
+          for date in ${CHART_DATES//,/ }; do
+            [[ -z "$date" ]] && continue
+            if [[ "$date" < "$today" ]]; then
+              echo "skip $date: night already past"
+              continue
+            fi
+            # 只是一步，不新增构建；只访问 Open-Meteo，不碰 CelesTrak
+            python -m app.geminids_cloud --date "$date" \
+              --font-dir "$FONT_DIR" --out "charts/$date"
+          done
       - name: Compute next 96 hours
         run: python -m app.export --database .state/transit.db --output dist/data --hours 96
       - name: Save durable inputs (including failed request attempts)
@@ -93,6 +134,10 @@ jobs:
           cp DESIGN.md dist/design.md
           cp THIRD_PARTY_NOTICES.md dist/third-party.md
           cp -R licenses dist/licenses
+          if [[ -d charts ]]; then
+            mkdir -p dist/charts
+            cp -R charts/. dist/charts/
+          fi
           touch dist/.nojekyll
       - name: Save calculation cache
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4

@@ -76,7 +76,16 @@ python -m app.geminids_cloud --date 2026-12-12 --out charts --font-dir ~/.fonts
 python -m pytest -q tests/test_geminids_cloud.py
 ```
 
-`.github/workflows/gemini-cloud.yml` 可手动触发（可指定日期与角标），在 Actions 里装图表依赖、下载 Noto Sans SC 字体、渲染并上传 `charts/<日期>/` 产物，不影响 `backend.yml` 的定时构建。matplotlib 只在 `chart` 可选依赖里，主构建不安装。
+这张图跟着 `backend.yml` 的两小时定时构建走：
+
+- 它不是独立 workflow，**不新增任何构建次数**——只是现有 job 里的一步，定时仍是每天 12 次；
+- 只访问 Open-Meteo，**不访问 CelesTrak 或任何卫星目录**，卫星侧的缓存冷却与每日下载上限不受影响；
+- 按 `FONT_SHA` 缓存 Noto Sans SC，渲染结果在 `dist/charts/<日期>/`，随同一次 Pages 发布上线：`https://beblugger.github.io/sjtu-transit-predictor/charts/2026-12-12/cloud_all.png`；
+- 已经过去的观测夜直接跳过，所以 12/13 之后这一步自动空转，站点上不再保留。
+
+手动运行时可以指定夜：`gh workflow run backend.yml -f chart_dates=2026-12-13`。
+
+matplotlib 只出现在 `chart` 可选依赖里。不需要这张图时，把 `Install backend` 的 `[dev,chart]` 改回 `[dev]`、删掉 font/render 两步和 `dist/charts` 的拷贝即可，其余构建不受影响。
 
 ## 计算与验证
 
